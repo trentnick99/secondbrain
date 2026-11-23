@@ -29,7 +29,7 @@ jobs:
       BUNDLE_ID: ${{ vars.BUNDLE_ID }}
       BUILD_NUMBER: ${{ github.run_number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check one-time setup
         env:
