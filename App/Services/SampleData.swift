@@ -49,7 +49,7 @@ enum SampleData {
         let spill = task("Wet floor by the dairy cooler — confirm cleanup and signage", kind: .issue, quadrant: .doFirst,
                          category: .safety, priority: .critical, due: today)
         spill.department = "Dairy"
-        _ = task("Cover two open front-end shifts for Saturday", quadrant: .doFirst, category: .people, priority: .high,
+        _ = task("Cover two open SCO shifts for Saturday", quadrant: .doFirst, category: .people, priority: .high,
                  due: at(0, 14), hasTime: true, reminder: at(0, 13, 30))
         _ = task("Check with Priya about her availability next week", kind: .followUp, quadrant: .schedule,
                  category: .people, due: day(1), reminder: at(1, 9), person: priya,
@@ -59,9 +59,9 @@ enum SampleData {
                  commitment: "Walk through it with him before lunch")
         _ = task("Talk to the overnight coach about the freight backlog", kind: .followUp, quadrant: .schedule,
                  category: .freight, due: day(1), person: sam)
-        _ = task("Prep notes for the district visit", quadrant: .schedule, category: .meeting, priority: .high, due: day(3))
+        _ = task("Market is coming — get the store tour ready", quadrant: .schedule, category: .meeting, priority: .high, due: day(3))
         _ = task("Build a cross-training plan for Marcus", quadrant: .schedule, category: .development, due: day(5), person: marcus)
-        _ = task("Review last week's results with the team", quadrant: .schedule, category: .admin, due: day(2))
+        _ = task("Review WTD sales, WOSH and VizPick % with the TLs", quadrant: .schedule, category: .admin, due: day(2))
         _ = task("Reprint missing shelf labels in aisle 12", quadrant: .delegate, category: .merchandising, due: today)
         let delegated = task("Routine price-change audit", quadrant: .delegate, category: .merchandising, due: day(1), person: avery)
         delegated.delegatedTo = "Avery Brooks"

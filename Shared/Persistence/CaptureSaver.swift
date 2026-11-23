@@ -140,7 +140,7 @@ enum CaptureSaver {
         let title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? draft.rawText.trimmingCharacters(in: .whitespacesAndNewlines)
             : draft.title
-        let isGroup = ["tls", "team leads", "coaches", "everyone", "the team"].contains(draft.associateName.lowercased())
+        let isGroup = StoreRole.isGroupName(draft.associateName)
         let person = isGroup ? nil : TaskActions.associate(named: draft.associateName, department: draft.department,
                                                            createIfMissing: true, in: context)
         if let person, !draft.department.isEmpty, person.department.isEmpty {

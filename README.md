@@ -23,6 +23,8 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 
 | Area | Highlights |
 |---|---|
+| **Your store** | Knows coach and team lead roles, the store manager, and areas like AP, ACC and OPD. "Have Jordan work the truck" hands a task to a team lead, and it stays Waiting until they confirm. A weekly 7–5 / 10–8 / 12–10 schedule drives "end of shift", briefings and End My Shift. |
+| **Store terms** | Capture understands Stock 1–3, CAP, O/N, MOD, department numbers, OPD and Fresh terms, and safety equipment. It also includes a searchable, offline reference of about 500 store terms, flagged when they're older, informal or vary by store. A gentle note appears if you start typing disciplinary, medical, attendance or AP case details. |
 | **Quick Capture** | A + button on every tab, plus a Control Center / Action button control, Siri and widget links. Type or speak (on-device speech). The capture is interpreted live: person, department, date, time, reminder, repeat, category, priority and quadrant. Anything ambiguous is shown for confirmation first. “Inbox” saves the raw text unchanged. |
 | **Home** | Today's top 3, overdue, Do First, follow-ups, due today, upcoming reminders, tomorrow and the rest of the week, recurring work, completed today, a daily briefing, and an **End My Shift** button. |
 | **Eisenhower Matrix** | A 2×2 overview with drag-and-drop between quadrants, and swipeable full-screen quadrants. Each suggestion explains its reasons. Safety and compliance work always stays important. Q4 items are never auto-deleted, and delegation is never assumed accepted. |
@@ -44,7 +46,7 @@ SecondBrain.xcodeproj      Ready-to-open project (Xcode 16+, synchronized folder
 App/                       iPhone app target (SwiftUI screens, services, App Intents, assets)
 Shared/                    Compiled into app + widget: SwiftData models, persistence, task rules, theme
 Widgets/                   WidgetKit extension (Home/Lock Screen widgets, Control Center control)
-Packages/SecondBrainCore/  Platform-independent engine + 73 unit tests (runs anywhere with `swift test`)
+Packages/SecondBrainCore/  Platform-independent engine + 119 unit tests (runs anywhere with `swift test`)
 Tests/UnitTests            SwiftData integration tests (Xcode)
 Tests/UITests              XCUITest end-to-end workflow (Xcode)
 Config/                    Info.plists, entitlements, Signing.xcconfig

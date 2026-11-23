@@ -176,7 +176,7 @@ public struct NaturalLanguageParser: Sendable {
             associateName = primary.name
             associateIsKnown = primary.isKnown
             associateIsRole = primary.isRole
-            if !primary.isKnown {
+            if !primary.isKnown && !(primary.isRole && StoreRole.isGroupName(primary.name)) {
                 let message = primary.isRole
                     ? "“\(primary.name)” isn't in Associates yet — it will be added as a contact."
                     : "“\(primary.name)” isn't in Associates yet — a new associate will be added."
@@ -271,7 +271,7 @@ public struct NaturalLanguageParser: Sendable {
                 let rest = ns.substring(from: target)
                 if needsTo {
                     // "ask Maria to zone…" (a request), not "ask Maria about her schedule" (a follow-up).
-                    guard Lexicon.regex(#"^\S+(?:\s+(?:[A-Z]\S*|TLs?|coach(?:es)?|leads?|manager))*\s+to\s+[a-z]"#, caseInsensitive: false)?
+                    guard Lexicon.regex(#"^\S+(?:\s+(?:[A-Z]\S*|[123]|TLs?|team|crew|coach(?:es)?|leads?|manager|on\s+duty))*\s+to\s+[a-z]"#, caseInsensitive: false)?
                         .firstMatch(in: rest, options: [], range: NSRange(location: 0, length: (rest as NSString).length)) != nil
                     else { continue }
                 } else if pattern.contains("have|get") {
@@ -299,6 +299,8 @@ public struct NaturalLanguageParser: Sendable {
         for (category, words) in Lexicon.categoryKeywords {
             var score = Lexicon.countMatches(lower, words)
             if category.isSafetyCritical { score *= 2 }
+            // "Check VizPick results" is reviewing a report, not working freight.
+            if category == .admin && Lexicon.containsAny(lower, Lexicon.performanceWords) { score += 1 }
             guard score > 0 else { continue }
             if let current = best {
                 if score > current.1 { best = (category, score) }

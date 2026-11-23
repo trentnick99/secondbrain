@@ -23,4 +23,6 @@
 - **iCloud sync** is wired and the model is CloudKit-compatible, but it needs the capability added at build time and hasn't been exercised across two devices.
 - **Apple Intelligence briefing** needs iOS 26 on an Apple Intelligence–capable iPhone. Otherwise the standard briefing is used.
 - **Week start** defaults to Saturday, since many retail schedules run Saturday–Friday. Change it in Settings.
+- **Store Terms is unofficial.** The reference was compiled from public employee discussions and retail references. Terms change and vary by store and market; entries are tagged older, informal or "varies" where known. Edit `StoreGlossary.swift` to correct or add terms.
+- **Privacy nudges are keyword-based.** They catch common phrasing ("write up", "DA", "NCNS", "FMLA"), not every way of describing sensitive information, and they never block saving.
 - **No employer integrations,** by design: no connection to internal systems, no scraping, no stored work credentials.

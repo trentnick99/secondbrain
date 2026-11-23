@@ -22,7 +22,11 @@ enum Lexicon {
         "ppe", "ladder", "ladders", "osha", "first aid", "trip hazard", "slip hazard", "blocked exit", "fire exit",
         "fire extinguisher", "extinguisher", "extinguishers", "eyewash", "chemical spill", "sds", "msds", "lockout",
         "tagout", "baler", "compactor", "forklift", "pallet jack", "safety observation", "safety observations",
-        "safety walk", "safety huddle", "fire marshal"
+        "safety walk", "safety huddle", "fire marshal",
+        "safety sweep", "safety committee", "safety champion", "near miss", "near misses", "loto", "lockout/tagout",
+        "lock out tag out", "pit", "ple", "pre-use", "pre-use inspection", "pre-use inspections", "equipment inspection",
+        "walkie stacker", "walkie rider", "electric pallet jack", "epj", "scissor lift", "ergonomics", "spill response",
+        "evacuation", "fire drill", "emergency action plan", "code adam", "code white", "code blue", "active threat"
     ]
 
     static let complianceWords = [
@@ -30,13 +34,19 @@ enum Lexicon {
         "temp check", "temp checks", "temperature check", "temperature checks", "food safety", "expired",
         "expiration", "date check", "date checks", "code date", "code dates", "out of date", "price accuracy",
         "regulation", "regulatory", "health inspection", "health inspector", "fire inspection", "mandatory",
-        "required training", "certification", "license", "licence"
+        "required training", "certification", "license", "licence",
+        "cold chain", "expiration pull", "expiration pulls", "date code", "date codes", "ulearn", "ulearns", "cbl", "cbls",
+        "meal exception", "meal exceptions", "wercs"
     ]
 
     static let performanceWords = [
         "results", "metrics", "numbers", "kpi", "kpis", "scores", "performance", "sales", "shrink",
         "productivity", "in-stock", "instock", "inventory accuracy", "on-hand accuracy", "survey scores",
-        "customer experience", "pick rate", "fill rate", "scorecard"
+        "customer experience", "pick rate", "fill rate", "scorecard",
+        "ftpr", "nil pick", "nil picks", "nil pick rate", "osa", "osca", "in-stock %", "splh", "uph", "pph", "wosh",
+        "nps", "5-star", "5 star", "comp sales", "wtd", "mtd", "qtd", "ytd", "yoy", "shrink %", "on-time pick",
+        "on time pick", "on-time delivery", "wait time", "wait times", "substitution rate", "physical inventory",
+        "pi prep", "labor", "variance", "turnover", "retention", "vizpick %", "topstock %", "overtime"
     ]
 
     static let accountabilityWords = [
@@ -51,13 +61,16 @@ enum Lexicon {
     static let leadershipWords = [
         "store manager", "market manager", "regional manager", "district manager", "co-manager", "comanager",
         "sm asked", "sm wants", "manager asked", "manager wants", "my manager", "boss", "market visit",
-        "regional visit", "store visit", "executive visit", "vp visit", "leadership", "corporate visit", "visit prep"
+        "regional visit", "store visit", "executive visit", "vp visit", "leadership", "corporate visit", "visit prep",
+        "market coach", "market is coming", "market coming", "regional is coming", "market walk", "market tour",
+        "store tour", "tour ready", "business review", "market call", "regional call", "sm needs", "sm said", "store lead"
     ]
 
     static let routineWords = [
         "routine", "status update", "status check", "check status", "zone", "zoning", "recovery", "facing",
         "price change", "price changes", "reprint", "print", "labels", "checklist", "paperwork", "data entry",
-        "fyi", "cycle count", "cycle counts", "routine inspection", "routine inspections"
+        "fyi", "cycle count", "cycle counts", "routine inspection", "routine inspections",
+        "fast zone", "facing up", "zoning up", "zone recovery"
     ]
 
     static let lowValueWords = [
@@ -71,7 +84,8 @@ enum Lexicon {
         "not working", "isn't working", "isnt working", "stopped working", "is down", "are down", "went down",
         "jammed", "blocked", "empty", "low on", "shortage", "short staffed", "short-staffed", "outage", "error",
         "problem", "issue", "malfunction", "malfunctioning", "failing", "failed", "overflowing", "stuck",
-        "doesn't work", "won't", "no power", "beeping"
+        "doesn't work", "won't", "no power", "beeping",
+        "phantom inventory", "negative on-hand", "negative on hand", "zero on-hand", "nil picks"
     ]
 
     static let actionStartVerbs: Set<String> = [
@@ -102,43 +116,56 @@ enum Lexicon {
             "shoutout", "shout out", "thank", "morale", "concern", "concerns", "question", "questions", "conflict",
             "associate", "associates", "staffing", "coverage", "short staffed", "hire", "hiring", "interview",
             "interviews", "onboarding", "new hire", "orientation", "1:1", "one on one", "one-on-one", "feedback",
-            "conversation", "punch", "punches", "time card", "timecard"
+            "conversation", "punch", "punches", "time card", "timecard", "ncns", "no call no show", "meal punch",
+            "time adjustment", "time adjustments", "ppto", "loa", "open availability", "availability change",
+            "schedule adherence", "headcount", "huddle with", "touch base", "cover", "covering"
         ]),
         (.development, [
             "training", "develop", "development", "coaching", "career", "growth", "mentor", "mentoring",
             "cross-train", "cross train", "learning", "skills", "promotion", "development plan", "evaluation",
-            "evaluations", "performance review"
+            "evaluations", "performance review", "cross-training", "ulearn", "academy", "succession", "bench",
+            "talent pipeline", "calibration", "coach trainee", "mit"
         ]),
         (.freight, [
             "freight", "truck", "trucks", "pallet", "pallets", "unload", "unloading", "backlog", "stock",
             "stocking", "overstock", "top stock", "topstock", "bins", "binning", "picking", "pick list", "capacity",
-            "cases", "totes", "rolltainer", "rolltainers", "steel", "backstock"
+            "cases", "totes", "rolltainer", "rolltainers", "steel", "backstock", "remix", "vizpick", "viz pick",
+            "picks", "pick walk", "downstack", "breakpack", "casepack", "condense", "rework", "freight flow",
+            "running freight", "working freight", "throwing freight", "throw freight", "working topstock",
+            "chasing picks", "bin audit", "bin audits", "overstock verification", "live freight", "unworked freight",
+            "dsd", "fdd", "hvdc", "rdc", "truck process", "mixed pallet", "mixed pallets", "replenishment"
         ]),
         (.merchandising, [
             "modular", "modulars", "mod", "mods", "feature", "features", "endcap", "endcaps", "display", "displays",
             "planogram", "pog", "signage", "price change", "price changes", "rollback", "rollbacks", "clearance",
             "markdown", "markdowns", "zone", "zoning", "out of stock", "outs", "labels", "reset", "resets",
-            "action alley", "seasonal set"
+            "action alley", "seasonal set", "mod set", "mod sets", "mod flex", "mod reset", "modular integrity",
+            "wing stack", "wing stacks", "sidekick", "sidekicks", "pdq", "pdqs", "stack base", "flexing", "plugging",
+            "feature-to-home", "feature to home", "fast zone", "zone recovery", "facing up", "secondary location",
+            "end of aisle", "seasonal transition", "feature quantity", "price change", "osa"
         ]),
         (.operations, [
             "clean", "cleaned", "cleaning", "cleanup", "clean up", "cleaned up", "maintenance", "broken", "repair",
             "repairs", "fix", "equipment", "cooler", "coolers", "freezer", "freezers", "leak", "leaking", "register",
             "registers", "scanner", "scanners", "handheld", "handhelds", "battery", "batteries", "printer", "lights",
             "door", "doors", "order", "ordering", "supplies", "supply", "bags", "trash", "cardboard", "keys",
-            "cash office", "till", "opening", "closing", "store walk", "walk the store", "carts"
+            "cash office", "till", "opening", "closing", "store walk", "walk the store", "carts", "baler", "bale",
+            "bales", "compactor", "clean backroom", "trailer", "trailers", "cash recycler", "tour ready",
+            "store ready", "customer ready", "walking the store"
         ]),
         (.customer, [
             "customer", "customers", "complaint", "complaints", "guest", "guests", "shopper", "shoppers", "refund",
-            "return", "returns", "special order", "customer experience"
+            "return", "returns", "special order", "customer experience", "price match", "price override", "nps",
+            "5-star", "wait time", "bopis", "dispense", "dispensing", "10-foot rule"
         ]),
         (.meeting, [
             "meeting", "meetings", "huddle", "conference", "agenda", "market visit", "store visit", "visit",
-            "presentation", "sync"
+            "presentation", "sync", "business review", "market call", "market walk", "store tour", "market tour"
         ]),
         (.admin, [
             "report", "reports", "email", "emails", "paperwork", "sign off", "approve", "approval", "submit",
             "results", "metrics", "numbers", "kpi", "kpis", "data", "spreadsheet", "payroll", "exceptions",
-            "scorecard"
+            "scorecard", "wtd", "mtd", "splh", "wosh", "budgeted hours", "on-hand adjustment", "isa", "labor"
         ])
     ]
 
@@ -175,7 +202,9 @@ enum Lexicon {
             "about", "with", "for", "to", "on", "at", "by", "from", "in", "of", "who", "what", "when", "where",
             "why", "how", "new", "old", "all", "everyone", "anyone", "someone", "somebody", "nobody", "him", "her",
             "his", "hers", "their", "mine", "yes", "no", "hi", "hey", "thanks", "thank", "due", "until", "end",
-            "first", "second", "third", "christmas", "thanksgiving", "easter", "halloween", "black"
+            "first", "second", "third", "christmas", "thanksgiving", "easter", "halloween", "black",
+            "code", "stock", "cap", "remix", "mod", "feature", "vizpick", "topstock", "freight", "huddle",
+            "regional", "green", "red", "dept", "department"
         ]
         words.formUnion(DepartmentLexicon.stopWords)
         return words

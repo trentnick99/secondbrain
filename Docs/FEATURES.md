@@ -13,7 +13,54 @@
 | 7. Complete a responsibility | Tap the circle on any row, swipe right, or use the widget checkbox | It's marked complete and logged. For a follow-up, the associate's history shows it resolved. |
 | 8. Review the weekly planner | Home › calendar icon › **Week** | Seven days (your week start, Saturday by default) with quadrant counts per day. Drag tasks between days. |
 | 9. Use End My Shift | Home › **End My Shift** | Shows completed, unfinished, overdue, open commitments, unconfirmed hand-offs, upcoming deadlines, Q2 work and suggested priorities for tomorrow |
-| 10. Carry unfinished tasks into tomorrow | **Carry all to tomorrow**, or per item **Tomorrow / Pick date / Done** | Each item keeps its time of day and reminder offset. Postponements are counted. Starred suggestions become tomorrow's top 3. Nothing is discarded. |
+| 10. Carry unfinished tasks into your next shift | **Carry all to next shift**, or per item **Next shift / Pick date / Done** | They move to your next scheduled shift, skipping days off. Each item keeps its time of day and reminder offset, and postponements are counted. Starred suggestions become that shift's top 3. Nothing is discarded. |
+
+## Your store and your schedule
+
+**Store vocabulary.** Capture understands how a store team talks:
+- **Roles:** "the store manager" or "the SM"; the fresh, food, fashion, AP, ACC, front end, digital/OPD, stocking and overnight coaches; "the fresh TL", "my TLs", "team leads".
+- **Areas:** Stocking, Overnight, Fresh, Food, Fashion, Front End, Digital (OPD), Asset Protection (AP) and Auto Care Center (ACC). These also appear first in every department picker, with sub-departments like Dairy and Produce below them.
+- **Store manager requests** count as important in the Matrix.
+
+**Delegating to team leads.** Say it the way you'd say it on the floor, and the hand-off shows in the preview:
+
+| You say | Result |
+|---|---|
+| "Have Jordan work the truck by end of shift" | A task handed to Jordan, due at your shift's end |
+| "Ask the fresh TL to check dates in dairy" | Handed to "Fresh TL" |
+| "Tell my TLs to work the steel at 2" | Handed to your TLs, as a group (no contact is created) |
+| "Delegate the price change audit to Avery" | Handed to Avery |
+| "Ask Maria about her schedule" | A **follow-up** you owe Maria, not a hand-off |
+
+A handed-off task shows as **Waiting** until you confirm the person took it on, because it's never assumed accepted. You can also delegate from any task (long-press › **Delegate…**). The picker lists your team leads first, then coaches and the store manager, then associates. End My Shift lists hand-offs that haven't been confirmed.
+
+**Store terms in Quick Capture.** Capture also understands everyday store language:
+
+| You say | Result |
+|---|---|
+| "Have Stock 2 work the remix tonight" | Handed to the Stock 2 team (Stocking, freight); no contact is created |
+| "Ask the O/N TL to finish the FDD freight" | Handed to the O/N TL (Overnight) |
+| "Tell the MOD the baler is full" | Linked to the Manager on Duty (lowercase "mod" stays a modular) |
+| "Dept 94 mod set by Friday" | Department: Produce (department numbers work as "dept 94", "department 94" or "D94") |
+| "Nil picks are up, review FTPR with Avery Friday" | Digital (OPD), important (performance) |
+| "Pre-use inspection on the walkie stacker" | Safety, always important |
+| "Temp logs and expiration pull on the meat wall" | Compliance, always important; Meat |
+| "Market is coming Thursday" | Important (leadership visit) |
+
+Teams and groups (Stock 1–3, CAP 1–3, "the overnight team", "my TLs", "the stocking TLs") can be handed work, but they never become contacts.
+
+**Store Terms reference.** Tap the book icon on Home (or Settings › Store terms) to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Second Brain". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
+
+**Privacy nudges.** If what you type in Quick Capture, a task, a note or a person's context looks like disciplinary detail ("write up", "DA"), attendance records ("NCNS", "attendance points"), medical or leave detail ("FMLA", "LOA"), an AP case, a password or WIN, or personal identifiers, a short note suggests keeping only the task and leaving the details in the approved system. It never blocks saving and never changes your text.
+
+**People by role.** Associates groups people as Store Manager, Coaches, Team Leads and Associates (with job titles like Stocker or Cashier), each with their area. To add a whole team at once, use **Add Several People**: choose a role and area, then enter one name per line. A team lead's page also shows the tasks handed to them that are still waiting.
+
+**Your weekly schedule.** In Settings › Your schedule (also part of the welcome steps), set each day to **7–5, 10–8, 12–10**, a custom time, or **Off**. Second Brain then:
+- **Matches phrases to your shifts:** "by end of shift" means 5 PM on a 7–5 day and 8 PM on a 10–8 day; "before I leave" works too. "First thing" means the start of your next shift, and "next shift" skips your days off.
+- **Times reminders to your shifts:** date-only items get a reminder at that day's shift start.
+- **Briefs you only on workdays:** the daily briefing arrives at the start of each scheduled shift.
+- **Flags days off:** you get a heads-up when something is due on a day you're off.
+- **Carries work to your next shift:** End My Shift moves unfinished work there, so items aren't dropped onto a day off. The Home header shows today's shift, or your next one on days off.
 
 ## Quick Capture
 

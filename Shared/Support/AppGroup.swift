@@ -53,4 +53,12 @@ enum DeepLink {
     static var overdue: URL { url("overdue") }
 
     static func task(_ id: UUID) -> URL { url("task/\(id.uuidString)") }
+
+    static func terms(_ query: String? = nil) -> URL {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = "terms"
+        if let query, !query.isEmpty { components.queryItems = [URLQueryItem(name: "q", value: query)] }
+        return components.url ?? url("terms")
+    }
 }

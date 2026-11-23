@@ -180,6 +180,7 @@ struct AssociateEditorView: View {
                 }
                 Section {
                     TextField("Short, non-sensitive context", text: $profileNote, axis: .vertical).lineLimit(2...5)
+                    SensitiveContentNotice(text: profileNote)
                 } header: {
                     Text("Context")
                 } footer: {

@@ -25,6 +25,7 @@ struct NoteEditorView: View {
                 TextField("Write your note…", text: $note.body, axis: .vertical)
                     .lineLimit(6...30)
                     .focused($bodyFocused)
+                SensitiveContentNotice(text: note.title + "\n" + note.body)
             }
 
             Section("Checklist") {

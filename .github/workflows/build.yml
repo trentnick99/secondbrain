@@ -46,7 +46,7 @@ jobs:
           swift --version
           echo "Xcode: $(xcodebuild -version | head -1)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Engine tests (SecondBrainCore, 73 tests)
+      - name: Engine tests (SecondBrainCore)
         run: swift test --package-path Packages/SecondBrainCore
 
       - name: Pick an iPhone simulator

@@ -28,6 +28,7 @@ struct TaskDetailView: View {
             matrixSection
             peopleSection
             if task.kind == .followUp { followUpSection }
+            TermsMentionedSection(text: task.title + "\n" + task.details)
             subtasksSection
             relatedSection
             calendarSection
@@ -96,6 +97,7 @@ struct TaskDetailView: View {
                 .accessibilityIdentifier("taskTitleField")
             TextField("Description", text: $task.details, axis: .vertical)
                 .lineLimit(2...8)
+            SensitiveContentNotice(text: task.title + "\n" + task.details)
             Picker("Type", selection: $task.kind) {
                 ForEach(TaskKind.allCases) { Label($0.title, systemImage: $0.systemImage).tag($0) }
             }

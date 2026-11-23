@@ -169,6 +169,17 @@ final class PersistenceTests: XCTestCase {
 
     func testGroupRolesDoNotBecomeAssociates() throws {
         _ = CaptureSaver.save(draft("Tell my TLs to work the truck at 2pm"), in: context)
+        _ = CaptureSaver.save(draft("Ask the stocking TLs to condense the bins"), in: context)
+        XCTAssertTrue(try context.fetch(FetchDescriptor<Associate>()).isEmpty)
+    }
+
+    func testHandOffToATeamWaitsWithoutCreatingAContact() throws {
+        let result = CaptureSaver.save(draft("Have Stock 2 work the remix tonight"), in: context)
+        guard case .task(let task)? = result else { return XCTFail("Expected a task") }
+        XCTAssertEqual(task.delegatedTo, "Stock 2")
+        XCTAssertEqual(task.status, .waiting)
+        XCTAssertFalse(task.delegationConfirmed)
+        XCTAssertEqual(task.department, "Stocking")
         XCTAssertTrue(try context.fetch(FetchDescriptor<Associate>()).isEmpty)
     }
 

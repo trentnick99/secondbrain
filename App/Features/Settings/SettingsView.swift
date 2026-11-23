@@ -40,6 +40,7 @@ struct SettingsView: View {
     @State private var confirmDeleteAll = false
     @State private var confirmDeleteAllAgain = false
     @State private var showRecurring = false
+    @State private var showStoreTerms = false
     @State private var calendarService = CalendarService.shared
 
     var body: some View {
@@ -60,6 +61,7 @@ struct SettingsView: View {
             Section {
                 Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
                 Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
+                Button { showStoreTerms = true } label: { Label("Store terms", systemImage: "character.book.closed") }
                 Picker("Appearance", selection: $appearance) {
                     ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
                 }
@@ -109,6 +111,7 @@ struct SettingsView: View {
                 }
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
+            .sheet(isPresented: $showStoreTerms) { StoreTermsView() }
     }
 
     // MARK: Sections
@@ -128,7 +131,7 @@ struct SettingsView: View {
         } header: {
             Text("Your schedule")
         } footer: {
-            Text("Set each day to 7–5, 10–8, 12–10, a custom time, or Off. Second Brain uses it for “end of shift”, “first thing” and “next shift”, sends the daily briefing at shift start on workdays only, and End My Shift carries unfinished work to your next shift.")
+            Text("Set each day to 7–5, 10–8, 12–10, a custom time, or Off. Second Brain uses it for “end of shift”, “first thing” and “next shift”, sends the daily briefing at shift start on workdays only, and End My Shift carries unfinished work to your next shift. The week starts Saturday by default, matching a Saturday–Friday business week.")
         }
     }
 

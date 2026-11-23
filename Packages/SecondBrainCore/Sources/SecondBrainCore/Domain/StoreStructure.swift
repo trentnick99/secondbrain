@@ -128,7 +128,7 @@ public enum StoreRole: String, Codable, CaseIterable, Identifiable, Sendable {
 
     public var pluralTitle: String {
         switch self {
-        case .storeManager: return "Store Manager"
+        case .storeManager: return "Store & Market Leaders"
         case .coach: return "Coaches"
         case .teamLead: return "Team Leads"
         case .associate: return "Associates"
@@ -155,12 +155,29 @@ public enum StoreRole: String, Codable, CaseIterable, Identifiable, Sendable {
 
     /// Reads a free-text role ("Fresh TL", "Cashier", "AP Coach") into a structural role.
     public static func infer(from text: String) -> StoreRole? {
-        let lower = " " + text.lowercased() + " "
-        if lower.contains("store manager") || lower.contains(" sm ") { return .storeManager }
+        let lower = " " + text.lowercased().replacingOccurrences(of: ",", with: " ") + " "
+        if lower.contains("store manager") || lower.contains(" sm ") || lower.contains("market ")
+            || lower.contains("regional ") || lower.contains(" store lead") { return .storeManager }
         if lower.contains("team lead") || lower.contains(" tl ") || lower.contains(" tls ") { return .teamLead }
-        if lower.contains("coach") { return .coach }
+        if lower.contains("coach") || lower.contains("people lead") || lower.contains(" pl ")
+            || lower.contains("co-manager") || lower.contains("comanager") || lower.contains(" asm ")
+            || lower.contains(" mit ") || lower.contains(" accm ") { return .coach }
         if text.trimmingCharacters(in: .whitespaces).isEmpty { return nil }
         return .associate
+    }
+
+    /// True when a name means a group rather than one person — "TLs", "Stocking TLs", "Stock 2",
+    /// "the overnight team" — so a hand-off to them doesn't create a contact.
+    public static func isGroupName(_ name: String) -> Bool {
+        let lower = name.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        if ["everyone", "the team", "team", "my team", "all hands", "o/n", "overnights", "manager on duty"].contains(lower) { return true }
+        let patterns = [
+            #"^(?:stock|cap)\s*[123]$"#,
+            #"(?:^|\s)(?:tls|team\s+leads|leads|coaches|associates|stockers|cashiers|team|crew|unloaders|pickers)$"#
+        ]
+        return patterns.contains { pattern in
+            lower.range(of: pattern, options: .regularExpression) != nil
+        }
     }
 }
 

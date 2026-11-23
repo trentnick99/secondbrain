@@ -52,6 +52,9 @@ struct DashboardView: View {
                         .accessibilityLabel("Daily and weekly planner")
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button { router.open(.storeTerms(nil)) } label: { Image(systemName: "character.book.closed") }
+                        .accessibilityLabel("Store terms")
+                        .accessibilityIdentifier("storeTermsButton")
                     Button { router.open(.weeklyReview) } label: { Image(systemName: "chart.bar.doc.horizontal") }
                         .accessibilityLabel("Weekly review")
                     Button { router.open(.settings) } label: { Image(systemName: "gearshape") }

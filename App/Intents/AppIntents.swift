@@ -40,6 +40,45 @@ struct AddReminderIntent: AppIntent {
     }
 }
 
+/// "Look up a store term in Second Brain" — Siri asks which term and reads the meaning.
+struct LookUpStoreTermIntent: AppIntent {
+    static var title: LocalizedStringResource = "Look Up a Store Term"
+    static var description = IntentDescription("Explains a store acronym or term, like FTPR, WOSH or remix. Works offline.")
+
+    @Parameter(title: "Term", requestValueDialog: IntentDialog("Which term?"))
+    var term: String
+
+    init() {}
+
+    init(term: String) { self.term = term }
+
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        .result(dialog: IntentDialog(stringLiteral: StoreTermAnswer.answer(for: term)))
+    }
+}
+
+/// Builds the spoken answer for a term lookup.
+enum StoreTermAnswer {
+    static func answer(for spoken: String) -> String {
+        let word = spoken.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !word.isEmpty else { return "Which term should I look up?" }
+        var matches = StoreGlossary.lookup(word)
+        if matches.isEmpty {
+            // Siri may hear "F T P R" or "ftp r" — try without spaces and dots, then a search.
+            let squeezed = word.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: ".", with: "")
+            matches = StoreGlossary.lookup(squeezed)
+            if matches.isEmpty, let best = StoreGlossary.search(word).first { matches = [best] }
+        }
+        guard let first = matches.first else { return "I don't have “\(word)” in Store Terms yet." }
+        if matches.count == 1 {
+            let note = first.usage.label.map { " (\($0.lowercased()))" } ?? ""
+            return "\(first.displayTerm): \(first.meaning)\(note)."
+        }
+        let meanings = matches.prefix(3).map { "\($0.meaning) — \($0.category.title)" }.joined(separator: "; or ")
+        return "\(first.term) can mean \(meanings)."
+    }
+}
+
 @MainActor
 enum IntentCapture {
     static func capture(_ text: String) -> String {
@@ -177,6 +216,10 @@ struct SecondBrainShortcuts: AppShortcutsProvider {
         AppShortcut(intent: EndShiftIntent(), phrases: [
             "End my shift in \(.applicationName)"
         ], shortTitle: "End My Shift", systemImageName: "moon.stars")
+        AppShortcut(intent: LookUpStoreTermIntent(), phrases: [
+            "Look up a store term in \(.applicationName)",
+            "What does a term mean in \(.applicationName)"
+        ], shortTitle: "Store Terms", systemImageName: "character.book.closed")
         AppShortcut(intent: OpenQuickCaptureIntent(), phrases: [
             "Quick capture in \(.applicationName)",
             "Open \(.applicationName) capture"

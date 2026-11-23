@@ -69,6 +69,27 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.buttons["Home"].waitForExistence(timeout: 3))
     }
 
+    func testStoreTermsLookup() throws {
+        let terms = app.buttons["storeTermsButton"].firstMatch
+        XCTAssertTrue(terms.waitForExistence(timeout: 5))
+        terms.tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("FTPR")
+        XCTAssertTrue(element(containing: "First Time Pick Rate").waitForExistence(timeout: 5))
+    }
+
+    func testCaptureNudgesAwayFromDisciplinaryDetail() throws {
+        app.buttons["quickCaptureButton"].firstMatch.tap()
+        XCTAssertTrue(captureField.waitForExistence(timeout: 3))
+        captureField.tap()
+        captureField.typeText("Write up Tasha for being late")
+        let notice = app.descendants(matching: .any).matching(identifier: "sensitiveNotice").firstMatch
+        XCTAssertTrue(notice.waitForExistence(timeout: 3), "A gentle privacy note appears; saving is still allowed")
+        XCTAssertTrue(app.buttons["captureSaveButton"].isEnabled)
+    }
+
     func testWeeklyPlannerOpens() throws {
         let planner = app.buttons["Daily and weekly planner"].firstMatch
         XCTAssertTrue(planner.waitForExistence(timeout: 5))

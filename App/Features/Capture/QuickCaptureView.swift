@@ -27,6 +27,7 @@ struct QuickCaptureView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     inputField
+                    SensitiveContentNotice(text: text)
                     kindChips
                     if !draft.isEmpty {
                         InterpretationCard(draft: draft, onAdjust: { showAdjust = true })
