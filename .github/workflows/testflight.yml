@@ -5,6 +5,12 @@ name: TestFlight
 # Run it from the Actions tab: TestFlight › Run workflow.
 on:
   workflow_dispatch:
+    inputs:
+      runner:
+        description: "Cloud Mac type (Intel is used by default because Apple-silicon capacity is often queued)"
+        type: choice
+        default: macos-26-intel
+        options: [macos-26-intel, macos-26, macos-15]
 
 concurrency:
   group: testflight
@@ -13,7 +19,8 @@ concurrency:
 jobs:
   testflight:
     name: Archive & upload to TestFlight
-    runs-on: macos-26
+    # Override for every run with a repository variable MAC_RUNNER (e.g. macos-26).
+    runs-on: ${{ inputs.runner || vars.MAC_RUNNER || 'macos-26-intel' }}
     timeout-minutes: 60
     env:
       TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}

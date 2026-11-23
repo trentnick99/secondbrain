@@ -93,6 +93,7 @@ TestFlight builds last 90 days. Every time you run the TestFlight workflow, a ne
 
 | What you see | What to do |
 |---|---|
+| Run stays *Queued*, then fails with “The job was not acquired by Runner…” | GitHub was out of that kind of cloud Mac. Use **Run workflow** and pick another **Cloud Mac type**, or set a repository variable `MAC_RUNNER` (for example `macos-26`) to change the default. The default is `macos-26-intel`. |
 | `Missing repository settings: …` | A secret or the `BUNDLE_ID` variable from step 7 is missing or misspelled |
 | `No profiles for '…' were found` / `doesn't include the App Groups entitlement` | Check step 4: both App IDs exist, both have App Groups ticked and assigned to `group.<BUNDLE_ID>` |
 | `You haven't been given access to cloud-managed distribution certificates` | The API key must have **Admin** access (step 6). Create a new key with Admin and update the three secrets. |
