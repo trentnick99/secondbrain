@@ -1,6 +1,8 @@
 # Installing Second Brain on your iPhone
 
-This project was built in a Linux environment, where iOS apps can't be compiled. **The app has not yet been compiled by Xcode or installed on a device.** The steps below are what you do on a Mac to build it, run the tests and put it on your iPhone. If Xcode reports a compile error on first build, see "If the first build fails" at the bottom.
+**No Mac?** Use [GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md) instead: GitHub's cloud Macs build the app and TestFlight installs it.
+
+The project builds cleanly with Xcode 26.6, which GitHub Actions checks on every push. The steps below are for building on your own Mac.
 
 ## What you need
 

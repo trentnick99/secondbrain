@@ -22,6 +22,7 @@
 | 11 | End My Shift and Weekly Review | ✅ |
 | 11 | Face ID lock, privacy previews, backup / restore, daily automatic backup, fictional sample data | ✅ |
 | 12 | Engine tests: 73/73 passing; syntax check of all files; project validation | ✅ |
-| 12 | Xcode build, integration tests and UI tests | ⏳ needs a Mac |
+| 12 | Xcode build (cloud Mac, Xcode 26.6) and 17 integration tests | ✅ GitHub Actions |
+| 12 | GitHub Actions: Build & Test on push; manual TestFlight upload | ✅ |
 | 13 | Installation, signing, backup, features, architecture, limitations, roadmap docs | ✅ |
-| 13 | Install on iPhone | ⏳ needs a Mac (see INSTALL.md) |
+| 13 | Install on iPhone | ⏳ TestFlight, after Apple Developer setup (see GITHUB_TESTFLIGHT.md) |

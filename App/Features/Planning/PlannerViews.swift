@@ -241,7 +241,8 @@ struct WeeklyPlannerView: View {
         let cal = Calendar.current
         let open = tasks.filter(\.isOpen)
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            // Lazy so off-screen days aren't built until scrolled to.
+            LazyVStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Button { weekOffset -= 1 } label: { Image(systemName: "chevron.left") }
                         .accessibilityLabel("Previous week")

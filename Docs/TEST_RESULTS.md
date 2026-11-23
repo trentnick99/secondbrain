@@ -1,21 +1,25 @@
 # Test results
 
-_Run on 2026-11-23 in the build environment (Linux x86_64, Swift 5.10.1). Xcode was not available there._
+## Cloud Mac (GitHub Actions) — 2026-11-23
 
-## Summary
+Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5**. Workflow: `.github/workflows/build.yml`.
 
-| Suite | Where it runs | Status here |
-|---|---|---|
-| **SecondBrainCoreTests**: 73 tests covering the parser, Eisenhower classifier, recurrence, agenda, End My Shift, weekly review, notification planner, rescheduling and commitment detection | `swift test` (Mac or Linux) and Xcode ⌘U | ✅ **73 / 73 passed** (0 failures, 0.28 s) |
-| **Swift syntax check**: every app, widget and test file (47 files) parsed with `swiftc -parse` | Linux | ✅ 47 / 47 parse cleanly |
-| **Project validation**: `project.pbxproj` parsed, all object references resolve, synchronized folders and file references exist, schemes, plists, entitlements and asset JSON are well-formed | `python3 scripts/validate_project.py` | ✅ valid |
-| **Symbol cross-check**: every `TaskActions`, `RecurrenceService`, `AppSettings`, … member referenced by the app exists | script | ✅ 0 unresolved |
-| **SecondBrainTests**: 17 SwiftData integration tests | Xcode, iOS Simulator | ⏳ **Not run.** These need Xcode on a Mac. |
-| **SecondBrainUITests**: 5 end-to-end UI tests | Xcode, iOS Simulator | ⏳ **Not run.** These need Xcode on a Mac. |
-| **Full app compile (SwiftUI / SwiftData / WidgetKit)** | Xcode | ⏳ **Not done.** The iOS SDK isn't available on Linux. |
-| **On-device checks**: notifications (open / background / suspended / closed / after restart), widgets, Siri, Face ID, speech | iPhone | ⏳ Manual checklist below |
+| Suite | Result |
+|---|---|
+| **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
+| **SecondBrainCoreTests**: 73 engine tests | ✅ **73 / 73 passed** |
+| **SecondBrainTests**: 17 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`) |
+| **SecondBrainUITests**: 5 end-to-end tests | See "UI tests" below |
+| **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
+| **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
-Nothing in this project claims to have been compiled by Xcode, installed on an iPhone or run on a simulator. Those steps happen on your Mac (see [INSTALL.md](INSTALL.md)).
+## Linux build environment — 2026-11-23
+
+| Check | Result |
+|---|---|
+| Engine tests (Swift 5.10.1, Linux) | ✅ 73 / 73 |
+| `swiftc -parse` on all app, widget and test files | ✅ |
+| Project validation (`scripts/validate_project.py`) | ✅ |
 
 ## Engine tests (passed)
 

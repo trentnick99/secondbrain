@@ -2,8 +2,9 @@
 
 ## Build & verification
 
-- **Not yet compiled by Xcode.** The project was produced in a Linux environment with no Xcode and no iOS SDK. The engine package compiles and passes 73 tests, every Swift file passes the Swift parser, and the project file was validated. The SwiftUI, SwiftData, WidgetKit and App Intents code still needs its first Xcode build, and a few small fixes from SDK differences are possible. The XCTest integration and UI tests haven't been run yet.
-- **Not installed on a device.** Notification delivery, widgets, Siri phrases, Face ID and speech capture need the manual checks listed in [TEST_RESULTS.md](TEST_RESULTS.md).
+- **Compiled and tested on a cloud Mac.** GitHub Actions with Xcode 26.6 builds the app, widget and tests, and the engine and SwiftData integration tests pass on an iOS 26.5 simulator. See [TEST_RESULTS.md](TEST_RESULTS.md).
+- **Not yet installed on a device.** Notification delivery, widgets, Siri phrases, Face ID and speech capture need the manual checks in [TEST_RESULTS.md](TEST_RESULTS.md) once the TestFlight build is installed.
+- **GitHub's Apple-silicon Macs were at capacity** during setup, so the workflows default to `macos-26-intel`. You can pick another runner when you start a run.
 
 ## Platform constraints (iOS rules)
 

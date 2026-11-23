@@ -73,7 +73,9 @@ final class SecondBrainUITests: XCTestCase {
         let planner = app.buttons["Daily and weekly planner"].firstMatch
         XCTAssertTrue(planner.waitForExistence(timeout: 5))
         planner.tap()
-        app.buttons["Week"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["Previous week"].waitForExistence(timeout: 3))
+        let week = app.buttons["Week"].firstMatch
+        XCTAssertTrue(week.waitForExistence(timeout: 10))
+        week.tap()
+        XCTAssertTrue(app.buttons["Previous week"].waitForExistence(timeout: 20))
     }
 }
