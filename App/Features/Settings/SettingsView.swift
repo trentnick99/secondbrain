@@ -44,35 +44,47 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                shiftSection
-                notificationSection
-                privacySection
-                intelligenceSection
-                calendarSection
-                dataSection
-                Section {
-                    Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
-                    Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
-                    Picker("Appearance", selection: $appearance) {
-                        ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
-                    }
+            dialogs(on: form)
+        }
+    }
+
+    /// The form plus its navigation chrome. Split from `dialogs(on:)` to keep type-checking fast.
+    private var form: some View {
+        Form {
+            shiftSection
+            notificationSection
+            privacySection
+            intelligenceSection
+            calendarSection
+            dataSection
+            Section {
+                Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
+                Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
+                Picker("Appearance", selection: $appearance) {
+                    ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
                 }
-                aboutSection
             }
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-            .task { await refreshStatus() }
-            .onChange(of: notifyReminders) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: notifyDeadlines) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: notifyOverdue) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: notifyBriefing) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: hidePreviews) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: showBadge) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: overdueGrace) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: shiftStart) { _, _ in NotificationService.shared.requestResync() }
-            .onChange(of: shiftEnd) { _, _ in NotificationService.shared.requestResync() }
+            aboutSection
+        }
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        .task { await refreshStatus() }
+        .onChange(of: resyncKey) { _, _ in NotificationService.shared.requestResync() }
+    }
+
+    /// Any setting that changes which notifications are scheduled.
+    private var resyncKey: [Int] {
+        [notifyReminders ? 1 : 0, notifyDeadlines ? 1 : 0, notifyOverdue ? 1 : 0, notifyBriefing ? 1 : 0,
+         hidePreviews ? 1 : 0, showBadge ? 1 : 0, overdueGrace, shiftStart, shiftEnd]
+    }
+
+    private var alertBinding: Binding<Bool> {
+        Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })
+    }
+
+    private func dialogs(on content: some View) -> some View {
+        content
             .fileExporter(isPresented: $showExporter, document: exportDocument, contentType: .json,
                           defaultFilename: "SecondBrain-Backup-\(NotificationPlannerKey.today())") { result in
                 if case .failure(let error) = result { alertMessage = "Export failed: \(error.localizedDescription)" }
@@ -80,9 +92,11 @@ struct SettingsView: View {
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.json]) { result in
                 importBackup(result)
             }
-            .alert("Second Brain", isPresented: Binding(get: { alertMessage != nil }, set: { if !$0 { alertMessage = nil } })) {
+            .alert("Second Brain", isPresented: alertBinding) {
                 Button("OK", role: .cancel) {}
-            } message: { Text(alertMessage ?? "") }
+            } message: {
+                Text(alertMessage ?? "")
+            }
             .confirmationDialog("Delete all Second Brain data?", isPresented: $confirmDeleteAll, titleVisibility: .visible) {
                 Button("Delete Everything", role: .destructive) { confirmDeleteAllAgain = true }
             } message: {
@@ -95,7 +109,6 @@ struct SettingsView: View {
                 }
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
-        }
     }
 
     // MARK: Sections
