@@ -1,0 +1,22 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.xcresult
+*.ipa
+*.xcarchive
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Never commit signing secrets
+*.p8
+*.p12
+*.mobileprovision
+AuthKey_*
+
+# macOS
+.DS_Store

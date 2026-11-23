@@ -1,0 +1,85 @@
+name: Build & Test
+
+# Compiles the app on a cloud Mac and runs the tests. No Apple account or signing needed.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["Docs/**", "**.md"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ui_tests:
+        description: "Also run the UI tests (slower)"
+        type: boolean
+        default: true
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & test on iPhone simulator
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+          echo "Xcode: $(xcodebuild -version | head -1)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Engine tests (SecondBrainCore, 73 tests)
+        run: swift test --package-path Packages/SecondBrainCore
+
+      - name: Pick an iPhone simulator
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available --json | python3 scripts/ci/pick_simulator.py)
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Compile app, widget and tests
+        run: |
+          scripts/ci/xcodebuild_step.sh "Compile" xcodebuild build-for-testing \
+            -project SecondBrain.xcodeproj -scheme SecondBrain \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Integration tests (SwiftData)
+        run: |
+          scripts/ci/xcodebuild_step.sh "Integration tests" xcodebuild test-without-building \
+            -project SecondBrain.xcodeproj -scheme SecondBrain \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath build/DerivedData \
+            -only-testing:SecondBrainTests \
+            -resultBundlePath build/IntegrationTests.xcresult
+
+      - name: UI tests (end-to-end workflow)
+        if: github.event_name == 'workflow_dispatch' && inputs.ui_tests
+        continue-on-error: true
+        run: |
+          scripts/ci/xcodebuild_step.sh "UI tests" xcodebuild test-without-building \
+            -project SecondBrain.xcodeproj -scheme SecondBrain \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -derivedDataPath build/DerivedData \
+            -only-testing:SecondBrainUITests \
+            -resultBundlePath build/UITests.xcresult
+
+      - name: Upload logs and test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ github.run_number }}
+          path: |
+            build/logs
+            build/*.xcresult
+          retention-days: 14
+          if-no-files-found: ignore

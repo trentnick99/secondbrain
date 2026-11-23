@@ -1,0 +1,86 @@
+# Alternative project definition for XcodeGen (https://github.com/yonaskolb/XcodeGen).
+# The committed SecondBrain.xcodeproj is ready to open; use this only if you prefer to regenerate:
+#   brew install xcodegen && xcodegen generate
+name: SecondBrain
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
+options:
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+packages:
+  SecondBrainCore:
+    path: Packages/SecondBrainCore
+targets:
+  SecondBrain:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+    dependencies:
+      - package: SecondBrainCore
+      - target: SecondBrainWidgets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BASE_BUNDLE_ID)
+        INFOPLIST_FILE: Config/SecondBrain-Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/SecondBrain.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          DEAD_CODE_STRIPPING: NO
+  SecondBrainWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widgets
+      - Shared
+    dependencies:
+      - package: SecondBrainCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BASE_BUNDLE_ID).widgets
+        INFOPLIST_FILE: Config/SecondBrainWidgets-Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/SecondBrainWidgets.entitlements
+        CODE_SIGN_STYLE: Automatic
+  SecondBrainTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests/UnitTests]
+    dependencies:
+      - target: SecondBrain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BASE_BUNDLE_ID).tests
+        GENERATE_INFOPLIST_FILE: YES
+  SecondBrainUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Tests/UITests]
+    dependencies:
+      - target: SecondBrain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BASE_BUNDLE_ID).uitests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  SecondBrain:
+    build:
+      targets:
+        SecondBrain: all
+    test:
+      targets:
+        - SecondBrainTests
+        - SecondBrainUITests
+        - package: SecondBrainCore/SecondBrainCoreTests

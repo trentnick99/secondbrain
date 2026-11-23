@@ -1,0 +1,13 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  Project Second Brain — signing configuration
+//
+//  1. Set DEVELOPMENT_TEAM to your Apple Developer Team ID
+//     (Xcode › Settings › Accounts › your Apple ID › Team ID, 10 characters).
+//  2. Change BASE_BUNDLE_ID to something unique to you, e.g. com.yourname.secondbrain
+//  Everything else (widget bundle id, App Group) is derived from these two values.
+//  See Docs/SIGNING.md for details.
+// ─────────────────────────────────────────────────────────────────────────────
+
+DEVELOPMENT_TEAM =
+BASE_BUNDLE_ID = com.example.secondbrain
+APP_GROUP_IDENTIFIER = group.$(BASE_BUNDLE_ID)
