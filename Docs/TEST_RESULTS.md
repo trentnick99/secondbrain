@@ -9,7 +9,7 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 | **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
 | **SecondBrainCoreTests**: 73 engine tests | ✅ **73 / 73 passed** |
 | **SecondBrainTests**: 17 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`) |
-| **SecondBrainUITests**: 5 end-to-end tests | See "UI tests" below |
+| **SecondBrainUITests**: 5 end-to-end tests (in-memory store, fictional data) | ✅ **5 / 5 passed**: Quick Capture saves a task; an ambiguous capture requires Confirm & Save; the Matrix shows all four quadrants; End My Shift carries unfinished work forward; the weekly planner opens. (The first run hit a UI-query timeout on the weekly planner; it passed after making the day list lazy.) |
 | **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
 | **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
