@@ -7,9 +7,9 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 | Suite | Result |
 |---|---|
 | **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
-| **SecondBrainCoreTests**: 73 engine tests | ✅ **73 / 73 passed** |
-| **SecondBrainTests**: 17 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`) |
-| **SecondBrainUITests**: 5 end-to-end tests (in-memory store, fictional data) | ✅ **5 / 5 passed**: Quick Capture saves a task; an ambiguous capture requires Confirm & Save; the Matrix shows all four quadrants; End My Shift carries unfinished work forward; the weekly planner opens. (The first run hit a UI-query timeout on the weekly planner; it passed after making the day list lazy.) |
+| **SecondBrainCoreTests**: 119 engine tests, including store terms, team hand-offs, department numbers and privacy notes | ✅ **119 / 119 passed** |
+| **SecondBrainTests**: 20 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`) |
+| **SecondBrainUITests**: 7 end-to-end tests (in-memory store, fictional data) | ✅ **7 / 7 passed** (run 45256280901): Quick Capture saves a task; an ambiguous capture requires Confirm & Save; the Matrix shows all four quadrants; End My Shift carries unfinished work forward; the weekly planner opens; Store Terms finds "FTPR"; disciplinary wording in Quick Capture shows the privacy note while still allowing save. In the run before, one test failed at setup because the simulator timed out launching the app. It passed on the re-run with no code changes. |
 | **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
 | **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
@@ -17,7 +17,7 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 
 | Check | Result |
 |---|---|
-| Engine tests (Swift 5.10.1, Linux) | ✅ 73 / 73 |
+| Engine tests (Swift 5.10.1, Linux) | ✅ 119 / 119 |
 | `swiftc -parse` on all app, widget and test files | ✅ |
 | Project validation (`scripts/validate_project.py`) | ✅ |
 
