@@ -6,7 +6,7 @@ import SecondBrainCore
 /// adjusted fields are "locked" so further typing doesn't overwrite them.
 struct CaptureDraft: Equatable {
     enum Field: Hashable {
-        case kind, title, associate, department, due, reminder, recurrence, quadrant, category, priority
+        case kind, title, associate, department, due, reminder, recurrence, quadrant, category, priority, delegate
     }
 
     var rawText: String = ""
@@ -29,6 +29,9 @@ struct CaptureDraft: Equatable {
     var recurrenceTimeMinutes: Int? = nil
     var request: String = ""
     var commitment: String = ""
+    /// "Have Jordan work the truck" → Jordan. Saved as waiting until the person confirms.
+    var delegateTo: String = ""
+    var delegateIsKnown: Bool = false
     var ambiguities: [CaptureAmbiguity] = []
     var notes: [String] = []
     var locked: Set<Field> = []
@@ -56,6 +59,8 @@ struct CaptureDraft: Equatable {
         recurrenceTimeMinutes = parsed.recurrenceTimeMinutes
         request = parsed.request ?? ""
         commitment = parsed.commitment ?? ""
+        delegateTo = parsed.delegateTo ?? ""
+        delegateIsKnown = parsed.delegateIsKnown
         ambiguities = parsed.ambiguities
         notes = parsed.notes
     }
@@ -74,6 +79,7 @@ struct CaptureDraft: Equatable {
         if locked.contains(.quadrant) { next.quadrant = quadrant; next.classificationReasons = ["Set manually"] }
         if locked.contains(.category) { next.category = category }
         if locked.contains(.priority) { next.priority = priority }
+        if locked.contains(.delegate) { next.delegateTo = delegateTo; next.delegateIsKnown = delegateIsKnown }
         // Ambiguities about fields the person already settled no longer apply.
         next.ambiguities = next.ambiguities.filter { a in
             switch a.field {
@@ -134,8 +140,9 @@ enum CaptureSaver {
         let title = draft.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? draft.rawText.trimmingCharacters(in: .whitespacesAndNewlines)
             : draft.title
-        let person = TaskActions.associate(named: draft.associateName, department: draft.department,
-                                           createIfMissing: true, in: context)
+        let isGroup = ["tls", "team leads", "coaches", "everyone", "the team"].contains(draft.associateName.lowercased())
+        let person = isGroup ? nil : TaskActions.associate(named: draft.associateName, department: draft.department,
+                                                           createIfMissing: true, in: context)
         if let person, !draft.department.isEmpty, person.department.isEmpty {
             person.department = draft.department
         }
@@ -186,6 +193,15 @@ enum CaptureSaver {
         context.insert(task)
         task.associate = person
         TaskActions.log(.created, "Captured", task: task, in: context)
+        let handOff = draft.delegateTo.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !handOff.isEmpty {
+            // Never assumed accepted: waiting until the person confirms.
+            task.delegatedTo = handOff
+            task.delegationConfirmed = false
+            task.waitingOn = handOff
+            task.status = .waiting
+            TaskActions.log(.delegated, "Handed to \(handOff) — awaiting confirmation", task: task, in: context)
+        }
         if let person {
             let kind: InteractionKind = taskKind == .followUp ? .request : .conversation
             TaskActions.logInteraction(kind, title, associate: person, task: task, in: context)

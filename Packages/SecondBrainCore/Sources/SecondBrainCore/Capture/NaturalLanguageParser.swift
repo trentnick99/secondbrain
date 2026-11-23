@@ -38,7 +38,15 @@ public struct NaturalLanguageParser: Sendable {
             }
         }
 
-        // 2. Schedule phrases
+        // 2. Schedule phrases ("next shift" first, so "next" isn't read as a weekday modifier)
+        var nextShiftDay: Date?
+        if let schedule = context.schedule,
+           let m = scan.firstMatch(#"\b(?:on\s+|at\s+the\s+start\s+of\s+|by\s+)?(?:my\s+|the\s+)?next\s+shift\b"#) {
+            scan.consume(m.range)
+            let day = schedule.nextWorkday(after: context.now, calendar: cal)
+            nextShiftDay = day
+            notes.append("“next shift” → \(RelativeDateText.dayLabel(for: day, now: context.now, calendar: cal))")
+        }
         let recurrence = ScheduleExtraction.recurrence(scan, context, &ambiguities)
         let time = ScheduleExtraction.time(scan, context, &ambiguities, &notes)
         let dateHit = ScheduleExtraction.date(scan, context, &ambiguities, &notes)
@@ -48,9 +56,12 @@ public struct NaturalLanguageParser: Sendable {
         let primary = people.first
         let department = DepartmentLexicon.match(in: normalized)
 
-        // 4. Kind
+        let delegate = Self.detectDelegation(scan: scan, people: people)
+
+        // 4. Kind (a hand-off is a task you're waiting on, not a follow-up you owe)
         let lower = " " + normalized.lowercased() + " "
-        let kind = explicitKind ?? Self.inferKind(text: normalized, lower: lower, hasPerson: primary != nil)
+        var kind = explicitKind ?? Self.inferKind(text: normalized, lower: lower, hasPerson: primary != nil)
+        if delegate != nil && explicitKind == nil && kind == .followUp { kind = .task }
 
         // 5. Category and priority
         let category = Self.inferCategory(lower: lower, kind: kind)
@@ -85,9 +96,27 @@ public struct NaturalLanguageParser: Sendable {
             hasDueTime = true
             reminderDate = absolute
             reminderSource = .relative
+        } else if let anchor = time?.shiftAnchor, let schedule = context.schedule {
+            // "by end of shift", "first thing" — follow the schedule for that day.
+            func minutes(on day: Date) -> Int {
+                anchor == .end
+                    ? schedule.endMinutes(on: day, calendar: cal, fallback: context.shiftEndMinutes)
+                    : schedule.startMinutes(on: day, calendar: cal, fallback: context.shiftStartMinutes)
+            }
+            if let explicitDay = dateHit?.date ?? nextShiftDay {
+                let day = math.startOfDay(explicitDay)
+                dueDate = math.date(on: day, minutes: minutes(on: day))
+            } else {
+                var day = schedule.currentOrNextWorkday(context.now, calendar: cal)
+                if math.date(on: day, minutes: minutes(on: day)) <= context.now {
+                    day = schedule.nextWorkday(after: day, calendar: cal)
+                }
+                dueDate = math.date(on: day, minutes: minutes(on: day))
+            }
+            hasDueTime = true
         } else if let minutes = time?.minutes {
-            if let dateHit {
-                dueDate = math.date(on: dateHit.date, minutes: minutes)
+            if let explicitDay = dateHit?.date ?? nextShiftDay {
+                dueDate = math.date(on: explicitDay, minutes: minutes)
             } else if time?.impliesToday == true {
                 dueDate = math.date(on: today, minutes: minutes)
             } else {
@@ -103,6 +132,13 @@ public struct NaturalLanguageParser: Sendable {
             hasDueTime = true
         } else if let dateHit {
             dueDate = math.startOfDay(dateHit.date)
+        } else if let nextShiftDay {
+            dueDate = nextShiftDay
+        }
+
+        if let due = dueDate, let schedule = context.schedule, recurrence == nil,
+           !schedule.isWorkday(due, calendar: cal), !(time?.absolute != nil) {
+            notes.append("Heads up: you're off \(RelativeDateText.dayLabel(for: due, now: context.now, calendar: cal)) on your schedule.")
         }
 
         if let due = dueDate, hasDueTime, due < context.now, reminderSource != .relative {
@@ -116,7 +152,10 @@ public struct NaturalLanguageParser: Sendable {
                     reminderDate = due
                     reminderSource = .explicitTime
                 }
-            } else if let defaultMinutes = context.defaultReminderMinutes {
+            } else if var defaultMinutes = context.defaultReminderMinutes {
+                if context.defaultReminderAtShiftStart, let shift = context.schedule?.shift(on: due, calendar: cal) {
+                    defaultMinutes = shift.startMinutes
+                }
                 let candidate = math.date(on: due, minutes: defaultMinutes)
                 if candidate > context.now {
                     reminderDate = candidate
@@ -156,6 +195,10 @@ public struct NaturalLanguageParser: Sendable {
             if !normalized.isEmpty {
                 ambiguities.append(CaptureAmbiguity(field: .kind, message: "Add a few words describing what needs to happen."))
             }
+        }
+
+        if let delegate {
+            notes.append("Hand-off to \(delegate.name) — shows as waiting until they confirm.")
         }
 
         var request: String?
@@ -199,8 +242,47 @@ public struct NaturalLanguageParser: Sendable {
             notes: notes,
             matchedPhrases: scan.phrases,
             request: request,
-            commitment: commitment
+            commitment: commitment,
+            delegateTo: delegate?.name,
+            delegateIsKnown: delegate?.isKnown ?? false
         )
+    }
+
+    // MARK: - Delegation
+
+    /// "have Maria zone aisle 5", "ask the fresh TL to check dates", "delegate this to Jordan",
+    /// "tell my TLs to work the truck". The target must be a person or role the parser found.
+    static func detectDelegation(scan: CaptureScan, people: [PersonHit]) -> PersonHit? {
+        guard !people.isEmpty else { return nil }
+        let text = scan.text
+        let ns = scan.ns
+        let determiner = #"(?:the\s+|my\s+|our\s+)?"#
+        let patterns: [(String, Bool)] = [
+            (#"\b(?:delegate|assign|hand\s+off|hand)\b[^.!?]{0,60}?\bto\s+"# + determiner + #"(\S)"#, false),
+            (#"\b(?:give|pass)\s+(?:this|it|that)\s+(?:off\s+)?to\s+"# + determiner + #"(\S)"#, false),
+            (#"\b(?:have|get)\s+"# + determiner + #"(\S)"#, false),
+            (#"\b(?:ask|tell)\s+"# + determiner + #"(\S)"#, true)
+        ]
+        for (pattern, needsTo) in patterns {
+            guard let regex = Lexicon.regex(pattern, caseInsensitive: true) else { continue }
+            for m in regex.matches(in: text, options: [], range: NSRange(location: 0, length: ns.length)) {
+                let target = m.range(at: 1).location
+                guard let hit = people.first(where: { $0.location == target }) else { continue }
+                let rest = ns.substring(from: target)
+                if needsTo {
+                    // "ask Maria to zone…" (a request), not "ask Maria about her schedule" (a follow-up).
+                    guard Lexicon.regex(#"^\S+(?:\s+(?:[A-Z]\S*|TLs?|coach(?:es)?|leads?|manager))*\s+to\s+[a-z]"#, caseInsensitive: false)?
+                        .firstMatch(in: rest, options: [], range: NSRange(location: 0, length: (rest as NSString).length)) != nil
+                    else { continue }
+                } else if pattern.contains("have|get") {
+                    // "have Maria zone…" — not "get Maria's schedule" / "have John about…".
+                    if Lexicon.regex(#"^\S+(?:['’]s\b|\s+(?:about|with|on|for)\b)"#, caseInsensitive: true)?
+                        .firstMatch(in: rest, options: [], range: NSRange(location: 0, length: (rest as NSString).length)) != nil { continue }
+                }
+                return hit
+            }
+        }
+        return nil
     }
 
     // MARK: - Inference helpers

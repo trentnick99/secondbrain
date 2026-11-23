@@ -81,8 +81,10 @@ public enum Rescheduler {
         return RescheduleResult(dueDate: newDue, hasDueTime: hasDueTime && dueDate != nil, reminderDate: newReminder, isPostponement: postponed)
     }
 
-    /// The default "carry forward" target from End My Shift: the next day.
-    public static func carryForwardDay(now: Date, calendar: Calendar) -> Date {
+    /// The default "carry forward" target from End My Shift: the next scheduled workday
+    /// (or simply the next day when no schedule is set).
+    public static func carryForwardDay(now: Date, calendar: Calendar, schedule: ShiftSchedule? = nil) -> Date {
+        if let schedule { return schedule.nextWorkday(after: now, calendar: calendar) }
         let math = DateMath(calendar: calendar)
         return math.addingDays(1, to: math.startOfDay(now))
     }

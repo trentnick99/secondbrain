@@ -44,6 +44,22 @@ struct CaptureAdjustSheet: View {
                         }
                         .disabled(newPersonName.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
+                    if !draft.createsNote {
+                        HStack {
+                            TextField("Hand off to (optional)", text: bind(\.delegateTo, .delegate))
+                                .textInputAutocapitalization(.words)
+                            Menu {
+                                Button("No one") { draft.delegateTo = ""; draft.locked.insert(.delegate) }
+                                ForEach(associates.filter { !$0.isArchived && $0.storeRole == .teamLead }) { lead in
+                                    Button(lead.roleLine.isEmpty ? lead.name : "\(lead.name) — \(lead.department)") {
+                                        draft.delegateTo = lead.name
+                                        draft.locked.insert(.delegate)
+                                    }
+                                }
+                            } label: { Image(systemName: "person.2.circle") }
+                            .accessibilityLabel("Pick a team lead")
+                        }
+                    }
                     Picker("Department", selection: bind(\.department, .department)) {
                         Text("None").tag("")
                         ForEach(DepartmentLexicon.allNames, id: \.self) { Text($0).tag($0) }

@@ -18,6 +18,9 @@ public struct NotificationPreferences: Equatable, Sendable {
     public var maxPending: Int
     /// How many days of daily briefings to schedule ahead.
     public var briefingDaysAhead: Int
+    /// When set, briefings go out only on workdays at that day's shift start, and "still open"
+    /// nudges for date-only items fire at that day's shift end.
+    public var schedule: ShiftSchedule?
 
     public init(remindersEnabled: Bool = true,
                 deadlineAlertsEnabled: Bool = true,
@@ -28,7 +31,8 @@ public struct NotificationPreferences: Equatable, Sendable {
                 overdueGraceMinutes: Int = 60,
                 hidePreviews: Bool = false,
                 maxPending: Int = 60,
-                briefingDaysAhead: Int = 7) {
+                briefingDaysAhead: Int = 7,
+                schedule: ShiftSchedule? = nil) {
         self.remindersEnabled = remindersEnabled
         self.deadlineAlertsEnabled = deadlineAlertsEnabled
         self.overdueAlertsEnabled = overdueAlertsEnabled
@@ -39,6 +43,7 @@ public struct NotificationPreferences: Equatable, Sendable {
         self.hidePreviews = hidePreviews
         self.maxPending = max(1, min(64, maxPending))
         self.briefingDaysAhead = max(0, min(14, briefingDaysAhead))
+        self.schedule = schedule
     }
 }
 
@@ -135,7 +140,9 @@ public enum NotificationPlanner {
                 if task.hasDueTime {
                     fire = math.addingMinutes(preferences.overdueGraceMinutes, to: due)
                 } else {
-                    fire = math.date(on: due, minutes: preferences.shiftEndMinutes)
+                    let end = preferences.schedule?.endMinutes(on: due, calendar: calendar, fallback: preferences.shiftEndMinutes)
+                        ?? preferences.shiftEndMinutes
+                    fire = math.date(on: due, minutes: end)
                 }
                 if fire > now {
                     let whenText = task.hasDueTime
@@ -160,7 +167,12 @@ public enum NotificationPlanner {
             let today = math.startOfDay(now)
             for offset in 0..<max(preferences.briefingDaysAhead, 0) {
                 let day = math.addingDays(offset, to: today)
-                let fire = math.date(on: day, minutes: preferences.briefingMinutes)
+                var startMinutes = preferences.briefingMinutes
+                if let schedule = preferences.schedule {
+                    guard let shift = schedule.shift(on: day, calendar: calendar) else { continue }   // day off
+                    startMinutes = shift.startMinutes
+                }
+                let fire = math.date(on: day, minutes: startMinutes)
                 guard fire > now else { continue }
                 let agenda = DayAgenda.build(tasks: tasks, day: day, now: fire, calendar: calendar)
                 let counts = BriefingBuilder.countsLine(agenda)

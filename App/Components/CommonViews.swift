@@ -163,7 +163,7 @@ struct Chip: View {
 struct PrivacyReminder: View {
     var body: some View {
         Label {
-            Text("Personal organizer only. Don't store medical details, disciplinary records, passwords or confidential personnel information.")
+            Text("Personal organizer only. Don't store medical details, disciplinary records, asset-protection case details, passwords or confidential personnel information.")
         } icon: {
             Image(systemName: "hand.raised")
         }

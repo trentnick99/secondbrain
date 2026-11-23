@@ -11,8 +11,8 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @Environment(AppRouter.self) private var router
 
-    @AppStorage(SettingsKey.shiftStartMinutes, store: AppGroup.defaults) private var shiftStart = SettingsDefault.shiftStartMinutes
-    @AppStorage(SettingsKey.shiftEndMinutes, store: AppGroup.defaults) private var shiftEnd = SettingsDefault.shiftEndMinutes
+    @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
+    @AppStorage(SettingsKey.reminderAtShiftStart, store: AppGroup.defaults) private var reminderAtShiftStart = SettingsDefault.reminderAtShiftStart
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @AppStorage(SettingsKey.defaultReminderEnabled, store: AppGroup.defaults) private var defaultReminderEnabled = SettingsDefault.defaultReminderEnabled
     @AppStorage(SettingsKey.defaultReminderMinutes, store: AppGroup.defaults) private var defaultReminderMinutes = SettingsDefault.defaultReminderMinutes
@@ -74,9 +74,9 @@ struct SettingsView: View {
     }
 
     /// Any setting that changes which notifications are scheduled.
-    private var resyncKey: [Int] {
-        [notifyReminders ? 1 : 0, notifyDeadlines ? 1 : 0, notifyOverdue ? 1 : 0, notifyBriefing ? 1 : 0,
-         hidePreviews ? 1 : 0, showBadge ? 1 : 0, overdueGrace, shiftStart, shiftEnd]
+    private var resyncKey: [String] {
+        [notifyReminders, notifyDeadlines, notifyOverdue, notifyBriefing, hidePreviews, showBadge]
+            .map { $0 ? "1" : "0" } + [String(overdueGrace), scheduleJSON]
     }
 
     private var alertBinding: Binding<Bool> {
@@ -115,19 +115,20 @@ struct SettingsView: View {
 
     private var shiftSection: some View {
         Section {
-            DatePicker("Shift starts", selection: minutesBinding($shiftStart), displayedComponents: .hourAndMinute)
-            DatePicker("Shift ends", selection: minutesBinding($shiftEnd), displayedComponents: .hourAndMinute)
+            ScheduleEditor(scheduleJSON: $scheduleJSON, weekStartsOn: weekStartsOn)
             Picker("Week starts on", selection: $weekStartsOn) {
                 ForEach(1...7, id: \.self) { day in Text(Calendar.current.weekdaySymbols[day - 1]).tag(day) }
             }
             Toggle("Default reminder for dated items", isOn: $defaultReminderEnabled)
             if defaultReminderEnabled {
-                DatePicker("Default reminder time", selection: minutesBinding($defaultReminderMinutes), displayedComponents: .hourAndMinute)
+                Toggle("At the start of that day's shift", isOn: $reminderAtShiftStart)
+                DatePicker(reminderAtShiftStart ? "On days off" : "Default reminder time",
+                           selection: minutesBinding($defaultReminderMinutes), displayedComponents: .hourAndMinute)
             }
         } header: {
-            Text("Your shift")
+            Text("Your schedule")
         } footer: {
-            Text("Used for “end of shift”, the daily briefing, “tomorrow morning” snoozes, and to read times like “at 3”. A default reminder is shown in Quick Capture before saving.")
+            Text("Set each day to 7–5, 10–8, 12–10, a custom time, or Off. Second Brain uses it for “end of shift”, “first thing” and “next shift”, sends the daily briefing at shift start on workdays only, and End My Shift carries unfinished work to your next shift.")
         }
     }
 

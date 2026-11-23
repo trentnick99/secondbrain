@@ -41,6 +41,7 @@ struct AssociateDetailView: View {
             }
 
             taskSection("Open follow-ups", associate.openFollowUps, empty: "No open follow-ups.")
+            taskSection("Handed to \(associate.name.split(separator: " ").first.map(String.init) ?? associate.name) · waiting", handedOff, empty: nil)
             taskSection("Other open tasks", associate.otherOpenTasks, empty: nil)
 
             if !associate.sortedNotes.isEmpty {
@@ -106,6 +107,19 @@ struct AssociateDetailView: View {
         }
     }
 
+    /// Open tasks delegated to this person (by name), whether or not they're linked.
+    private var handedOff: [TaskItem] {
+        let name = associate.name.lowercased()
+        let first = associate.name.split(separator: " ").first.map { $0.lowercased() } ?? name
+        let descriptor = FetchDescriptor<TaskItem>()
+        let all = (try? context.fetch(descriptor)) ?? []
+        return all.filter { t in
+            guard t.isOpen, !t.delegatedTo.isEmpty else { return false }
+            let d = t.delegatedTo.lowercased()
+            return d == name || d == first
+        }
+    }
+
     private func actionButton(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 4) {
@@ -134,6 +148,7 @@ struct AssociateEditorView: View {
     @State private var name = ""
     @State private var department = ""
     @State private var role = ""
+    @State private var roleKind: StoreRole?
     @State private var profileNote = ""
     @State private var isArchived = false
 
@@ -143,8 +158,21 @@ struct AssociateEditorView: View {
                 Section {
                     TextField("Name or identifier", text: $name)
                         .textInputAutocapitalization(.words)
-                    TextField("Role (optional)", text: $role)
-                    Picker("Department", selection: $department) {
+                    Picker("Role", selection: $roleKind) {
+                        Text("Not set").tag(StoreRole?.none)
+                        ForEach(StoreRole.allCases) { Text($0.title).tag(Optional($0)) }
+                    }
+                    if roleKind == .associate {
+                        TextField("Job title (e.g. Stocker, Cashier)", text: $role)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(StoreAreas.associateTitles, id: \.self) { title in
+                                    Chip(title: title, isSelected: role == title) { role = title }
+                                }
+                            }
+                        }
+                    }
+                    Picker("Area / department", selection: $department) {
                         Text("None").tag("")
                         ForEach(DepartmentLexicon.allNames, id: \.self) { Text($0).tag($0) }
                         if !department.isEmpty && !DepartmentLexicon.allNames.contains(department) { Text(department).tag(department) }
@@ -175,7 +203,9 @@ struct AssociateEditorView: View {
             }
             .onAppear {
                 if let a = associate {
-                    name = a.name; department = a.department; role = a.role; profileNote = a.profileNote; isArchived = a.isArchived
+                    name = a.name; department = a.department; profileNote = a.profileNote; isArchived = a.isArchived
+                    roleKind = a.storeRole
+                    role = a.storeRole == .associate ? a.role : ""
                 }
             }
         }
@@ -194,7 +224,11 @@ struct AssociateEditorView: View {
         }
         target.name = trimmed
         target.department = department
-        target.role = role
+        switch roleKind {
+        case .associate?: target.role = role.trimmingCharacters(in: .whitespaces).isEmpty ? "Associate" : role
+        case let kind?: target.role = kind.title
+        case nil: target.role = ""
+        }
         target.profileNote = profileNote
         target.isArchived = isArchived
         target.updatedAt = Date()

@@ -173,7 +173,8 @@ enum TaskActions {
     }
 
     static func snooze(_ task: TaskItem, option: SnoozeOption, in context: ModelContext, now: Date = Date()) {
-        let date = option.date(from: now, morningMinutes: AppSettings.shiftStartMinutes, calendar: .current)
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? now
+        let date = option.date(from: now, morningMinutes: AppSettings.shiftStartMinutes(on: tomorrow), calendar: .current)
         snooze(task, until: date, label: option.title, in: context)
     }
 

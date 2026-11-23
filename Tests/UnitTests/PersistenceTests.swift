@@ -153,6 +153,25 @@ final class PersistenceTests: XCTestCase {
         XCTAssertTrue(task.delegationConfirmed)
     }
 
+    func testCapturedHandOffWaitsForConfirmation() throws {
+        let lead = Associate(name: "Jordan Ellis", department: "Stocking", role: "Team Lead")
+        context.insert(lead)
+        try context.save()
+        let result = CaptureSaver.save(draft("Have Jordan work the truck by end of shift", known: ["Jordan Ellis"]), in: context)
+        guard case .task(let task)? = result else { return XCTFail("Expected a task") }
+        XCTAssertEqual(task.delegatedTo, "Jordan Ellis")
+        XCTAssertEqual(task.status, .waiting)
+        XCTAssertFalse(task.delegationConfirmed, "A hand-off is never assumed accepted")
+        XCTAssertEqual(task.associate?.name, "Jordan Ellis")
+        XCTAssertEqual(lead.storeRole, .teamLead)
+        XCTAssertTrue(task.sortedActivity.contains { $0.kindRaw == ActivityKind.delegated.rawValue })
+    }
+
+    func testGroupRolesDoNotBecomeAssociates() throws {
+        _ = CaptureSaver.save(draft("Tell my TLs to work the truck at 2pm"), in: context)
+        XCTAssertTrue(try context.fetch(FetchDescriptor<Associate>()).isEmpty)
+    }
+
     func testTopThreeLimit() throws {
         let tasks = (1...4).map { TaskActions.createTask(title: "T\($0)", in: context) }
         XCTAssertTrue(TaskActions.toggleFocus(tasks[0], in: context))

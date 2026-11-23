@@ -241,6 +241,7 @@ struct InterpretationCard: View {
                 if !draft.associateName.isEmpty {
                     tag(draft.associateIsKnown ? draft.associateName : "\(draft.associateName) (new)", "person")
                 }
+                if !draft.delegateTo.isEmpty { tag("Hand off to \(draft.delegateTo) · waiting", "person.badge.clock") }
                 if !draft.department.isEmpty { tag(draft.department, "building.2") }
                 if let rule = draft.recurrence {
                     tag(rule.summary(calendar: .current), "repeat")

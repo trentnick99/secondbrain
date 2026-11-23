@@ -10,7 +10,6 @@ struct TaskInteractions: ViewModifier {
     @Environment(AppRouter.self) private var router
     @State private var showReschedule = false
     @State private var showDelegate = false
-    @State private var delegateName = ""
     @State private var confirmDelete = false
     @State private var pendingQuadrant: Quadrant?
 
@@ -47,16 +46,7 @@ struct TaskInteractions: ViewModifier {
                 RescheduleSheet(task: task)
                     .presentationDetents([.medium, .large])
             }
-            .alert("Delegate to…", isPresented: $showDelegate) {
-                TextField("Name", text: $delegateName)
-                Button("Delegate") {
-                    TaskActions.delegate(task, to: delegateName, in: context)
-                    delegateName = ""
-                }
-                Button("Cancel", role: .cancel) { delegateName = "" }
-            } message: {
-                Text("The task will show as waiting until you confirm the person accepted it.")
-            }
+            .sheet(isPresented: $showDelegate) { DelegateSheet(task: task) }
             .confirmationDialog("Delete this task permanently?", isPresented: $confirmDelete, titleVisibility: .visible) {
                 Button("Delete", role: .destructive) { TaskActions.delete(task, in: context) }
                 Button("Archive instead") { TaskActions.archive(task, in: context) }

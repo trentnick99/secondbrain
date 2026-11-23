@@ -4,8 +4,8 @@ import SecondBrainCore
 /// UserDefaults keys. Views bind with `@AppStorage(key, store: AppGroup.defaults)`.
 enum SettingsKey {
     static let hasCompletedOnboarding = "hasCompletedOnboarding"
-    static let shiftStartMinutes = "shiftStartMinutes"
-    static let shiftEndMinutes = "shiftEndMinutes"
+    static let shiftSchedule = "shiftSchedule"
+    static let reminderAtShiftStart = "reminderAtShiftStart"
     static let weekStartsOn = "weekStartsOn"
     static let defaultReminderEnabled = "defaultReminderEnabled"
     static let defaultReminderMinutes = "defaultReminderMinutes"
@@ -30,8 +30,10 @@ enum SettingsKey {
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
 enum SettingsDefault {
+    /// Used only when no schedule entry applies.
     static let shiftStartMinutes = 7 * 60
-    static let shiftEndMinutes = 16 * 60
+    static let shiftEndMinutes = 17 * 60
+    static let reminderAtShiftStart = true
     /// Saturday — many retail schedules run Saturday through Friday. Adjustable in Settings.
     static let weekStartsOn = 7
     static let defaultReminderEnabled = true
@@ -65,8 +67,36 @@ enum AppSettings {
     }
 
     static var hasCompletedOnboarding: Bool { bool(SettingsKey.hasCompletedOnboarding, false) }
-    static var shiftStartMinutes: Int { int(SettingsKey.shiftStartMinutes, SettingsDefault.shiftStartMinutes) }
-    static var shiftEndMinutes: Int { int(SettingsKey.shiftEndMinutes, SettingsDefault.shiftEndMinutes) }
+    /// The weekly shift pattern (7–5, 10–8, 12–10 or off for each weekday).
+    static var shiftSchedule: ShiftSchedule {
+        ScheduleStorage.decode(defaults.string(forKey: SettingsKey.shiftSchedule) ?? "")
+    }
+
+    static var reminderAtShiftStart: Bool { bool(SettingsKey.reminderAtShiftStart, SettingsDefault.reminderAtShiftStart) }
+
+    /// Today's shift, or the next scheduled one if today is a day off.
+    static func referenceShift(now: Date = Date()) -> ShiftTime? {
+        let schedule = shiftSchedule
+        let day = schedule.currentOrNextWorkday(now, calendar: .current)
+        return schedule.shift(on: day, calendar: .current)
+    }
+
+    static var shiftStartMinutes: Int { referenceShift()?.startMinutes ?? SettingsDefault.shiftStartMinutes }
+    static var shiftEndMinutes: Int { referenceShift()?.endMinutes ?? SettingsDefault.shiftEndMinutes }
+
+    static func shiftStartMinutes(on date: Date) -> Int {
+        shiftSchedule.startMinutes(on: date, calendar: .current, fallback: SettingsDefault.shiftStartMinutes)
+    }
+
+    /// End My Shift carries unfinished work to the next scheduled shift.
+    static func nextShiftDay(after date: Date = Date()) -> Date {
+        Rescheduler.carryForwardDay(now: date, calendar: .current, schedule: shiftSchedule)
+    }
+
+    /// "Thu", "Tomorrow" — for button labels.
+    static func nextShiftLabel(after date: Date = Date()) -> String {
+        RelativeDateText.dayLabel(for: nextShiftDay(after: date), now: date, calendar: .current)
+    }
     static var weekStartsOn: Int { int(SettingsKey.weekStartsOn, SettingsDefault.weekStartsOn) }
     static var defaultReminderEnabled: Bool { bool(SettingsKey.defaultReminderEnabled, SettingsDefault.defaultReminderEnabled) }
     static var defaultReminderMinutes: Int { int(SettingsKey.defaultReminderMinutes, SettingsDefault.defaultReminderMinutes) }
@@ -91,7 +121,8 @@ enum AppSettings {
             overdueGraceMinutes: int(SettingsKey.overdueGraceMinutes, SettingsDefault.overdueGraceMinutes),
             hidePreviews: hidePreviews,
             maxPending: 60,
-            briefingDaysAhead: 7
+            briefingDaysAhead: 7,
+            schedule: shiftSchedule
         )
     }
 
@@ -103,12 +134,28 @@ enum AppSettings {
             defaultReminderMinutes: effectiveDefaultReminderMinutes,
             shiftStartMinutes: shiftStartMinutes,
             shiftEndMinutes: shiftEndMinutes,
-            weekStartsOn: weekStartsOn
+            weekStartsOn: weekStartsOn,
+            schedule: shiftSchedule,
+            defaultReminderAtShiftStart: reminderAtShiftStart
         )
     }
 
     /// Records that another process (widget / intent) changed the store.
     static func markExternalChange() {
         defaults.set(Date().timeIntervalSince1970, forKey: SettingsKey.externalChangeStamp)
+    }
+}
+
+/// Stores the weekly schedule as JSON in shared defaults (readable by the widget too).
+enum ScheduleStorage {
+    static func decode(_ json: String) -> ShiftSchedule {
+        guard let data = json.data(using: .utf8), !json.isEmpty,
+              let schedule = try? JSONDecoder().decode(ShiftSchedule.self, from: data) else { return .unset }
+        return schedule
+    }
+
+    static func encode(_ schedule: ShiftSchedule) -> String {
+        guard let data = try? JSONEncoder().encode(schedule) else { return "" }
+        return String(decoding: data, as: UTF8.self)
     }
 }

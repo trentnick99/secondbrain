@@ -8,8 +8,7 @@ import SecondBrainCore
 struct OnboardingView: View {
     @Environment(\.modelContext) private var context
     @AppStorage(SettingsKey.hasCompletedOnboarding, store: AppGroup.defaults) private var hasCompletedOnboarding = false
-    @AppStorage(SettingsKey.shiftStartMinutes, store: AppGroup.defaults) private var shiftStart = SettingsDefault.shiftStartMinutes
-    @AppStorage(SettingsKey.shiftEndMinutes, store: AppGroup.defaults) private var shiftEnd = SettingsDefault.shiftEndMinutes
+    @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @State private var page = 0
     @State private var notificationResult: String?
@@ -83,15 +82,18 @@ struct OnboardingView: View {
     }
 
     private var shift: some View {
-        pageLayout(icon: "clock.fill", title: "Your shift") {
-            Text("Used for “end of shift”, your daily briefing, and “tomorrow morning” snoozes.").foregroundStyle(.secondary)
-            DatePicker("Shift starts", selection: minutes($shiftStart), displayedComponents: .hourAndMinute)
-            DatePicker("Shift ends", selection: minutes($shiftEnd), displayedComponents: .hourAndMinute)
+        pageLayout(icon: "clock.fill", title: "Your shifts") {
+            Text("Set each day's shift so “end of shift”, your morning briefing and End My Shift line up with when you actually work.")
+                .foregroundStyle(.secondary)
+            VStack(spacing: 10) {
+                ScheduleEditor(scheduleJSON: $scheduleJSON, weekStartsOn: weekStartsOn)
+            }
+            .card()
             Picker("Week starts on", selection: $weekStartsOn) {
                 ForEach(1...7, id: \.self) { Text(Calendar.current.weekdaySymbols[$0 - 1]).tag($0) }
             }
             .pickerStyle(.menu)
-            Text("You can change these any time in Settings.").font(.footnote).foregroundStyle(.secondary)
+            Text("Schedules change? Update it any time in Settings › Your schedule.").font(.footnote).foregroundStyle(.secondary)
         }
     }
 
@@ -140,11 +142,6 @@ struct OnboardingView: View {
                 .foregroundStyle(Theme.accent)
             Text(text)
         }
-    }
-
-    private func minutes(_ value: Binding<Int>) -> Binding<Date> {
-        Binding(get: { DateMath(calendar: .current).date(on: Date(), minutes: value.wrappedValue) },
-                set: { value.wrappedValue = DateMath(calendar: .current).minutesSinceMidnight($0) })
     }
 
     private func finish() {

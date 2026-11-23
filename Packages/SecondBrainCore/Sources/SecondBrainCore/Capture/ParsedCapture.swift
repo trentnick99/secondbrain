@@ -12,6 +12,10 @@ public struct CaptureContext: Sendable {
     public var shiftEndMinutes: Int
     /// 1 = Sunday … 7 = Saturday.
     public var weekStartsOn: Int
+    /// The person's weekly shifts. When set, "end of shift", "first thing" and "next shift" follow it.
+    public var schedule: ShiftSchedule?
+    /// When true (and a schedule is set), date-only items get a reminder at that day's shift start.
+    public var defaultReminderAtShiftStart: Bool
 
     public init(now: Date = Date(),
                 calendar: Calendar = .current,
@@ -19,7 +23,9 @@ public struct CaptureContext: Sendable {
                 defaultReminderMinutes: Int? = 7 * 60,
                 shiftStartMinutes: Int = 7 * 60,
                 shiftEndMinutes: Int = 16 * 60,
-                weekStartsOn: Int? = nil) {
+                weekStartsOn: Int? = nil,
+                schedule: ShiftSchedule? = nil,
+                defaultReminderAtShiftStart: Bool = false) {
         self.now = now
         self.calendar = calendar
         self.knownAssociates = knownAssociates
@@ -27,6 +33,8 @@ public struct CaptureContext: Sendable {
         self.shiftStartMinutes = shiftStartMinutes
         self.shiftEndMinutes = shiftEndMinutes
         self.weekStartsOn = weekStartsOn ?? calendar.firstWeekday
+        self.schedule = schedule
+        self.defaultReminderAtShiftStart = defaultReminderAtShiftStart
     }
 }
 
@@ -84,6 +92,10 @@ public struct ParsedCapture: Equatable, Sendable {
     /// For follow-ups: what was asked, and what I committed to.
     public var request: String?
     public var commitment: String?
+
+    /// "Have Maria zone aisle 5" → Maria. The task is marked waiting until the person confirms.
+    public var delegateTo: String? = nil
+    public var delegateIsKnown: Bool = false
 
     public var needsReview: Bool { !ambiguities.isEmpty }
     public var isEmpty: Bool { rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }

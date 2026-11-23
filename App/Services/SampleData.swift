@@ -12,12 +12,16 @@ enum SampleData {
         func day(_ offset: Int) -> Date { math.addingDays(offset, to: today) }
         func at(_ offset: Int, _ hour: Int, _ minute: Int = 0) -> Date { math.date(on: day(offset), minutes: hour * 60 + minute) }
 
-        let jordan = Associate(name: "Jordan Ellis", department: "Grocery", role: "Stocker")
+        // A fictional store team: store manager, coaches, team leads and associates.
+        let morgan = Associate(name: "Morgan Hayes", department: "", role: "Store Manager")
+        let chris = Associate(name: "Chris Patel", department: "Fresh", role: "Coach")
+        let sam = Associate(name: "Sam Ortiz", department: "Overnight", role: "Coach")
+        let jordan = Associate(name: "Jordan Ellis", department: "Stocking", role: "Team Lead")
+        let marcus = Associate(name: "Marcus Lee", department: "Stocking", role: "Team Lead")
+        let avery = Associate(name: "Avery Brooks", department: "Fresh", role: "Team Lead")
+        let tasha = Associate(name: "Tasha Green", department: "Stocking", role: "Stocker")
         let priya = Associate(name: "Priya Shah", department: "Front End", role: "Cashier")
-        let marcus = Associate(name: "Marcus Lee", department: "Backroom & Receiving", role: "Unloader")
-        let avery = Associate(name: "Avery Brooks", department: "Dairy", role: "Team Lead")
-        let sam = Associate(name: "Sam Ortiz", department: "Overnight Stocking", role: "Coach")
-        for person in [jordan, priya, marcus, avery, sam] { context.insert(person) }
+        for person in [morgan, chris, sam, jordan, marcus, avery, tasha, priya] { context.insert(person) }
 
         func task(_ title: String, kind: TaskKind = .task, quadrant: Quadrant, category: TaskCategory,
                   priority: TaskPriority = .normal, due: Date? = nil, hasTime: Bool = false, reminder: Date? = nil,
@@ -59,9 +63,17 @@ enum SampleData {
         _ = task("Build a cross-training plan for Marcus", quadrant: .schedule, category: .development, due: day(5), person: marcus)
         _ = task("Review last week's results with the team", quadrant: .schedule, category: .admin, due: day(2))
         _ = task("Reprint missing shelf labels in aisle 12", quadrant: .delegate, category: .merchandising, due: today)
-        let delegated = task("Routine price-change audit", quadrant: .delegate, category: .merchandising, due: day(1))
+        let delegated = task("Routine price-change audit", quadrant: .delegate, category: .merchandising, due: day(1), person: avery)
         delegated.delegatedTo = "Avery Brooks"
+        delegated.waitingOn = "Avery Brooks"
         delegated.status = .waiting
+        let steel = task("Work the steel in aisle 9", quadrant: .doFirst, category: .freight, due: today, person: marcus)
+        steel.delegatedTo = "Marcus Lee"
+        steel.waitingOn = "Marcus Lee"
+        steel.status = .waiting
+        _ = task("Freight plan for the store manager", quadrant: .schedule, category: .freight, priority: .high,
+                 due: day(2), person: morgan)
+        _ = task("Train Tasha on the pallet jack", quadrant: .schedule, category: .development, due: day(4), person: tasha)
         _ = task("Reorganize the old training binder", quadrant: .eliminate, category: .admin, priority: .low)
         let overdue = task("Submit the cooler repair request", quadrant: .doFirst, category: .operations, due: day(-1))
         overdue.rescheduleCount = 3

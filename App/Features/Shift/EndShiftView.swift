@@ -44,14 +44,14 @@ struct EndShiftView: View {
                         Button {
                             confirmCarryAll = true
                         } label: {
-                            Label("Carry all \(carryCandidates.count) to tomorrow", systemImage: "arrow.right.circle.fill")
+                            Label("Carry all \(carryCandidates.count) to next shift (\(AppSettings.nextShiftLabel()))", systemImage: "arrow.right.circle.fill")
                                 .font(.headline)
                         }
                         .accessibilityIdentifier("carryAllButton")
                     } header: {
                         Text("Unfinished & overdue")
                     } footer: {
-                        Text("Nothing is removed. Items you leave alone stay where they are and show as overdue tomorrow.")
+                        Text("Nothing is removed. Items you leave alone stay where they are and show as overdue next shift.")
                     }
                 }
 
@@ -75,9 +75,9 @@ struct EndShiftView: View {
                         .buttonStyle(.plain)
                     }
                 } header: {
-                    Text("Suggested priorities for tomorrow")
+                    Text("Suggested priorities for your next shift")
                 } footer: {
-                    Text("Starred items become tomorrow's top 3 when you finish.")
+                    Text("Starred items become your next shift's top 3 when you finish.")
                 }
 
                 Section("Completed today · \(review.completedToday.count)") {
@@ -104,11 +104,11 @@ struct EndShiftView: View {
                     Button("Finish") { finish(review: review, items: items) }.fontWeight(.semibold)
                 }
             }
-            .confirmationDialog("Carry \(carryCandidates.count) items to tomorrow?", isPresented: $confirmCarryAll, titleVisibility: .visible) {
+            .confirmationDialog("Carry \(carryCandidates.count) items to your next shift (\(AppSettings.nextShiftLabel()))?", isPresented: $confirmCarryAll, titleVisibility: .visible) {
                 Button("Carry forward") {
-                    TaskActions.carryForward(carryCandidates, to: Rescheduler.carryForwardDay(now: Date(), calendar: .current), in: context)
+                    TaskActions.carryForward(carryCandidates, to: AppSettings.nextShiftDay(), in: context)
                     carriedCount += carryCandidates.count
-                    router.showToast("Carried \(carryCandidates.count) to tomorrow")
+                    router.showToast("Carried \(carryCandidates.count) to \(AppSettings.nextShiftLabel())")
                 }
             } message: {
                 Text("Each keeps its time of day and reminder offset. Postponements are counted for your weekly review.")
@@ -156,7 +156,7 @@ struct EndShiftView: View {
     }
 
     private func finish(review: ShiftReview, items: ([TaskSnapshot]) -> [TaskItem]) {
-        let tomorrow = Rescheduler.carryForwardDay(now: Date(), calendar: .current)
+        let tomorrow = AppSettings.nextShiftDay()
         let focus = tasks.filter { tomorrowFocus.contains($0.id) && $0.isOpen }
         if !focus.isEmpty { TaskActions.setFocus(focus, on: tomorrow, in: context) }
 
@@ -194,8 +194,8 @@ struct ShiftItemRow: View {
                 } label: { Label("Done", systemImage: "checkmark") }
                     .buttonStyle(.bordered).tint(Theme.success)
                 Button {
-                    TaskActions.carryForward([task], to: Rescheduler.carryForwardDay(now: Date(), calendar: .current), in: context)
-                } label: { Label("Tomorrow", systemImage: "sunrise") }
+                    TaskActions.carryForward([task], to: AppSettings.nextShiftDay(), in: context)
+                } label: { Label("Next shift", systemImage: "sunrise") }
                     .buttonStyle(.bordered).tint(Theme.accent)
                 Button {
                     showReschedule = true

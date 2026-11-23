@@ -13,7 +13,11 @@ struct TimeHit {
     var absolute: Date?
     var label: String
     var impliesToday: Bool
+    /// Set for "end of shift" / "first thing", so the time follows the person's schedule for that day.
+    var shiftAnchor: ShiftAnchor? = nil
 }
+
+enum ShiftAnchor { case start, end }
 
 struct DateHit {
     var date: Date
@@ -222,17 +226,17 @@ enum ScheduleExtraction {
         }
 
         // end of shift / end of day
-        if let m = scan.firstMatch(#"(?:\b(?:by|at|before|until)\s+)?(?:the\s+)?(?:\bend\s+of\s+(?:my\s+|the\s+)?shift\b|\beos\b|\bend\s+of\s+(?:the\s+)?day\b|\beod\b|\bcob\b|\bclose\s+of\s+business\b)"#) {
+        if let m = scan.firstMatch(#"(?:\b(?:by|at|before|until)\s+)?(?:the\s+)?(?:\bend\s+of\s+(?:my\s+|the\s+)?shift\b|\bbefore\s+i\s+(?:leave|go\s+home|clock\s+out)\b|\beos\b|\bend\s+of\s+(?:the\s+)?day\b|\beod\b|\bcob\b|\bclose\s+of\s+business\b)"#) {
             scan.consume(m.range)
             notes.append("“\(scan.substring(m.range).trimmingCharacters(in: .whitespaces))” → \(RelativeDateText.minutesText(ctx.shiftEndMinutes, calendar: cal)) (shift end)")
-            return TimeHit(minutes: ctx.shiftEndMinutes, absolute: nil, label: scan.substring(m.range), impliesToday: false)
+            return TimeHit(minutes: ctx.shiftEndMinutes, absolute: nil, label: scan.substring(m.range), impliesToday: false, shiftAnchor: .end)
         }
 
         // start of shift / first thing
         if let m = scan.firstMatch(#"(?:\b(?:at|by)\s+)?(?:the\s+)?(?:\b(?:start|beginning)\s+of\s+(?:my\s+|the\s+)?shift\b|\bfirst\s+thing(?:\s+in\s+the\s+morning)?\b)"#) {
             scan.consume(m.range)
             notes.append("“\(scan.substring(m.range).trimmingCharacters(in: .whitespaces))” → \(RelativeDateText.minutesText(ctx.shiftStartMinutes, calendar: cal)) (shift start)")
-            return TimeHit(minutes: ctx.shiftStartMinutes, absolute: nil, label: scan.substring(m.range), impliesToday: false)
+            return TimeHit(minutes: ctx.shiftStartMinutes, absolute: nil, label: scan.substring(m.range), impliesToday: false, shiftAnchor: .start)
         }
 
         // "this afternoon", "tonight", "in the morning"

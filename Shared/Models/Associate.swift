@@ -39,6 +39,14 @@ final class Associate {
         self.updatedAt = Date()
     }
 
+    /// Store Manager / Coach / Team Lead / Associate, read from the role text.
+    var storeRole: StoreRole? { StoreRole.infer(from: role) }
+
+    /// "Team Lead · Stocking"
+    var roleLine: String {
+        [role, department].filter { !$0.isEmpty }.joined(separator: " · ")
+    }
+
     var initials: String {
         let parts = name.split(separator: " ").prefix(2)
         let letters = parts.compactMap { $0.first }.map { String($0) }.joined()

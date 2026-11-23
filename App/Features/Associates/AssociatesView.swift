@@ -18,6 +18,7 @@ struct AssociatesView: View {
     @State private var search = ""
     @State private var showNewFollowUp = false
     @State private var showNewPerson = false
+    @State private var showTeamSetup = false
     @State private var showArchived = false
 
     var body: some View {
@@ -44,7 +45,8 @@ struct AssociatesView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button { showNewFollowUp = true } label: { Label("New Follow-up", systemImage: "person.crop.circle.badge.clock") }
-                        Button { showNewPerson = true } label: { Label("Add Associate", systemImage: "person.badge.plus") }
+                        Button { showNewPerson = true } label: { Label("Add Person", systemImage: "person.badge.plus") }
+                        Button { showTeamSetup = true } label: { Label("Add Several People…", systemImage: "person.3") }
                         Toggle("Show Archived People", isOn: $showArchived)
                     } label: { Image(systemName: "plus.circle") }
                     .accessibilityLabel("Add")
@@ -52,6 +54,7 @@ struct AssociatesView: View {
             }
             .sheet(isPresented: $showNewFollowUp) { FollowUpEditorView(associate: nil) }
             .sheet(isPresented: $showNewPerson) { AssociateEditorView(associate: nil) }
+            .sheet(isPresented: $showTeamSetup) { TeamSetupSheet() }
         }
     }
 
@@ -133,15 +136,37 @@ struct AssociatesView: View {
             ContentUnavailableView {
                 Label("No associates", systemImage: "person.2")
             } description: {
-                Text("People are added automatically when you capture a follow-up, or add them here.")
+                Text("Add your team leads and associates, or they're added automatically when you capture a follow-up.")
             } actions: {
-                Button("Add Associate") { showNewPerson = true }.buttonStyle(.borderedProminent)
+                Button("Add Several People") { showTeamSetup = true }.buttonStyle(.borderedProminent)
             }
             .listRowBackground(Color.clear)
         } else {
-            Section("\(people.count) people") {
-                ForEach(people) { person in
-                    NavigationLink { AssociateDetailView(associate: person) } label: { PersonRow(person: person) }
+            // Grouped by role: Store Manager, Coaches, Team Leads, Associates.
+            ForEach(StoreRole.allCases) { role in
+                let group = people.filter { $0.storeRole == role }
+                    .sorted { ($0.department, $0.name) < ($1.department, $1.name) }
+                if !group.isEmpty {
+                    Section("\(role.pluralTitle) · \(group.count)") {
+                        ForEach(group) { person in
+                            NavigationLink { AssociateDetailView(associate: person) } label: { PersonRow(person: person) }
+                        }
+                    }
+                }
+            }
+            let unassigned = people.filter { $0.storeRole == nil }
+            if !unassigned.isEmpty {
+                Section("No role set · \(unassigned.count)") {
+                    ForEach(unassigned) { person in
+                        NavigationLink { AssociateDetailView(associate: person) } label: { PersonRow(person: person) }
+                    }
+                }
+            }
+            if !people.contains(where: { $0.storeRole == .teamLead }) {
+                Section {
+                    Button { showTeamSetup = true } label: {
+                        Label("Add your team leads so you can delegate to them in one tap", systemImage: "person.3")
+                    }
                 }
             }
         }

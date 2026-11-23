@@ -18,6 +18,7 @@ struct TaskDetailView: View {
     @State private var pendingQuadrant: Quadrant?
     @State private var calendarMessage: String?
     @State private var showSeries = false
+    @State private var showDelegate = false
 
     var body: some View {
         Form {
@@ -63,6 +64,7 @@ struct TaskDetailView: View {
             NotificationService.shared.requestResync()
         }
         .sheet(isPresented: $showReschedule) { RescheduleSheet(task: task).presentationDetents([.medium, .large]) }
+        .sheet(isPresented: $showDelegate) { DelegateSheet(task: task) }
         .sheet(isPresented: $showSeries) {
             if let id = task.seriesID, let series = RecurrenceService.series(with: id, in: context) {
                 NavigationStack { SeriesEditorView(series: series) }
@@ -217,6 +219,9 @@ struct TaskDetailView: View {
                 if !task.department.isEmpty && !DepartmentLexicon.allNames.contains(task.department) {
                     Text(task.department).tag(task.department)
                 }
+            }
+            Button { showDelegate = true } label: {
+                Label(task.delegatedTo.isEmpty ? "Delegate to a team lead…" : "Change who it's delegated to…", systemImage: "person.badge.plus")
             }
             TextField("Delegated to", text: Binding(
                 get: { task.delegatedTo },

@@ -73,7 +73,7 @@ struct DashboardView: View {
 
     private func header(_ agenda: DayAgenda) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
+            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()) + " · " + shiftLine)
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
             HStack(spacing: 10) {
@@ -101,6 +101,16 @@ struct DashboardView: View {
             .accessibilityIdentifier("endShiftButton")
         }
         .card()
+    }
+
+    /// "Shift 10–8" or "Off today · next shift Thu 12–10".
+    private var shiftLine: String {
+        let schedule = AppSettings.shiftSchedule
+        let cal = Calendar.current
+        if let shift = schedule.shift(on: Date(), calendar: cal) { return "Shift \(shift.shortLabel)" }
+        let next = schedule.nextWorkday(after: Date(), calendar: cal)
+        let label = schedule.shift(on: next, calendar: cal)?.shortLabel ?? ""
+        return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: Date(), calendar: cal)) \(label)"
     }
 
     private var quickActions: some View {

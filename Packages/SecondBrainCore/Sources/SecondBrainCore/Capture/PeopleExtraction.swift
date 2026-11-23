@@ -53,7 +53,9 @@ enum PeopleExtraction {
         }
 
         // 2. Roles: "talk to the overnight coach", "tell the store manager".
-        let rolePattern = #"\b(?:with|to|tell|ask|remind|email|text|call|update|inform|from|for|let|see)\s+(?:the\s+|my\s+|our\s+|an?\s+)?((?:(?:overnight|morning|evening|night|day|weekend|front\s+end|backroom|pharmacy|deli|bakery|grocery|produce|frozen|dairy|meat|fresh|online|pickup|apparel|electronics|hardlines|softlines|closing|opening|other|new|assistant)\s+)?(?:store\s+manager|market\s+manager|co-?manager|team\s+lead(?:er)?|coach|manager|supervisor|asset\s+protection|tl))\b"#
+        let roleArea = #"(?:overnight|morning|evening|night|day|weekend|front\s+end|frontend|backroom|pharmacy|deli|bakery|grocery|produce|frozen|dairy|meat|fresh|food|fashion|stocking|digital|opd|ap|acc|auto\s+care|online|pickup|apparel|electronics|hardlines|softlines|closing|opening|other|new|assistant)"#
+        let roleNoun = #"(?:store\s+manager|market\s+manager|co-?manager|team\s+leads?(?:er)?|coach(?:es)?|manager|supervisor|asset\s+protection|tls?|sm)"#
+        let rolePattern = #"\b(?:with|to|tell|ask|remind|email|text|call|update|inform|from|for|let|see|have|get|by)\s+(?:the\s+|my\s+|our\s+|an?\s+)?((?:"# + roleArea + #"\s+)?"# + roleNoun + #")\b"#
         for m in scan.matches(rolePattern) {
             guard let role = scan.group(m, 1) else { continue }
             hits.append(PersonHit(name: formatRole(role), isKnown: false, isRole: true, location: m.range(at: 1).location))
@@ -61,7 +63,7 @@ enum PeopleExtraction {
 
         // 3. Capitalised names after a clear trigger ("follow up with Sarah", "ask Maria").
         let namePart = #"([A-Z][a-z]+(?:[-'’][A-Za-z]+)?)(?:\s+([A-Z][a-z]+|[A-Z]\.?))?(?![\w])"#
-        let triggers = #"(?i:follow(?:ing)?[ -]?up\s+with|check(?:ing)?\s+(?:in\s+)?(?:with|on)|check\s+back\s+with|talk(?:ing)?\s+(?:to|with)|speak(?:ing)?\s+(?:to|with)|meet(?:ing)?\s+(?:up\s+)?with|get\s+back\s+to|reach\s+out\s+to|touch\s+base\s+with|circle\s+back\s+with|sit\s+down\s+with|let|ask|tell|remind|help|call|text|email|message|thank|coach|train|see|with|for|to|from)"#
+        let triggers = #"(?i:follow(?:ing)?[ -]?up\s+with|check(?:ing)?\s+(?:in\s+)?(?:with|on)|check\s+back\s+with|talk(?:ing)?\s+(?:to|with)|speak(?:ing)?\s+(?:to|with)|meet(?:ing)?\s+(?:up\s+)?with|get\s+back\s+to|reach\s+out\s+to|touch\s+base\s+with|circle\s+back\s+with|sit\s+down\s+with|let|ask|tell|have|get|remind|help|call|text|email|message|thank|coach|train|see|with|for|to|from)"#
         for m in scan.matches(#"\b"# + triggers + #"\s+"# + namePart, caseInsensitive: false) {
             if let hit = makeHit(scan, m, firstGroup: 1, secondGroup: 2) { hits.append(hit) }
         }
@@ -117,12 +119,15 @@ enum PeopleExtraction {
     }
 
     static func formatRole(_ role: String) -> String {
-        role.split(whereSeparator: { $0 == " " || $0 == "\t" })
+        let lowered = role.lowercased().split(whereSeparator: { $0 == " " || $0 == "\t" }).joined(separator: " ")
+        if lowered == "sm" { return "Store Manager" }
+        let acronyms: [String: String] = ["tl": "TL", "tls": "TLs", "ap": "AP", "acc": "ACC", "opd": "OPD", "sm": "SM"]
+        return lowered.split(separator: " ")
             .map { word -> String in
                 let w = String(word)
-                if w.lowercased() == "tl" { return "TL" }
-                if w.lowercased().hasPrefix("co-") || w.lowercased() == "comanager" { return "Co-Manager" }
-                return w.prefix(1).uppercased() + w.dropFirst().lowercased()
+                if let acronym = acronyms[w] { return acronym }
+                if w.hasPrefix("co-") || w == "comanager" { return "Co-Manager" }
+                return w.prefix(1).uppercased() + w.dropFirst()
             }
             .joined(separator: " ")
     }
