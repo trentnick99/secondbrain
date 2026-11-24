@@ -54,6 +54,8 @@ final class AppRouter {
     var selectedTab: AppTab = .home
     var showCapture = false
     var captureKind: CaptureKind?
+    /// Text to pre-fill in Quick Capture (from a `secondbrain://capture?text=` link). Never saved automatically.
+    var captureText: String?
     var presentedTask: TaskRef?
     var showEndShift = false
     var showPlanner = false
@@ -74,6 +76,7 @@ final class AppRouter {
         case .capture(let kind):
             presentedTask = nil
             captureKind = kind
+            captureText = nil
             showCapture = true
         case .task(let id):
             showCapture = false
@@ -109,7 +112,12 @@ final class AppRouter {
         let host = url.host ?? ""
         let parts = url.pathComponents.filter { $0 != "/" }
         switch host {
-        case "capture": open(.capture(nil))
+        case "capture":
+            open(.capture(nil))
+            captureText = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "text" }?.value
+        case "review": open(.weeklyReview)
+        case "settings": open(.settings)
         case "home": open(.tab(.home))
         case "tasks": open(.tab(.tasks))
         case "matrix": open(.tab(.matrix))

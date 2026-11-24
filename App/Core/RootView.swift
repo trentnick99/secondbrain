@@ -33,7 +33,7 @@ struct RootView: View {
         .tint(Theme.accent)
         .preferredColorScheme(colorScheme)
         .sheet(isPresented: $router.showCapture) {
-            QuickCaptureView(initialKind: router.captureKind)
+            QuickCaptureView(initialKind: router.captureKind, initialText: router.captureText)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }

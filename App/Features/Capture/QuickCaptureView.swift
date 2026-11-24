@@ -6,6 +6,8 @@ import SecondBrainCore
 /// Return key; anything ambiguous is shown for confirmation first. "Inbox" saves the raw text as-is.
 struct QuickCaptureView: View {
     var initialKind: CaptureKind?
+    /// Pre-filled text, e.g. from a Shortcuts link. It's only interpreted — saving still takes a tap.
+    var initialText: String? = nil
 
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -54,6 +56,9 @@ struct QuickCaptureView: View {
         }
         .onAppear {
             focused = true
+            if let initialText, text.isEmpty {
+                text = initialText.replacingOccurrences(of: "\n", with: " ")
+            }
             if let initialKind {
                 draft.kind = initialKind
                 draft.locked.insert(.kind)
