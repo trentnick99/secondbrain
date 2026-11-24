@@ -81,6 +81,37 @@ final class SecondBrainUITests: XCTestCase {
                       "The step shows as added")
     }
 
+    func testEditingTheScheduleKeepsSettingsOpen() throws {
+        let settingsButton = app.buttons["settingsButton"].firstMatch
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5))
+        settingsButton.tap()
+        let settings = app.navigationBars["Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+
+        // Choose a preset shift from the menu.
+        let saturday = app.buttons["Saturday shift"].firstMatch
+        XCTAssertTrue(saturday.waitForExistence(timeout: 5))
+        saturday.tap()
+        let preset = app.buttons["10–8"].firstMatch
+        XCTAssertTrue(preset.waitForExistence(timeout: 3))
+        preset.tap()
+        sleep(2)
+        XCTAssertTrue(settings.exists, "Settings stays open after choosing a shift")
+        XCTAssertEqual(app.buttons["Saturday shift"].firstMatch.value as? String, "10–8")
+
+        // Set a custom time.
+        app.buttons["Sunday shift"].firstMatch.tap()
+        let custom = app.buttons["Custom…"].firstMatch
+        XCTAssertTrue(custom.waitForExistence(timeout: 3))
+        custom.tap()
+        let save = app.buttons["Save"].firstMatch
+        XCTAssertTrue(save.waitForExistence(timeout: 5), "The custom time editor opens")
+        save.tap()
+        sleep(2)
+        XCTAssertTrue(settings.exists, "Settings stays open after saving a custom shift")
+        XCTAssertEqual(app.buttons["Sunday shift"].firstMatch.value as? String, "7–5")
+    }
+
     func testImportNotesAddsReviewedItems() throws {
         let importButton = app.buttons["New Import"].firstMatch
         XCTAssertTrue(importButton.waitForExistence(timeout: 5))
