@@ -85,6 +85,16 @@ final class RetailCalendarTests: XCTestCase {
 }
 
 final class HolidayCaptureTests: XCTestCase {
+    func testEventNamesAreNotWeekdays() {
+        let alley = Fixtures.parse("Keep Action Alley open for Black Friday")
+        XCTAssertNil(alley.dueDate, "“for Black Friday” isn't a due date, and it isn't this Friday")
+        XCTAssertTrue(alley.title.contains("Black Friday"), alley.title)
+        XCTAssertNil(Fixtures.parse("Build the Cyber Monday endcap").dueDate)
+        XCTAssertNil(Fixtures.parse("Set the Good Friday ham display").dueDate)
+        XCTAssertEqual(Fixtures.day(Fixtures.parse("Black Friday signs up by Friday").dueDate), "2026-11-27",
+                       "A plain weekday in the same sentence still counts")
+    }
+
     func testHolidaysAfterAPrepositionAreDueDates() {
         XCTAssertEqual(Fixtures.day(Fixtures.parse("Get the toy wall full by Black Friday").dueDate), "2026-11-27")
         XCTAssertEqual(Fixtures.day(Fixtures.parse("Turkeys out before Thanksgiving").dueDate), "2026-11-25")

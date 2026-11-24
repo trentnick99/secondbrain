@@ -367,7 +367,9 @@ enum ScheduleExtraction {
         }
         // weekdays: "Friday", "by Thu", "next Monday"
         let wd = CalendarWords.weekdayAny
-        for m in scan.matches(prep + #"(?:\b(next|this|coming)\s+)?\b(\#(wd))\b\.?"#) {
+        // "Black Friday", "Cyber Monday", "Good Friday" and "Giving Tuesday" are events, not that weekday.
+        let eventName = #"(?<!black\s)(?<!cyber\s)(?<!good\s)(?<!giving\s)"#
+        for m in scan.matches(prep + #"(?:\b(next|this|coming)\s+)?"# + eventName + #"\b(\#(wd))\b\.?"#) {
             guard let token = scan.group(m, 3), let weekday = CalendarWords.weekdayNumber(token) else { continue }
             let modifier = scan.group(m, 2)?.lowercased()
             let lowerToken = token.lowercased()

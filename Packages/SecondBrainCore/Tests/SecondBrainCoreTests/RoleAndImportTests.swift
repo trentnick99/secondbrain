@@ -104,6 +104,7 @@ final class NoteImporterTests: XCTestCase {
         XCTAssertEqual(dairy.parsed.department, "Food")
         XCTAssertNil(result.items(.mine)[1].parsed.dueDate, "No date is invented")
         XCTAssertEqual(result.items(.totalStore)[0].parsed.department, "Total Store")
+        XCTAssertTrue(result.items(.totalStore)[0].parsed.title.hasSuffix("Black Friday"), result.items(.totalStore)[0].parsed.title)
         XCTAssertTrue(result.items(.totalStore)[0].parsed.classification.isImportant, "Fire exits are safety")
     }
 
