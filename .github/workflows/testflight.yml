@@ -58,15 +58,24 @@ jobs:
         env:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: |
-          KEY_PATH="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
-          if printf '%s' "$ASC_KEY_P8" | grep -q "BEGIN PRIVATE KEY"; then
-            printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
-          else
-            # Also accept a base64-encoded .p8.
-            printf '%s' "$ASC_KEY_P8" | base64 --decode > "$KEY_PATH"
-          fi
+          # Forgive copy-paste slips: stray spaces, Windows line endings, indented key lines.
+          KEY_ID=$(printf '%s' "$ASC_KEY_ID" | tr -d '[:space:]')
+          ISSUER=$(printf '%s' "$ASC_ISSUER_ID" | tr -d '[:space:]')
+          echo "::add-mask::$KEY_ID"
+          echo "::add-mask::$ISSUER"
+          echo "ASC_KEY_ID=$KEY_ID" >> "$GITHUB_ENV"
+          echo "ASC_ISSUER_ID=$ISSUER" >> "$GITHUB_ENV"
+          KEY_PATH="$RUNNER_TEMP/AuthKey_${KEY_ID}.p8"
+          # Rebuild a clean key file even if the paste lost its line breaks (common from a phone),
+          # picked up curly dashes, or was the base64 of the whole .p8.
+          python3 scripts/ci/normalize_p8.py "$KEY_PATH"
           chmod 600 "$KEY_PATH"
           echo "ASC_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Check the API key with Apple
+        run: |
+          python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" || python3 -m pip install --quiet "pyjwt[crypto]"
+          python3 scripts/ci/check_asc_key.py
 
       - name: Archive (signed automatically with the API key)
         run: |
