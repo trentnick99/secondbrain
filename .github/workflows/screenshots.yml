@@ -47,8 +47,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Capture screens
-        timeout-minutes: 20
+        timeout-minutes: 30
         run: |
+          python3 -m pip install --quiet --break-system-packages pillow || python3 -m pip install --quiet pillow
           chmod +x scripts/ci/screenshots.sh
           scripts/ci/screenshots.sh "${{ steps.sim.outputs.udid }}" \
             build/DerivedData/Build/Products/Debug-iphonesimulator/SecondBrain.app screenshots

@@ -31,15 +31,15 @@ shot() {
 # Each screen is a fresh launch straight onto that screen (test mode only), because opening
 # links from outside the app makes iOS ask "Open in Second Brain?" and blocks the screen.
 screen() {
-  local name="$1" link="$2" wait="${3:-10}"
-  for attempt in 1 2 3; do
+  local name="$1" link="$2" wait="${3:-14}"
+  for attempt in 1 2 3 4; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
     xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -openURL "secondbrain://$link" >/dev/null
-    sleep $((wait + attempt * 4))
+    sleep $((wait + attempt * 5))
     shot "$name"
-    # Still on Home? The slow simulator missed the screen — try again with more time.
-    if [ "$(md5 -q "$OUT/$name.png")" != "$(md5 -q "$OUT/01-home.png")" ]; then return; fi
-    echo "  $name still showed Home (attempt $attempt)"
+    # Still launching, or still on Home? The slow simulator missed the screen — retry with more time.
+    if ! python3 scripts/ci/screen_check.py "$OUT/01-home.png" "$OUT/$name.png"; then return; fi
+    echo "  $name not ready yet (attempt $attempt)"
   done
 }
 

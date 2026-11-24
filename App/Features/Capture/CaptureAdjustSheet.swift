@@ -28,7 +28,7 @@ struct CaptureAdjustSheet: View {
                             Text(person.name).tag(person.name)
                         }
                         if !draft.associateName.isEmpty && !associates.contains(where: { $0.name.caseInsensitiveCompare(draft.associateName) == .orderedSame }) {
-                            Text("\(draft.associateName) (new)").tag(draft.associateName)
+                            Text("\(draft.associateName) \(StoreRole.isGroupName(draft.associateName) ? "(team)" : "(new)")").tag(draft.associateName)
                         }
                     }
                     HStack {

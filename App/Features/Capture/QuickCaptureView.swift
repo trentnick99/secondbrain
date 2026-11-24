@@ -24,6 +24,12 @@ struct QuickCaptureView: View {
 
     private let parser = NaturalLanguageParser()
 
+    /// "Jordan", "Priya (new)" for someone not in Associates yet, or "Stock 2 (team)" — teams never become contacts.
+    private var personLabel: String {
+        if StoreRole.isGroupName(draft.associateName) { return "\(draft.associateName) (team)" }
+        return draft.associateIsKnown ? draft.associateName : "\(draft.associateName) (new)"
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -245,7 +251,7 @@ struct InterpretationCard: View {
             FlowLayout(spacing: 6) {
                 tag(draft.kind.title, draft.kind.systemImage)
                 if !draft.associateName.isEmpty {
-                    tag(draft.associateIsKnown ? draft.associateName : "\(draft.associateName) (new)", "person")
+                    tag(personLabel, StoreRole.isGroupName(draft.associateName) ? "person.3" : "person")
                 }
                 if !draft.delegateTo.isEmpty { tag("Hand off to \(draft.delegateTo) · waiting", "person.badge.clock") }
                 if !draft.department.isEmpty { tag(draft.department, "building.2") }
