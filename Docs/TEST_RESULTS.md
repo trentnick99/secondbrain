@@ -7,9 +7,9 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 | Suite | Result |
 |---|---|
 | **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
-| **SecondBrainCoreTests**: 119 engine tests, including store terms, team hand-offs, department numbers and privacy notes | ✅ **119 / 119 passed** |
-| **SecondBrainTests**: 20 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`) |
-| **SecondBrainUITests**: 7 end-to-end tests (in-memory store, fictional data) | ✅ **7 / 7 passed** (run 45256280901): Quick Capture saves a task; an ambiguous capture requires Confirm & Save; the Matrix shows all four quadrants; End My Shift carries unfinished work forward; the weekly planner opens; Store Terms finds "FTPR"; disciplinary wording in Quick Capture shows the privacy note while still allowing save. In the run before, one test failed at setup because the simulator timed out launching the app. It passed on the re-run with no code changes. |
+| **SecondBrainCoreTests**: 129 engine tests, including holidays, the fiscal week, Season Planner prep dates, store terms, team hand-offs and privacy notes | ✅ **129 / 129 passed** |
+| **SecondBrainTests**: 21 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`, run 45302137288) |
+| **SecondBrainUITests**: 8 end-to-end tests (in-memory store, fictional data) | ✅ **8 / 8 passed** (run 45306281891). The tests cover: Quick Capture saves a task; an ambiguous capture needs Confirm & Save; the Matrix shows all four quadrants; End My Shift carries unfinished work forward; the weekly planner opens; Store Terms finds "FTPR"; disciplinary wording shows the privacy note but still allows saving; the Season Planner opens from Home and adds a prep task. The run before this one had three failures caused by the simulator (app launch and termination timeouts and a UI-query timeout), plus a bug in the new Season Planner test: it tapped an "Add" button belonging to the Settings sheet underneath. The test was fixed to use its own button identifiers, and everything passed on the re-run. |
 | **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
 | **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
@@ -17,7 +17,7 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 
 | Check | Result |
 |---|---|
-| Engine tests (Swift 5.10.1, Linux) | ✅ 119 / 119 |
+| Engine tests (Swift 5.10.1, Linux) | ✅ 129 / 129 |
 | `swiftc -parse` on all app, widget and test files | ✅ |
 | Project validation (`scripts/validate_project.py`) | ✅ |
 
