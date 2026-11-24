@@ -8,6 +8,6 @@
 //  See Docs/SIGNING.md for details.
 // ─────────────────────────────────────────────────────────────────────────────
 
-DEVELOPMENT_TEAM =
-BASE_BUNDLE_ID = com.example.secondbrain
+DEVELOPMENT_TEAM = RP964NS9GM
+BASE_BUNDLE_ID = com.trentnick.secondbrain
 APP_GROUP_IDENTIFIER = group.$(BASE_BUNDLE_ID)

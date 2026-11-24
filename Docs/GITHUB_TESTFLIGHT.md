@@ -60,16 +60,12 @@ In the repository on github.com, go to **Settings › Secrets and variables › 
 
 | Name | Value |
 |---|---|
-| `APPLE_TEAM_ID` | Your Team ID from step 2 |
+| `APPLE_TEAM_ID` | Optional — already set to `RP964NS9GM` in `Config/Signing.xcconfig` and the workflow |
 | `ASC_KEY_ID` | The Key ID from step 6 |
 | `ASC_ISSUER_ID` | The Issuer ID from step 6 |
 | `ASC_KEY_P8` | Open the `.p8` file in Notepad and paste **all** of it, including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines |
 
-**Variables** tab, then **New repository variable**:
-
-| Name | Value |
-|---|---|
-| `BUNDLE_ID` | `com.trentnick.secondbrain` (your choice from step 3) |
+**Variables** tab (optional): `BUNDLE_ID` overrides the default `com.trentnick.secondbrain`, which is already set in `Config/Signing.xcconfig` and the workflow.
 
 GitHub encrypts secrets, and they never appear in logs.
 

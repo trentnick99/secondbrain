@@ -23,10 +23,11 @@ jobs:
     runs-on: ${{ inputs.runner || vars.MAC_RUNNER || 'macos-26-intel' }}
     timeout-minutes: 60
     env:
-      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      # Team ID and bundle ID aren't secret; they default to the values in Config/Signing.xcconfig.
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID || 'RP964NS9GM' }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      BUNDLE_ID: ${{ vars.BUNDLE_ID }}
+      BUNDLE_ID: ${{ vars.BUNDLE_ID || 'com.trentnick.secondbrain' }}
       BUILD_NUMBER: ${{ github.run_number }}
     steps:
       - uses: actions/checkout@v5
