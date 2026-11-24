@@ -157,11 +157,13 @@ private struct MomentRow: View {
                             .labelStyle(.iconOnly)
                             .foregroundStyle(Theme.success)
                             .accessibilityLabel("Added")
+                            .accessibilityIdentifier("seasonAddedMark")
                     } else {
                         Button("Add") { onAdd(step) }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                             .accessibilityLabel("Add \(step.title)")
+                            .accessibilityIdentifier("seasonAddButton")
                     }
                 }
                 .padding(.leading, 30)
@@ -204,9 +206,11 @@ struct SeasonComingUpCard: View {
         let calendar = Calendar.current
         let added = SeasonPlanStore.keys(addedRaw)
         let hidden = SeasonPlanStore.keys(hiddenRaw)
-        let moments = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar)
-            .filter { !hidden.contains($0.key) }
-            .prefix(3)
+        // The next three weeks — or, in a quiet stretch, just the next thing coming.
+        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar).filter { !hidden.contains($0.key) }
+        let moments = soon.isEmpty
+            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar).filter { !hidden.contains($0.key) }.prefix(1))
+            : Array(soon.prefix(3))
         if !moments.isEmpty {
             Button { router.open(.seasonPlanner) } label: {
                 VStack(alignment: .leading, spacing: 10) {
@@ -217,7 +221,7 @@ struct SeasonComingUpCard: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
-                    ForEach(Array(moments)) { moment in
+                    ForEach(moments) { moment in
                         let toAdd = moment.prep.filter { !added.contains($0.key) }.count
                         HStack(alignment: .firstTextBaseline, spacing: 10) {
                             Image(systemName: moment.kind.systemImage)

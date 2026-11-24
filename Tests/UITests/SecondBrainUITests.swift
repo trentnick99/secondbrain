@@ -70,18 +70,15 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testSeasonPlannerAddsAPrepTask() throws {
-        let settings = app.buttons["settingsButton"].firstMatch
-        XCTAssertTrue(settings.waitForExistence(timeout: 5))
-        settings.tap()
-        let planner = app.buttons["Season planner"].firstMatch
-        for _ in 0..<8 where !(planner.exists && planner.isHittable) { app.swipeUp() }
-        XCTAssertTrue(planner.waitForExistence(timeout: 3))
-        planner.tap()
+        let card = app.buttons["seasonComingUpCard"].firstMatch
+        XCTAssertTrue(card.waitForExistence(timeout: 5), "Home always shows what's coming up next")
+        card.tap()
         XCTAssertTrue(app.descendants(matching: .any)["fiscalWeekLabel"].waitForExistence(timeout: 5))
-        let add = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Add ' AND NOT (label BEGINSWITH 'Add all')")).firstMatch
+        let add = app.buttons.matching(identifier: "seasonAddButton").firstMatch
         XCTAssertTrue(add.waitForExistence(timeout: 5))
         add.tap()
-        XCTAssertTrue(element(containing: "Added").waitForExistence(timeout: 5), "The step shows as added")
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "seasonAddedMark").firstMatch.waitForExistence(timeout: 5),
+                      "The step shows as added")
     }
 
     func testStoreTermsLookup() throws {
