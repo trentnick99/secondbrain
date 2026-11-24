@@ -41,10 +41,11 @@ final class SecondBrainUITests: XCTestCase {
         captureField.tap()
         captureField.typeText("Follow up with Dana about availability next week")
         let confirm = app.buttons["Confirm & Save"].firstMatch
-        XCTAssertTrue(confirm.waitForExistence(timeout: 3), "Ambiguous captures are confirmed before saving")
+        // Generous waits: this is often the first test on a cold CI simulator.
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10), "Ambiguous captures are confirmed before saving")
         confirm.tap()
         app.tabBars.buttons["Associates"].tap()
-        XCTAssertTrue(element(containing: "Dana").waitForExistence(timeout: 3))
+        XCTAssertTrue(element(containing: "Dana").waitForExistence(timeout: 10))
     }
 
     func testMatrixShowsFourQuadrants() throws {
