@@ -77,7 +77,7 @@ jobs:
           python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" || python3 -m pip install --quiet "pyjwt[crypto]"
           python3 scripts/ci/check_asc_key.py
 
-      - name: Archive (signed automatically with the API key)
+      - name: Archive (signed for distribution with the API key — no registered devices needed)
         run: |
           scripts/ci/xcodebuild_step.sh "Archive" xcodebuild archive \
             -project SecondBrain.xcodeproj -scheme SecondBrain -configuration Release \
@@ -90,6 +90,7 @@ jobs:
             DEVELOPMENT_TEAM="$TEAM_ID" \
             BASE_BUNDLE_ID="$BUNDLE_ID" \
             CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 
       - name: Export & upload to App Store Connect
