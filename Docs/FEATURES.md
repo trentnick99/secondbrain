@@ -83,6 +83,22 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 - **Flags days off:** you get a heads-up when something is due on a day you're off.
 - **Carries work to your next shift:** End My Shift moves unfinished work there, so items aren't dropped onto a day off. The Home header shows today's shift, or your next one on days off.
 
+## Your role and imported notes
+
+**Your role.** In Settings › Your role (also part of the welcome steps), pick **Coach**, **Team Lead** or **Store Manager**, your main area (for example Food), and any other areas you also cover. Other areas are hidden by default, and you can change this at any time. Your role then shapes:
+- **Home:** a **My area** card shows open work for your areas and store-wide items. Store managers see the whole store, so they don't get this card.
+- **Tasks:** a **My area** filter.
+- **Season Planner:** a toggle shows only your areas plus store-wide items. It's on by default and also applies to the Home "Coming up" card.
+- **Suggested routines:** a starter list of common routines for your role and area, such as a Saturday numbers review for coaches or a truck plan for Stocking. Add one, or **Add all** after confirming. They become ordinary recurring tasks you can edit, pause or stop. They're suggestions only, so follow your store's actual schedule.
+
+**Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **Import** on Home, the Import button in Notes, or Settings › Import notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Second Brain"). Second Brain:
+- **Finds action items:** it reads bullet points and action sentences, skips greetings, sign-offs and the quoted earlier email, and uses the subject line.
+- **Routes each item:** using area headings ("Food", "Fresh:"), inline labels ("Front End - …") and the departments mentioned, it sorts items into **For you**, **Total store** and **No area mentioned**. Items for other areas are hidden, with a count shown. "Dairy" or "Frozen" count as Food, "Produce" or "Bakery" as Fresh, and so on.
+- **Uses only stated dates:** an item gets a due date only if the notes give one ("by Wednesday"). Nothing is invented.
+- **Lets you review first:** your items and total store items start ticked, and you can untick or edit any of them. Nothing saves until you tap **Add**. Each task records where it came from, and you can choose to keep the original text as a note.
+
+Copy and paste only content you're allowed to keep on a personal device. If your company's Outlook blocks copying, that's company policy and the app doesn't try to work around it. The privacy note still appears if pasted text looks like personnel, medical or case details.
+
 ## Quick Capture
 
 - **Where:** the **+** button on all five tabs, the Home quick actions (Capture, Task, Follow-up, Note, Reminder), the Control Center control or Action button, Siri ("Add a task to Second Brain"), and the widget's Capture link.
