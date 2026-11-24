@@ -31,6 +31,7 @@ struct SecondBrainApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .tint(Theme.accent)   // at the root so sheets inherit it too
                 .environment(router)
                 .environment(lock)
                 .onOpenURL { url in router.open(url: url) }

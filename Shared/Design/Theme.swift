@@ -47,6 +47,17 @@ enum Theme {
         }
     }
 
+    static func color(for kind: RetailMoment.Kind) -> Color {
+        switch kind {
+        case .holiday: return purple
+        case .salesEvent: return pink
+        case .seasonal: return success
+        case .operations: return color(for: .schedule)
+        case .safety: return warning
+        case .fiscal: return accent
+        }
+    }
+
     static func color(for priority: TaskPriority) -> Color {
         switch priority {
         case .critical: return danger

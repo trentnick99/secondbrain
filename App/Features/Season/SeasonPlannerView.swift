@@ -123,8 +123,10 @@ private struct MomentRow: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Image(systemName: moment.kind.systemImage)
-                    .foregroundStyle(moment.kind == .safety ? Theme.warning : Theme.accent)
-                    .frame(width: 22)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.color(for: moment.kind))
+                    .frame(width: 32, height: 32)
+                    .background(Theme.tint(Theme.color(for: moment.kind), 0.18), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(moment.title).font(.headline)
                     Text(dateText).font(.subheadline).foregroundStyle(.secondary)
@@ -133,7 +135,7 @@ private struct MomentRow: View {
                 if isHidden { Image(systemName: "eye.slash").foregroundStyle(.secondary) }
             }
             HStack(spacing: 6) {
-                badge(moment.kind.title)
+                badge(moment.kind.title, tint: Theme.color(for: moment.kind))
                 badge(moment.certainty.label, tint: moment.certainty == .typical ? Theme.warning : .secondary)
             }
             if !moment.note.isEmpty {
@@ -166,13 +168,13 @@ private struct MomentRow: View {
                             .accessibilityIdentifier("seasonAddButton")
                     }
                 }
-                .padding(.leading, 30)
+                .padding(.leading, 42)
             }
             if remaining.count > 1 {
                 Button("Add all \(remaining.count)") { onAddAll() }
                     .buttonStyle(.borderless)
                     .font(.footnote.weight(.semibold))
-                    .padding(.leading, 30)
+                    .padding(.leading, 42)
             }
         }
         .padding(.vertical, 4)
@@ -187,10 +189,9 @@ private struct MomentRow: View {
     private func badge(_ text: String, tint: Color = .secondary) -> some View {
         Text(text)
             .font(.caption2.weight(.semibold))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(Theme.surfaceRaised, in: Capsule())
-            .overlay(Capsule().strokeBorder(Theme.stroke))
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(Theme.tint(tint, 0.16), in: Capsule())
             .foregroundStyle(tint)
     }
 }

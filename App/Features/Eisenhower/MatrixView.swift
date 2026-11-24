@@ -162,7 +162,7 @@ struct MatrixView: View {
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(.secondary)
             }
-            .card()
+            .card(tint: Theme.warning)
         }
         .buttonStyle(.plain)
     }
