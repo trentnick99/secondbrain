@@ -29,6 +29,15 @@ struct SecondBrainApp: App {
                 .environment(router)
                 .environment(lock)
                 .onOpenURL { url in router.open(url: url) }
+                .task {
+                    // Test runs only: `-openURL secondbrain://…` opens a screen at launch (used for screenshots).
+                    guard PersistenceController.isUITesting else { return }
+                    let args = ProcessInfo.processInfo.arguments
+                    if let i = args.firstIndex(of: "-openURL"), i + 1 < args.count, let url = URL(string: args[i + 1]) {
+                        try? await Task.sleep(for: .seconds(1))
+                        router.open(url: url)
+                    }
+                }
                 .onReceive(NotificationCenter.default.publisher(for: RouteRequest.notification)) { _ in
                     if let url = RouteRequest.take() { router.open(url: url) }
                 }
