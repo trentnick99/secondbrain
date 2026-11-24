@@ -23,15 +23,15 @@ Go to **developer.apple.com/account** and open **Membership details**. Copy the 
 
 ## Step 3 — Choose your bundle ID
 
-Pick something unique, for example **`com.trentnick.secondbrain`**. You'll use it in steps 4, 5 and 6. The widget gets `com.trentnick.secondbrain.widgets`, and the shared App Group is `group.com.trentnick.secondbrain`.
+Pick something unique, for example **`com.trentnick99.secondbrain`**. You'll use it in steps 4, 5 and 6. The widget gets `com.trentnick99.secondbrain.widgets`, and the shared App Group is `group.com.trentnick99.secondbrain`.
 
 ## Step 4 — Register the identifiers (once)
 
 At **developer.apple.com/account**, open **Certificates, Identifiers & Profiles › Identifiers** and tap the **+** button for each of these:
 
-1. **App Group:** choose *App Groups*, set Description to `Second Brain`, and Identifier to `group.com.trentnick.secondbrain`.
-2. **App ID (the app):** choose *App IDs › App*, set Description to `Second Brain`, choose Bundle ID **Explicit** `com.trentnick.secondbrain`, and tick **App Groups** under Capabilities. Then choose Continue › Register. Open the new App ID, click **Configure** next to App Groups, tick your group and Save.
-3. **App ID (the widget):** do the same with `com.trentnick.secondbrain.widgets`, App Groups ticked and assigned to the same group.
+1. **App Group:** choose *App Groups*, set Description to `Second Brain`, and Identifier to `group.com.trentnick99.secondbrain`.
+2. **App ID (the app):** choose *App IDs › App*, set Description to `Second Brain`, choose Bundle ID **Explicit** `com.trentnick99.secondbrain`, and tick **App Groups** under Capabilities. Then choose Continue › Register. Open the new App ID, click **Configure** next to App Groups, tick your group and Save.
+3. **App ID (the widget):** do the same with `com.trentnick99.secondbrain.widgets`, App Groups ticked and assigned to the same group.
 
 ## Step 5 — Create the app in App Store Connect (once)
 
@@ -40,7 +40,7 @@ At **developer.apple.com/account**, open **Certificates, Identifiers & Profiles 
    - Platform: **iOS**
    - Name: something unique on the App Store, such as `Second Brain for Coaches`. App Store names must be unique. Your Home Screen still shows **Second Brain**.
    - Primary language: English (U.S.)
-   - Bundle ID: pick `com.trentnick.secondbrain` from the list
+   - Bundle ID: pick `com.trentnick99.secondbrain` from the list
    - SKU: anything, such as `secondbrain`
    - User Access: **Full Access**
 3. Nothing is published. The app stays private to you in TestFlight.
@@ -65,7 +65,7 @@ In the repository on github.com, go to **Settings › Secrets and variables › 
 | `ASC_ISSUER_ID` | The Issuer ID from step 6 |
 | `ASC_KEY_P8` | Open the `.p8` file in Notepad and paste **all** of it, including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines |
 
-**Variables** tab (optional): `BUNDLE_ID` overrides the default `com.trentnick.secondbrain`, which is already set in `Config/Signing.xcconfig` and the workflow.
+**Variables** tab (optional): `BUNDLE_ID` overrides the default `com.trentnick99.secondbrain`, which is already set in `Config/Signing.xcconfig` and the workflow.
 
 GitHub encrypts secrets, and they never appear in logs.
 

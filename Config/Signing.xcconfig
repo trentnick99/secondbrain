@@ -9,5 +9,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 DEVELOPMENT_TEAM = RP964NS9GM
-BASE_BUNDLE_ID = com.trentnick.secondbrain
+BASE_BUNDLE_ID = com.trentnick99.secondbrain
 APP_GROUP_IDENTIFIER = group.$(BASE_BUNDLE_ID)
