@@ -14,6 +14,11 @@ xcrun simctl bootstatus "$UDID" -b
 xcrun simctl ui "$UDID" appearance dark
 xcrun simctl status_bar "$UDID" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 \
   --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+# Skip the keyboard's first-run "slide to type" tip so it doesn't cover the screen.
+for domain in com.apple.Preferences com.apple.keyboard.preferences; do
+  xcrun simctl spawn "$UDID" defaults write "$domain" DidShowContinuousPathIntroduction -bool true || true
+  xcrun simctl spawn "$UDID" defaults write "$domain" DidShowGestureKeyboardIntroduction -bool true || true
+done
 xcrun simctl install "$UDID" "$APP"
 xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData >/dev/null
 sleep 20
@@ -26,11 +31,16 @@ shot() {
 # Each screen is a fresh launch straight onto that screen (test mode only), because opening
 # links from outside the app makes iOS ask "Open in Second Brain?" and blocks the screen.
 screen() {
-  local name="$1" link="$2" wait="${3:-9}"
-  xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
-  xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -openURL "secondbrain://$link" >/dev/null
-  sleep "$wait"
-  shot "$name"
+  local name="$1" link="$2" wait="${3:-10}"
+  for attempt in 1 2 3; do
+    xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
+    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -openURL "secondbrain://$link" >/dev/null
+    sleep $((wait + attempt * 4))
+    shot "$name"
+    # Still on Home? The slow simulator missed the screen — try again with more time.
+    if [ "$(md5 -q "$OUT/$name.png")" != "$(md5 -q "$OUT/01-home.png")" ]; then return; fi
+    echo "  $name still showed Home (attempt $attempt)"
+  done
 }
 
 shot 01-home

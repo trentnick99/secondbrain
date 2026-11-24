@@ -34,7 +34,7 @@ struct SecondBrainApp: App {
                     guard PersistenceController.isUITesting else { return }
                     let args = ProcessInfo.processInfo.arguments
                     if let i = args.firstIndex(of: "-openURL"), i + 1 < args.count, let url = URL(string: args[i + 1]) {
-                        try? await Task.sleep(for: .seconds(1))
+                        try? await Task.sleep(for: .seconds(2.5))
                         router.open(url: url)
                     }
                 }
