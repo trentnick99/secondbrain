@@ -24,12 +24,6 @@ struct QuickCaptureView: View {
 
     private let parser = NaturalLanguageParser()
 
-    /// "Jordan", "Priya (new)" for someone not in Associates yet, or "Stock 2 (team)" — teams never become contacts.
-    private var personLabel: String {
-        if StoreRole.isGroupName(draft.associateName) { return "\(draft.associateName) (team)" }
-        return draft.associateIsKnown ? draft.associateName : "\(draft.associateName) (new)"
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -234,6 +228,12 @@ struct QuickCaptureView: View {
 
 /// Shows how the capture was understood.
 struct InterpretationCard: View {
+    /// "Jordan", "Priya (new)" for someone not in Associates yet, or "Stock 2 (team)" — teams never become contacts.
+    private var personLabel: String {
+        if StoreRole.isGroupName(draft.associateName) { return "\(draft.associateName) (team)" }
+        return draft.associateIsKnown ? draft.associateName : "\(draft.associateName) (new)"
+    }
+
     let draft: CaptureDraft
     var onAdjust: () -> Void
 

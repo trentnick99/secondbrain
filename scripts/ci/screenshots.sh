@@ -20,7 +20,7 @@ for domain in com.apple.Preferences com.apple.keyboard.preferences; do
   xcrun simctl spawn "$UDID" defaults write "$domain" DidShowGestureKeyboardIntroduction -bool true || true
 done
 xcrun simctl install "$UDID" "$APP"
-xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData >/dev/null
+xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule >/dev/null
 sleep 20
 
 shot() {
@@ -34,7 +34,7 @@ screen() {
   local name="$1" link="$2" wait="${3:-14}"
   for attempt in 1 2 3 4; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
-    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -openURL "secondbrain://$link" >/dev/null
+    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -openURL "secondbrain://$link" >/dev/null
     sleep $((wait + attempt * 5))
     shot "$name"
     # Still launching, or still on Home? The slow simulator missed the screen — retry with more time.

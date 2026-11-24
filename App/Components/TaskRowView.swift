@@ -50,16 +50,24 @@ struct TaskRowView: View {
     private var metaLine: some View {
         let items = metaItems
         if !items.isEmpty {
-            HStack(spacing: 8) {
-                ForEach(items, id: \.text) { item in
-                    Label(item.text, systemImage: item.icon)
-                        .labelStyle(.titleAndIcon)
-                        .font(.caption)
-                        .foregroundStyle(item.color)
-                        .lineLimit(1)
+            // One line when it fits; otherwise each detail on its own line instead of truncating them all.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(items, id: \.text) { metaLabel($0) }
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(items, id: \.text) { metaLabel($0) }
                 }
             }
         }
+    }
+
+    private func metaLabel(_ item: Meta) -> some View {
+        Label(item.text, systemImage: item.icon)
+            .labelStyle(.titleAndIcon)
+            .font(.caption)
+            .foregroundStyle(item.color)
+            .lineLimit(1)
     }
 
     private struct Meta { let text: String; let icon: String; let color: Color }

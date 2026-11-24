@@ -16,6 +16,11 @@ struct SecondBrainApp: App {
         if PersistenceController.isUITesting {
             AppGroup.defaults.set(true, forKey: SettingsKey.hasCompletedOnboarding)
             AppGroup.defaults.set(false, forKey: SettingsKey.appLockEnabled)
+            if ProcessInfo.processInfo.arguments.contains("-sampleSchedule") {
+                // A realistic five-shift week for screenshots: 7–5, 10–8 and 12–10, off Thursday and Friday.
+                let schedule = ShiftSchedule(shifts: [.opening, .mid, .opening, .closing, nil, nil, .opening])
+                AppGroup.defaults.set(ScheduleStorage.encode(schedule), forKey: SettingsKey.shiftSchedule)
+            }
             if ProcessInfo.processInfo.arguments.contains("-sampleData") {
                 SampleData.load(into: PersistenceController.shared.mainContext)
             }
