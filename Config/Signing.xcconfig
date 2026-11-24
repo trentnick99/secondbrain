@@ -11,3 +11,6 @@
 DEVELOPMENT_TEAM = RP964NS9GM
 BASE_BUNDLE_ID = com.trentnick99.secondbrain
 APP_GROUP_IDENTIFIER = group.$(BASE_BUNDLE_ID)
+
+// TestFlight workflow only: App Store profiles chosen per target by name (empty — and ignored — otherwise).
+PROVISIONING_PROFILE_SPECIFIER = $(SB_PROFILE_$(TARGET_NAME))
