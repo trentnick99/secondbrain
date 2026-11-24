@@ -24,6 +24,8 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 | Area | Highlights |
 |---|---|
 | **Your store** | Knows coach and team lead roles, the store manager, and areas like AP, ACC and OPD. "Have Jordan work the truck" hands a task to a team lead, and it stays Waiting until they confirm. A weekly 7–5 / 10–8 / 12–10 schedule drives "end of shift", briefings and End My Shift. |
+| **Ask** | "What do I do if…": 28 offline guides (safety, leading people, the floor, customers, ethics) from general practice and public sources. On Apple Intelligence iPhones, written answers come from Apple's on-device model, and your question stays on the phone. Emergencies show "call 911" first. One tap searches Reddit (r/walmart) or the web in your browser. |
+| **Quick Note** | Set the Action button to **Quick Note** to save a note from anywhere without opening the app. |
 | **Your role & imports** | Choose your role and area (for example Food coach). Home, Tasks and the Season Planner focus on your areas plus store-wide items, and suggested routines fit your role. Paste a market email or notes, and the action items are sorted into yours, total store and no area. Other areas are hidden, only stated dates are used, and nothing saves until you review it. |
 | **Season Planner** | Shows the next 12 months: holidays, Walmart's announced deal events, typical seasonal sets, clock changes and weather safety. Each item has prep steps you add as tasks with a tap. Home shows what's coming up and the fiscal week. |
 | **Store terms** | Capture understands Stock 1–3, CAP, O/N, MOD, department numbers, OPD and Fresh terms, and safety equipment. It also includes a searchable, offline reference of about 500 store terms, flagged when they're older, informal or vary by store. A gentle note appears if you start typing disciplinary, medical, attendance or AP case details. |
@@ -38,7 +40,7 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 | **Recurring** | Daily, weekdays, specific weekdays, monthly and custom intervals. A week is generated ahead with no duplicates. Pause, edit or discontinue. |
 | **Notifications** | Local, scheduled ahead of time, and working offline. Actions: Mark Complete, Snooze 15 min / 1 hr, Tomorrow Morning, Open Task. Also deadline, still-open and daily-briefing alerts, privacy previews and a badge. |
 | **Widgets** | Home Screen (small, medium with tappable checkboxes, large with matrix counts and follow-ups) and Lock Screen (circular, rectangular, inline), all showing real data. |
-| **Siri & Shortcuts** | “Add a task to Second Brain”, “What are my priorities in Second Brain”, “Show my overdue tasks in Second Brain”, “Show my follow-ups in Second Brain”, “Remind me in Second Brain”, “End my shift in Second Brain”, “Import notes into Second Brain”. |
+| **Siri & Shortcuts** | “Add a task to Second Brain”, “What are my priorities in Second Brain”, “Show my overdue tasks in Second Brain”, “Show my follow-ups in Second Brain”, “Remind me in Second Brain”, “End my shift in Second Brain”, “Import notes into Second Brain”, “Quick note in Second Brain”. |
 | **Optional extras** | Apple Calendar integration (events, conflicts, add-to-calendar on request), an Apple Intelligence briefing (iOS 26+), iCloud sync, Face ID lock, JSON backup and restore with daily automatic backups. |
 
 ## Repository layout

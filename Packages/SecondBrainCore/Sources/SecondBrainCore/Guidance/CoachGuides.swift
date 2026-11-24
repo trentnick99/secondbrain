@@ -507,6 +507,7 @@ public enum CoachGuides {
         "can", "if", "when", "there", "their", "they", "them", "about", "get", "have", "has", "im", "i'm", "someone",
         "something", "need", "want", "help", "best", "way", "tip", "tips", "store", "walmart", "coach", "up", "out",
         "keep", "keeps", "associate", "employee", "worker", "team", "member", "people", "person", "go", "going", "got",
-        "just", "really", "very", "so", "too", "not", "no", "from", "into", "will", "would", "could", "all", "any"
+        "just", "really", "very", "so", "too", "not", "no", "from", "into", "will", "would", "could", "all", "any",
+        "first", "tonight", "now", "right", "thing", "things"
     ]
 }

@@ -99,6 +99,21 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 
 Copy and paste only content you're allowed to keep on a personal device. If your company's Outlook blocks copying, that's company policy and the app doesn't try to work around it. The privacy note still appears if pasted text looks like personnel, medical or case details.
 
+## Ask
+
+Tap **Ask: what do I do if…** on Home (or Settings › Ask) and type a question, like "We're short-staffed tonight and freight is behind, what first?" or "How do I give feedback to a team lead who keeps missing deadlines?"
+
+- **Guides (offline):** there are 28 short guides across Safety, Leading people, Running the floor, Customers, and Ethics & conduct. They're built from general leadership and safety practice and public sources: OSHA, FDA/USDA/CPSC recalls, the National Weather Service, and Walmart's public policies and Code of Conduct. Before you ask, Ask suggests guides for your role. Guides never invent store procedures; where one matters, they say to follow your store's procedure and who to check with.
+- **Written answers (Apple Intelligence, iOS 26+):** on an Apple Intelligence iPhone, Apple's on-device model writes a short answer from the matching guides and your own store steps. Your question never leaves the phone, and it works offline. You can turn this off in Settings › Intelligence. Answers can be wrong, so your store's procedures come first. **Save as note** keeps an answer.
+- **Emergencies:** if a question sounds like an emergency (someone hurt, a weapon, smoke), Ask shows "call 911 now, then get the manager on duty" first.
+- **Search online:** **Search Reddit (r/walmart)** and **Search the web** open in your browser. Reddit posts are other people's opinions, not company policy, and the app doesn't read Reddit itself.
+- **Your store's steps:** each guide has a place to write the steps your store trained you on. They're kept on your phone and used in written answers.
+- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks.
+
+## Quick Note (Action button)
+
+Set it up in your iPhone's **Settings › Action Button › Shortcut › Second Brain › Quick Note**. Press the button anywhere, type or dictate, and the note is saved to Notes exactly as you said it, without opening the app. It's tagged "quick note", and nothing is turned into a task or given a date. You can also say "Quick note in Second Brain". If the note looks like it holds personnel, medical or other sensitive details, Siri adds a short heads-up.
+
 ## Quick Capture
 
 - **Where:** the **+** button on all five tabs, the Home quick actions (Capture, Task, Follow-up, Note, Reminder), the Control Center control or Action button, Siri ("Add a task to Second Brain"), and the widget's Capture link.
@@ -174,7 +189,7 @@ Widgets read the same database through the App Group. They refresh after every c
 
 ## Siri & Shortcuts
 
-"Add a task to Second Brain" · "Remind me in Second Brain" · "What are my priorities in Second Brain" · "Show my overdue tasks in Second Brain" · "Show my follow-ups in Second Brain" · "End my shift in Second Brain" · "Quick capture in Second Brain". Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
+"Add a task to Second Brain" · "Remind me in Second Brain" · "What are my priorities in Second Brain" · "Show my overdue tasks in Second Brain" · "Show my follow-ups in Second Brain" · "End my shift in Second Brain" · "Quick capture in Second Brain" · "Quick note in Second Brain" · "Import notes into Second Brain" · "Look up a store term in Second Brain". Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
 
 ## Intelligence (optional, on-device)
 

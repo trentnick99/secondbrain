@@ -38,6 +38,10 @@ final class CoachGuideTests: XCTestCase {
         XCTAssertEqual(CoachGuides.search("employee crying in the breakroom").first?.id, "struggling")
         XCTAssertEqual(CoachGuides.search("what should I focus on today").first?.id, "plan-shift")
         XCTAssertEqual(CoachGuides.search("my store manager and market manager want different things").first?.id, "conflicting-priorities")
+        let rush = CoachGuides.search("Short staffed tonight and freight is behind, what first?").map(\.id)
+        XCTAssertEqual(Set(rush.prefix(2)), ["short-staffed", "freight-behind"])
+        XCTAssertFalse(rush.contains("new-associate"), "“what first?” isn't about a first week")
+        XCTAssertEqual(CoachGuides.search("new associate first week").first?.id, "new-associate")
         XCTAssertTrue(CoachGuides.search("zzzz qqqq").isEmpty)
         XCTAssertTrue(CoachGuides.search("").isEmpty)
     }
