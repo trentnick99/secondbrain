@@ -2,8 +2,8 @@ import SwiftUI
 import UIKit
 import SecondBrainCore
 
-/// Visual language: charcoal surfaces, one restrained accent, clear quadrant colors.
-/// Deliberately neutral — no retailer branding.
+/// Visual language: "bold color" — charcoal surfaces lit by a teal header, tinted stat tiles,
+/// colored section badges and quadrant stripes. Deliberately neutral — no retailer branding.
 enum Theme {
     static func dynamic(light: UIColor, dark: UIColor) -> Color {
         Color(uiColor: UIColor { traits in traits.userInterfaceStyle == .dark ? dark : light })
@@ -25,6 +25,18 @@ enum Theme {
     static let danger = dynamic(light: rgb(209, 52, 56), dark: rgb(255, 99, 99))
     static let warning = dynamic(light: rgb(199, 125, 0), dark: rgb(255, 184, 77))
     static let success = dynamic(light: rgb(36, 145, 84), dark: rgb(84, 214, 138))
+    static let purple = dynamic(light: rgb(83, 74, 183), dark: rgb(175, 169, 236))
+    static let pink = dynamic(light: rgb(193, 64, 110), dark: rgb(237, 147, 177))
+
+    // Header ("hero") card: deep teal with mint text, the same in light and dark.
+    static let heroFill = Color(uiColor: rgb(15, 110, 86))
+    static let heroText = Color(uiColor: rgb(225, 245, 238))
+    static let heroSecondary = Color(uiColor: rgb(159, 225, 203))
+    static let heroTrack = Color(uiColor: rgb(8, 80, 65))
+    static let heroProgress = Color(uiColor: rgb(93, 202, 165))
+
+    /// Background for a colored tile or badge.
+    static func tint(_ color: Color, _ strength: Double = 0.16) -> Color { color.opacity(strength) }
 
     static func color(for quadrant: Quadrant) -> Color {
         switch quadrant {
@@ -50,19 +62,26 @@ enum Theme {
 /// Card container used across the dashboard and planners.
 struct CardBackground: ViewModifier {
     var padding: CGFloat = 14
+    /// Optional color wash for cards that carry a meaning (Inbox, Coming up).
+    var tint: Color? = nil
 
     func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
         content
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
-                    .strokeBorder(Theme.stroke, lineWidth: 1)
-            )
+            .background {
+                ZStack {
+                    shape.fill(Theme.surface)
+                    if let tint { shape.fill(tint.opacity(0.12)) }
+                }
+            }
+            .overlay(shape.strokeBorder(tint.map { $0.opacity(0.35) } ?? Theme.stroke, lineWidth: 1))
     }
 }
 
 extension View {
-    func card(padding: CGFloat = 14) -> some View { modifier(CardBackground(padding: padding)) }
+    func card(padding: CGFloat = 14, tint: Color? = nil) -> some View {
+        modifier(CardBackground(padding: padding, tint: tint))
+    }
 }

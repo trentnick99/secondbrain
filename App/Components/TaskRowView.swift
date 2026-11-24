@@ -42,9 +42,18 @@ struct TaskRowView: View {
             }
         }
         .padding(.vertical, 4)
+        .padding(.leading, showsStripe ? 12 : 0)
+        .background(alignment: .leading) {
+            // Quadrant stripe: red Do First, blue Schedule, amber Delegate, gray Eliminate.
+            if showsStripe {
+                Capsule().fill(Theme.color(for: task.quadrant)).frame(width: 4).padding(.vertical, 2)
+            }
+        }
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
+
+    private var showsStripe: Bool { showQuadrant && task.isOpen && task.status != .inbox }
 
     @ViewBuilder
     private var metaLine: some View {

@@ -215,7 +215,7 @@ struct SeasonComingUpCard: View {
             Button { router.open(.seasonPlanner) } label: {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
-                        SectionTitle(title: "Coming up", systemImage: "leaf.arrow.triangle.circlepath")
+                        SectionTitle(title: "Coming up", systemImage: "leaf.arrow.triangle.circlepath", tint: Theme.purple)
                         Spacer()
                         Text(RetailCalendar.fiscalWeekLabel(for: now, calendar: calendar))
                             .font(.caption.weight(.semibold))
@@ -225,7 +225,7 @@ struct SeasonComingUpCard: View {
                         let toAdd = moment.prep.filter { !added.contains($0.key) }.count
                         HStack(alignment: .firstTextBaseline, spacing: 10) {
                             Image(systemName: moment.kind.systemImage)
-                                .foregroundStyle(moment.kind == .safety ? Theme.warning : Theme.accent)
+                                .foregroundStyle(moment.kind == .safety ? Theme.warning : Theme.purple)
                                 .frame(width: 20)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(moment.title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
@@ -236,13 +236,13 @@ struct SeasonComingUpCard: View {
                             Spacer()
                         }
                     }
-                    Text("Open Season Planner").font(.footnote.weight(.semibold)).foregroundStyle(Theme.accent)
+                    Text("Open Season Planner").font(.footnote.weight(.semibold)).foregroundStyle(Theme.purple)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .card()
+            .card(tint: Theme.purple)
             .accessibilityIdentifier("seasonComingUpCard")
         }
     }

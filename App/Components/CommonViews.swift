@@ -8,21 +8,30 @@ struct SectionTitle: View {
     var count: Int? = nil
     var tint: Color = .secondary
 
+    /// Neutral titles still get a colored badge, in the accent.
+    private var badge: Color { tint == .secondary ? Theme.accent : tint }
+
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             if let systemImage {
-                Image(systemName: systemImage).foregroundStyle(tint).accessibilityHidden(true)
+                Image(systemName: systemImage)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(badge)
+                    .frame(width: 26, height: 26)
+                    .background(Theme.tint(badge, 0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityHidden(true)
             }
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .textCase(.uppercase)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(tint == .secondary ? Color.secondary : tint)
             if let count {
                 Text("\(count)")
                     .font(.caption.weight(.bold))
+                    .foregroundStyle(badge)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 2)
-                    .background(Theme.surfaceRaised, in: Capsule())
+                    .background(Theme.tint(badge, 0.18), in: Capsule())
             }
             Spacer()
         }

@@ -79,35 +79,69 @@ struct DashboardView: View {
     // MARK: Sections
 
     private func header(_ agenda: DayAgenda) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()) + " · " + shiftLine)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-            HStack(spacing: 10) {
-                StatPill(value: agenda.overdue.count, label: "Overdue", tint: Theme.danger)
-                StatPill(value: agenda.dueToday.count, label: "Today", tint: Theme.accent)
-                StatPill(value: agenda.followUpsDue.count, label: "Follow-ups", tint: Theme.color(for: .schedule))
-                StatPill(value: agenda.completedToday.count, label: "Done", tint: Theme.success)
-            }
-            if !briefing.isEmpty {
-                Text(briefing)
+        let done = agenda.completedToday.count
+        let total = done + agenda.dueToday.count + agenda.overdue.count
+        let progress = total == 0 ? 0 : Double(done) / Double(total)
+        return VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(greeting)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Theme.heroText)
+                    .lineLimit(2)
+                Text(dateLine)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(5)
-                    .padding(.top, 2)
+                    .foregroundStyle(Theme.heroSecondary)
+                Capsule()
+                    .fill(Theme.heroTrack)
+                    .frame(height: 8)
+                    .overlay(alignment: .leading) {
+                        Capsule()
+                            .fill(Theme.heroProgress)
+                            .scaleEffect(x: max(progress, 0.03), y: 1, anchor: .leading)
+                    }
+                    .accessibilityHidden(true)
+                Text(total == 0 ? "Nothing due today" : "\(done) of \(total) done today")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Theme.heroSecondary)
+                Button {
+                    router.open(.shift)
+                } label: {
+                    Label("End My Shift", systemImage: "moon.stars")
+                        .font(.headline)
+                        .foregroundStyle(Theme.heroFill)
+                        .frame(maxWidth: .infinity, minHeight: 46)
+                        .background(Theme.heroText, in: Capsule())
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 2)
+                .accessibilityIdentifier("endShiftButton")
             }
-            Button {
-                router.open(.shift)
-            } label: {
-                Label("End My Shift", systemImage: "moon.stars")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, minHeight: 48)
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.heroFill, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+
+            HStack(spacing: 8) {
+                StatPill(value: agenda.overdue.count, label: "Overdue", tint: Theme.danger, systemImage: "exclamationmark.circle")
+                StatPill(value: agenda.dueToday.count, label: "Today", tint: Theme.accent, systemImage: "calendar")
+                StatPill(value: agenda.followUpsDue.count, label: "Follow-ups", tint: Theme.color(for: .schedule), systemImage: "person")
+                StatPill(value: done, label: "Done", tint: Theme.success, systemImage: "checkmark")
             }
-            .buttonStyle(.bordered)
-            .tint(Theme.accent)
-            .accessibilityIdentifier("endShiftButton")
         }
-        .card()
+    }
+
+    /// First line of the briefing ("Good evening. You have 6 tasks due today…"), or a plain greeting.
+    private var greeting: String {
+        let first = briefing.split(separator: "\n").first.map(String.init) ?? ""
+        if !first.isEmpty { return first }
+        let hour = Calendar.current.component(.hour, from: now)
+        return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
+    }
+
+    /// "Tue, Nov 24 · Shift 7–5 · Wk 43"
+    private var dateLine: String {
+        let week = RetailCalendar.fiscalWeek(of: now, calendar: .current).week
+        return now.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()) + " · " + shiftLine + " · Wk \(week)"
     }
 
     /// "Shift 10–8" or "Off today · next shift Thu 12–10".
@@ -123,11 +157,11 @@ struct DashboardView: View {
     private var quickActions: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                QuickActionButton(title: "Capture", systemImage: "bolt.fill") { router.open(.capture(nil)) }
-                QuickActionButton(title: "Task", systemImage: "checklist") { router.open(.capture(.task)) }
-                QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock") { router.open(.capture(.followUp)) }
-                QuickActionButton(title: "Note", systemImage: "note.text") { router.open(.capture(.note)) }
-                QuickActionButton(title: "Reminder", systemImage: "bell") { router.open(.capture(.reminder)) }
+                QuickActionButton(title: "Capture", systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
+                QuickActionButton(title: "Task", systemImage: "checklist", tint: Theme.color(for: .schedule)) { router.open(.capture(.task)) }
+                QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock", tint: Theme.purple) { router.open(.capture(.followUp)) }
+                QuickActionButton(title: "Note", systemImage: "note.text", tint: Theme.warning) { router.open(.capture(.note)) }
+                QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }
             }
         }
     }
@@ -144,7 +178,7 @@ struct DashboardView: View {
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(.secondary)
             }
-            .card()
+            .card(tint: Theme.warning)
         }
         .buttonStyle(.plain)
     }
@@ -241,15 +275,28 @@ struct StatPill: View {
     let value: Int
     let label: String
     let tint: Color
+    var systemImage: String? = nil
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text("\(value)").font(.title3.weight(.bold).monospacedDigit()).foregroundStyle(value > 0 ? tint : .secondary)
-            Text(label).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
+        let color = value > 0 ? tint : Color.secondary
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 4) {
+                if let systemImage {
+                    Image(systemName: systemImage).font(.caption.weight(.bold)).accessibilityHidden(true)
+                }
+                Text("\(value)").font(.title3.weight(.bold).monospacedDigit())
+            }
+            .foregroundStyle(color)
+            Text(label)
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(color.opacity(0.85))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Theme.tint(color, value > 0 ? 0.18 : 0.10), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 }
@@ -257,15 +304,20 @@ struct StatPill: View {
 struct QuickActionButton: View {
     let title: String
     let systemImage: String
+    var tint: Color = Theme.accent
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
-                Image(systemName: systemImage).font(.title3)
+                Image(systemName: systemImage)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 36, height: 36)
+                    .background(Theme.tint(tint, 0.18), in: Circle())
                 Text(title).font(.caption.weight(.medium))
             }
-            .frame(width: 84, height: 72)
+            .frame(width: 84, height: 80)
             .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.stroke))
         }
