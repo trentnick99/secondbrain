@@ -11,6 +11,8 @@ struct SeasonPlannerView: View {
     @AppStorage(SettingsKey.seasonHidden, store: AppGroup.defaults) private var hiddenRaw = ""
     @State private var showHidden = false
     @State private var confirmAll: RetailMoment?
+    @AppStorage(SettingsKey.seasonMyAreasOnly, store: AppGroup.defaults) private var myAreasOnly = SettingsDefault.seasonMyAreasOnly
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @State private var now = Date()
 
     private var calendar: Calendar { .current }
@@ -19,7 +21,9 @@ struct SeasonPlannerView: View {
         let added = SeasonPlanStore.keys(addedRaw)
         let hidden = SeasonPlanStore.keys(hiddenRaw)
         let all = RetailCalendar.upcoming(from: now, days: 365, calendar: calendar)
-        let visible = all.filter { showHidden || !hidden.contains($0.key) }
+        let role = RoleStorage.decode(roleJSON)
+        let filtering = myAreasOnly && SeasonFilter.canFilter(role)
+        let visible = all.filter { (showHidden || !hidden.contains($0.key)) && (!filtering || SeasonFilter.isRelevant($0, to: role)) }
 
         NavigationStack {
             List {
@@ -27,6 +31,10 @@ struct SeasonPlannerView: View {
                     Label(RetailCalendar.fiscalWeekLabel(for: now, calendar: calendar), systemImage: "calendar")
                         .font(.headline)
                         .accessibilityIdentifier("fiscalWeekLabel")
+                    if SeasonFilter.canFilter(role), let role {
+                        Toggle("Only \(role.areasSummary) and store-wide", isOn: $myAreasOnly)
+                            .accessibilityIdentifier("seasonMyAreasToggle")
+                    }
                 } footer: {
                     Text("Tap **Add** on a step to make it a task. Due dates move to your last workday before the event. Swipe an item to hide it if it doesn't apply to your store.")
                 }
@@ -196,6 +204,19 @@ private struct MomentRow: View {
     }
 }
 
+/// Shows the person's areas plus store-wide items (no areas listed) in the Season Planner and on Home.
+enum SeasonFilter {
+    static func canFilter(_ role: UserRole?) -> Bool {
+        guard let role else { return false }
+        return !role.seesWholeStore && role.primaryArea != nil
+    }
+
+    static func isRelevant(_ moment: RetailMoment, to role: UserRole?) -> Bool {
+        guard let role, canFilter(role) else { return true }
+        return moment.areas.isEmpty || moment.areas.contains(where: role.covers)
+    }
+}
+
 /// Home card: what's coming up in the next three weeks, with prep still to add.
 struct SeasonComingUpCard: View {
     @Environment(AppRouter.self) private var router
@@ -208,9 +229,14 @@ struct SeasonComingUpCard: View {
         let added = SeasonPlanStore.keys(addedRaw)
         let hidden = SeasonPlanStore.keys(hiddenRaw)
         // The next three weeks — or, in a quiet stretch, just the next thing coming.
-        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar).filter { !hidden.contains($0.key) }
+        let role = AppSettings.userRole
+        let mine: (RetailMoment) -> Bool = { m in
+            !hidden.contains(m.key) && (!AppGroup.defaults.bool(forKey: SettingsKey.seasonMyAreasOnly, default: SettingsDefault.seasonMyAreasOnly)
+                                        || SeasonFilter.isRelevant(m, to: role))
+        }
+        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar).filter(mine)
         let moments = soon.isEmpty
-            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar).filter { !hidden.contains($0.key) }.prefix(1))
+            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar).filter(mine).prefix(1))
             : Array(soon.prefix(3))
         if !moments.isEmpty {
             Button { router.open(.seasonPlanner) } label: {

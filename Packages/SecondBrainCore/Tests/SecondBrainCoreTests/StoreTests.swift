@@ -78,7 +78,8 @@ final class StoreVocabularyTests: XCTestCase {
     }
 
     func testAreasComeFirstInPickers() {
-        XCTAssertEqual(Array(DepartmentLexicon.allNames.prefix(9)), StoreAreas.all)
+        XCTAssertEqual(DepartmentLexicon.allNames.first, StoreAreas.totalStore, "Total Store leads the picker")
+        XCTAssertEqual(Array(DepartmentLexicon.allNames.dropFirst().prefix(9)), StoreAreas.all)
     }
 
     func testRoleInference() {

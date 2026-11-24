@@ -23,7 +23,8 @@ enum Lexicon {
         "fire extinguisher", "extinguisher", "extinguishers", "eyewash", "chemical spill", "sds", "msds", "lockout",
         "tagout", "baler", "compactor", "forklift", "pallet jack", "safety observation", "safety observations",
         "safety walk", "safety huddle", "fire marshal",
-        "safety sweep", "safety committee", "safety champion", "near miss", "near misses", "loto", "lockout/tagout",
+        "safety sweep", "safety committee", "safety champion", "fire exit", "fire exits", "emergency exit",
+        "emergency exits", "exits clear", "near miss", "near misses", "loto", "lockout/tagout",
         "lock out tag out", "pit", "ple", "pre-use", "pre-use inspection", "pre-use inspections", "equipment inspection",
         "walkie stacker", "walkie rider", "electric pallet jack", "epj", "scissor lift", "ergonomics", "spill response",
         "evacuation", "fire drill", "emergency action plan", "code adam", "code white", "code blue", "active threat"

@@ -57,6 +57,28 @@ struct LookUpStoreTermIntent: AppIntent {
     }
 }
 
+/// "Import notes into Second Brain" — opens the import screen with text from Shortcuts or the clipboard.
+struct ImportNotesIntent: AppIntent {
+    static var title: LocalizedStringResource = "Import Notes"
+    static var description = IntentDescription("Opens Second Brain's import screen with notes to sort into tasks. Nothing is added until you review it.")
+    static var openAppWhenRun: Bool = true
+
+    @Parameter(title: "Notes", description: "The email or notes to import. Leave empty to paste in the app.")
+    var text: String?
+
+    init() {}
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        var components = URLComponents()
+        components.scheme = DeepLink.scheme
+        components.host = "import"
+        if let text, !text.isEmpty { components.queryItems = [URLQueryItem(name: "text", value: text)] }
+        RouteRequest.post(components.url ?? DeepLink.capture)
+        return .result()
+    }
+}
+
 /// Builds the spoken answer for a term lookup.
 enum StoreTermAnswer {
     static func answer(for spoken: String) -> String {
@@ -220,6 +242,10 @@ struct SecondBrainShortcuts: AppShortcutsProvider {
             "Look up a store term in \(.applicationName)",
             "What does a term mean in \(.applicationName)"
         ], shortTitle: "Store Terms", systemImageName: "character.book.closed")
+        AppShortcut(intent: ImportNotesIntent(), phrases: [
+            "Import notes into \(.applicationName)",
+            "Import market notes in \(.applicationName)"
+        ], shortTitle: "Import Notes", systemImageName: "square.and.arrow.down")
         AppShortcut(intent: OpenQuickCaptureIntent(), phrases: [
             "Quick capture in \(.applicationName)",
             "Open \(.applicationName) capture"

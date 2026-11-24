@@ -9,6 +9,8 @@ public enum DepartmentLexicon {
     }
 
     public static let entries: [Entry] = [
+        // Whole-store scope, for notes addressed to every area.
+        Entry(name: "Total Store", aliases: ["total store", "store-wide", "storewide", "whole store", "entire store", "all areas", "all departments"]),
         // Store areas (each run by a coach).
         Entry(name: "Stocking", aliases: ["stocking", "day stocking", "stocking team", "stockers", "stock 1", "stock 2", "cap 1", "cap 2"]),
         Entry(name: "Overnight", aliases: ["overnight", "overnights", "overnight stocking", "night crew", "o/n", "stock 3", "cap 3"]),

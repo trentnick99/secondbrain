@@ -20,7 +20,7 @@ for domain in com.apple.Preferences com.apple.keyboard.preferences; do
   xcrun simctl spawn "$UDID" defaults write "$domain" DidShowGestureKeyboardIntroduction -bool true || true
 done
 xcrun simctl install "$UDID" "$APP"
-xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule >/dev/null
+xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -sampleRole >/dev/null
 sleep 20
 
 shot() {
@@ -34,7 +34,7 @@ screen() {
   local name="$1" link="$2" wait="${3:-14}"
   for attempt in 1 2 3 4; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
-    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -openURL "secondbrain://$link" >/dev/null
+    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -sampleRole -openURL "secondbrain://$link" >/dev/null
     sleep $((wait + attempt * 5))
     shot "$name"
     # Still launching, or still on Home? The slow simulator missed the screen — retry with more time.
@@ -57,5 +57,8 @@ screen 11-end-my-shift shift 10
 screen 12-planner planner 10
 screen 13-weekly-review review 10
 screen 14-settings settings
+IMPORT_TEXT="Subject%3A%20Market%20walk%20follow-up%0ATotal%20store%3A%0A-%20Clear%20all%20fire%20exits%20and%20keep%20Action%20Alley%20open%20for%20Black%20Friday%0AFood%0A-%20Fill%20the%20holes%20in%20dairy%20and%20frozen%20by%20Wednesday%0A-%20Rotate%20the%20bread%20aisle%20and%20pull%20out%20of%20date%20product%0AFresh%3A%0A-%20Wet%20wall%20needs%20culling%2C%20fix%20signage%20by%20tomorrow%0A%0APlease%20send%20me%20the%20pallet%20drop%20map%20by%20Friday."
+screen 15-import-review "import?text=$IMPORT_TEXT" 12
+screen 16-routines routines
 
 ls -la "$OUT"

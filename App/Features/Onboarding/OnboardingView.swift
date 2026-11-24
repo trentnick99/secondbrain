@@ -11,6 +11,7 @@ struct OnboardingView: View {
     @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @State private var page = 0
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @State private var notificationResult: String?
     @State private var addSample = false
 
@@ -19,17 +20,18 @@ struct OnboardingView: View {
             TabView(selection: $page) {
                 welcome.tag(0)
                 howItWorks.tag(1)
-                shift.tag(2)
-                notifications.tag(3)
-                privacy.tag(4)
+                roleStep.tag(2)
+                shift.tag(3)
+                notifications.tag(4)
+                privacy.tag(5)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
 
             Button {
-                if page < 4 { withAnimation { page += 1 } } else { finish() }
+                if page < 5 { withAnimation { page += 1 } } else { finish() }
             } label: {
-                Text(page < 4 ? "Continue" : "Start using Second Brain")
+                Text(page < 5 ? "Continue" : "Start using Second Brain")
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
@@ -78,6 +80,23 @@ struct OnboardingView: View {
             step("2", "Second Brain suggests the person, date, reminder and Eisenhower quadrant. If anything is unclear, it asks before saving — it never invents dates or people.")
             step("3", "Your dashboard, widgets and reminders keep it in front of you.")
             step("4", "At the end of the day, End My Shift shows what's done and carries the rest forward — nothing unfinished disappears.")
+        }
+    }
+
+    private var roleStep: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "person.badge.key")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(Theme.purple)
+                .padding(.top, 24)
+            Text("Your role").font(.title2.weight(.bold))
+            Text("Pick your role and area to get suggested routines, a “My area” view and market notes sorted for you. You can skip this and set it later in Settings.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            Form { RoleEditor(roleJSON: $roleJSON) }
+                .scrollContentBackground(.hidden)
         }
     }
 

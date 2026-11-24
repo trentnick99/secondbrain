@@ -21,6 +21,11 @@ struct SecondBrainApp: App {
                 let schedule = ShiftSchedule(shifts: [.opening, .mid, .opening, .closing, nil, nil, .opening])
                 AppGroup.defaults.set(ScheduleStorage.encode(schedule), forKey: SettingsKey.shiftSchedule)
             }
+            if ProcessInfo.processInfo.arguments.contains("-sampleRole") {
+                AppGroup.defaults.set(RoleStorage.encode(UserRole(role: .coach, areas: ["Food"])), forKey: SettingsKey.userRole)
+            } else {
+                AppGroup.defaults.removeObject(forKey: SettingsKey.userRole)
+            }
             if ProcessInfo.processInfo.arguments.contains("-sampleData") {
                 SampleData.load(into: PersistenceController.shared.mainContext)
             }

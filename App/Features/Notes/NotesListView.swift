@@ -4,6 +4,7 @@ import SecondBrainCore
 
 struct NotesListView: View {
     @Environment(\.modelContext) private var context
+    @Environment(AppRouter.self) private var router
     @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
     @State private var search = ""
     @State private var typeFilter: NoteType?
@@ -55,6 +56,10 @@ struct NotesListView: View {
             .navigationTitle("Notes")
             .searchable(text: $search, prompt: "Search notes, tags, people")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { router.open(.importNotes(nil)) } label: { Image(systemName: "square.and.arrow.down") }
+                        .accessibilityLabel("Import notes")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         ForEach(NoteType.allCases) { type in

@@ -31,6 +31,13 @@ enum SettingsKey {
     static let seasonAdded = "seasonAdded"
     /// Newline-separated keys of season items the person hid.
     static let seasonHidden = "seasonHidden"
+    /// The person's role and areas (JSON of `UserRole`); empty until chosen.
+    static let userRole = "userRole"
+    /// Newline-separated ids of suggested routines already added.
+    static let routinesAdded = "routinesAdded"
+    /// Season Planner and Coming up show only the person's areas plus store-wide items.
+    static let seasonMyAreasOnly = "seasonMyAreasOnly"
+    static let dismissedRolePrompt = "dismissedRolePrompt"
 }
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
@@ -46,6 +53,7 @@ enum SettingsDefault {
     static let overdueGraceMinutes = 60
     static let appearance = AppearanceMode.dark.rawValue
     static let showSeasonOnHome = true
+    static let seasonMyAreasOnly = true
 }
 
 enum AppearanceMode: String, CaseIterable, Identifiable {
@@ -104,6 +112,8 @@ enum AppSettings {
         RelativeDateText.dayLabel(for: nextShiftDay(after: date), now: date, calendar: .current)
     }
     static var weekStartsOn: Int { int(SettingsKey.weekStartsOn, SettingsDefault.weekStartsOn) }
+    /// The person's role, once chosen in onboarding or Settings.
+    static var userRole: UserRole? { RoleStorage.decode(defaults.string(forKey: SettingsKey.userRole) ?? "") }
     static var defaultReminderEnabled: Bool { bool(SettingsKey.defaultReminderEnabled, SettingsDefault.defaultReminderEnabled) }
     static var defaultReminderMinutes: Int { int(SettingsKey.defaultReminderMinutes, SettingsDefault.defaultReminderMinutes) }
     static var effectiveDefaultReminderMinutes: Int? { defaultReminderEnabled ? defaultReminderMinutes : nil }
@@ -153,6 +163,19 @@ enum AppSettings {
 }
 
 /// Stores the weekly schedule as JSON in shared defaults (readable by the widget too).
+/// Stores the person's role as JSON in shared defaults.
+enum RoleStorage {
+    static func decode(_ json: String) -> UserRole? {
+        guard !json.isEmpty, let data = json.data(using: .utf8) else { return nil }
+        return try? JSONDecoder().decode(UserRole.self, from: data)
+    }
+
+    static func encode(_ role: UserRole?) -> String {
+        guard let role, let data = try? JSONEncoder().encode(role) else { return "" }
+        return String(decoding: data, as: UTF8.self)
+    }
+}
+
 enum ScheduleStorage {
     static func decode(_ json: String) -> ShiftSchedule {
         guard let data = json.data(using: .utf8), !json.isEmpty,
@@ -163,5 +186,12 @@ enum ScheduleStorage {
     static func encode(_ schedule: ShiftSchedule) -> String {
         guard let data = try? JSONEncoder().encode(schedule) else { return "" }
         return String(decoding: data, as: UTF8.self)
+    }
+}
+
+extension UserDefaults {
+    /// A stored Bool, or `fallback` when the key has never been set.
+    func bool(forKey key: String, default fallback: Bool) -> Bool {
+        object(forKey: key) == nil ? fallback : bool(forKey: key)
     }
 }

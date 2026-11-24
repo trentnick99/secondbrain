@@ -42,6 +42,7 @@ struct SettingsView: View {
     @State private var showRecurring = false
     @State private var showStoreTerms = false
     @State private var showSeasonPlanner = false
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @State private var calendarService = CalendarService.shared
 
@@ -64,6 +65,15 @@ struct SettingsView: View {
                 Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
                 Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
                 Button { showStoreTerms = true } label: { Label("Store terms", systemImage: "character.book.closed") }
+                NavigationLink { RoleSettingsView() } label: {
+                    LabeledContent {
+                        Text(RoleStorage.decode(roleJSON).map(\.title) ?? "Not set")
+                    } label: {
+                        Label("Your role", systemImage: "person.badge.key")
+                    }
+                }
+                .accessibilityIdentifier("roleSettingsRow")
+                Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
                 Button { showSeasonPlanner = true } label: { Label("Season planner", systemImage: "leaf.arrow.triangle.circlepath") }
                 Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
                 Picker("Appearance", selection: $appearance) {

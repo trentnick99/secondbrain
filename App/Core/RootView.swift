@@ -46,6 +46,13 @@ struct RootView: View {
         .sheet(isPresented: $router.showSettings) { SettingsView() }
         .sheet(isPresented: $router.showStoreTerms) { StoreTermsView(initialQuery: router.storeTermsQuery) }
         .sheet(isPresented: $router.showSeasonPlanner) { SeasonPlannerView() }
+        .sheet(isPresented: $router.showRole) { RoleSheet() }
+        .sheet(isPresented: $router.showRoutines) {
+            NavigationStack {
+                RoutinesView().toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { router.showRoutines = false } } }
+            }
+        }
+        .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText) }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }

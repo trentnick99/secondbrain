@@ -3,13 +3,14 @@ import SwiftUI
 import SecondBrainCore
 
 enum TaskFilter: String, CaseIterable, Identifiable {
-    case today, upcoming, inbox, overdue, waiting, someday, completed, archived
+    case today, myArea, upcoming, inbox, overdue, waiting, someday, completed, archived
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
         case .today: return "Today"
+        case .myArea: return "My area"
         case .upcoming: return "Upcoming"
         case .inbox: return "Inbox"
         case .overdue: return "Overdue"
@@ -23,6 +24,7 @@ enum TaskFilter: String, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .today: return "sun.max"
+        case .myArea: return "person.crop.square"
         case .upcoming: return "calendar"
         case .inbox: return "tray"
         case .overdue: return "exclamationmark.circle"
@@ -102,12 +104,20 @@ struct TaskListView: View {
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(TaskFilter.allCases) { f in
+                ForEach(availableFilters) { f in
                     Chip(title: label(for: f), systemImage: f.systemImage, isSelected: filter == f) { filter = f }
                 }
             }
             .padding(.horizontal)
         }
+    }
+
+    /// "My area" appears once a role with an area is chosen (store managers already see everything).
+    private var availableFilters: [TaskFilter] {
+        guard let role = AppSettings.userRole, !role.seesWholeStore, role.primaryArea != nil else {
+            return TaskFilter.allCases.filter { $0 != .myArea }
+        }
+        return TaskFilter.allCases
     }
 
     private func label(for f: TaskFilter) -> String {
@@ -136,6 +146,9 @@ struct TaskListView: View {
             if let due = t.dueDate { return due < endOfToday }
             if let focus = t.focusDate { return cal.isDate(focus, inSameDayAs: now) }
             return false
+        case .myArea:
+            guard t.isOpen, t.status != .inbox, let role = AppSettings.userRole else { return false }
+            return MyAreaCard.belongs(t, to: role)
         case .upcoming:
             guard t.isOpen, let due = t.dueDate else { return false }
             return due >= endOfToday
@@ -206,6 +219,7 @@ struct TaskListView: View {
         case .inbox: return "Quick captures you save to the Inbox appear here for sorting."
         case .waiting: return "Delegated tasks and things you're waiting on show here until confirmed."
         case .today: return "Tap + to capture something, or check Upcoming."
+        case .myArea: return "Open tasks for your areas and the total store show here. Import market notes to add some."
         default: return "Try another filter."
         }
     }

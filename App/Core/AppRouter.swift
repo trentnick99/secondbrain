@@ -38,6 +38,9 @@ enum Route: Equatable {
     case overdue
     case storeTerms(String?)
     case seasonPlanner
+    case role
+    case routines
+    case importNotes(String?)
 }
 
 /// Wraps an id so it can drive `.sheet(item:)`.
@@ -63,6 +66,10 @@ final class AppRouter {
     var showSettings = false
     var showStoreTerms = false
     var showSeasonPlanner = false
+    var showRole = false
+    var showRoutines = false
+    var showImport = false
+    var importText: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
     var toast: String?
@@ -104,6 +111,16 @@ final class AppRouter {
         case .seasonPlanner:
             dismissSheets()
             showSeasonPlanner = true
+        case .role:
+            dismissSheets()
+            showRole = true
+        case .routines:
+            dismissSheets()
+            showRoutines = true
+        case .importNotes(let text):
+            dismissSheets()
+            importText = text
+            showImport = true
         }
     }
 
@@ -127,6 +144,11 @@ final class AppRouter {
         case "planner": open(.planner)
         case "overdue": open(.overdue)
         case "season": open(.seasonPlanner)
+        case "role": open(.role)
+        case "routines": open(.routines)
+        case "import":
+            open(.importNotes(URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "text" }?.value))
         case "terms":
             let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value
@@ -146,6 +168,9 @@ final class AppRouter {
         showSettings = false
         showStoreTerms = false
         showSeasonPlanner = false
+        showRole = false
+        showRoutines = false
+        showImport = false
     }
 
     func showToast(_ message: String) {

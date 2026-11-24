@@ -7,6 +7,7 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var context
     @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @Query(sort: \TaskItem.createdAt, order: .reverse) private var tasks: [TaskItem]
     @State private var briefing: String = ""
     @State private var showCompleted = false
@@ -39,6 +40,11 @@ struct DashboardView: View {
                     TaskCard(title: "Upcoming reminders", systemImage: "bell", tint: Theme.accent,
                              tasks: items(agenda.upcomingReminders), limit: 4)
 
+                    if let role = RoleStorage.decode(roleJSON), role.seesWholeStore || role.primaryArea != nil {
+                        if !role.seesWholeStore { MyAreaCard(role: role, tasks: tasks) }
+                    } else {
+                        RolePromptCard()
+                    }
                     if showSeasonOnHome { SeasonComingUpCard(now: now) }
                     upcoming(agenda, items: items)
                     completed(agenda, items: items)
@@ -160,6 +166,7 @@ struct DashboardView: View {
                 QuickActionButton(title: "Capture", systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
                 QuickActionButton(title: "Task", systemImage: "checklist", tint: Theme.color(for: .schedule)) { router.open(.capture(.task)) }
                 QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock", tint: Theme.purple) { router.open(.capture(.followUp)) }
+                QuickActionButton(title: "Import", systemImage: "square.and.arrow.down", tint: Theme.purple) { router.open(.importNotes(nil)) }
                 QuickActionButton(title: "Note", systemImage: "note.text", tint: Theme.warning) { router.open(.capture(.note)) }
                 QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }
             }

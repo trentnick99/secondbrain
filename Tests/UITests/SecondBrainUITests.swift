@@ -81,6 +81,26 @@ final class SecondBrainUITests: XCTestCase {
                       "The step shows as added")
     }
 
+    func testImportNotesAddsReviewedItems() throws {
+        let importButton = app.buttons["New Import"].firstMatch
+        XCTAssertTrue(importButton.waitForExistence(timeout: 5))
+        importButton.tap()
+        let editor = app.textViews["importTextEditor"].firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.tap()
+        editor.typeText("Food\n- Fill the holes in dairy by Wednesday\n- Rotate the bread aisle")
+        app.buttons["importReviewButton"].firstMatch.tap()
+        let add = app.buttons["importAddButton"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        app.tabBars.buttons["Tasks"].tap()
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("bread aisle")
+        XCTAssertTrue(element(containing: "Rotate the bread aisle").waitForExistence(timeout: 5))
+    }
+
     func testStoreTermsLookup() throws {
         let terms = app.buttons["storeTermsButton"].firstMatch
         XCTAssertTrue(terms.waitForExistence(timeout: 5))

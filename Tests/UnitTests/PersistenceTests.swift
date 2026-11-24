@@ -24,6 +24,29 @@ final class PersistenceTests: XCTestCase {
         return CaptureDraft(parsed: parsed)
     }
 
+    // MARK: Importing notes
+
+    func testImportedItemsSaveWithTheirAreaAndOnlyStatedDates() throws {
+        let notes = """
+        Total store:
+        - Clear all fire exits by Friday
+        Food
+        - Rotate the bread aisle
+        Fresh:
+        - Cull the wet wall
+        """
+        let result = NoteImporter.parse(notes, role: UserRole(role: .coach, areas: ["Food"]),
+                                        context: AppSettings.captureContext(knownAssociates: []))
+        let chosen = result.items.filter { $0.relevance == .mine || $0.relevance == .totalStore }
+        XCTAssertEqual(chosen.count, 2, "The Fresh item is left out for a Food coach")
+        for item in chosen { _ = CaptureSaver.save(CaptureDraft(parsed: item.parsed), in: context) }
+        let tasks = try context.fetch(FetchDescriptor<TaskItem>())
+        XCTAssertEqual(Set(tasks.map(\.department)), ["Total Store", "Food"])
+        XCTAssertNotNil(tasks.first { $0.department == "Total Store" }?.dueDate)
+        XCTAssertNil(tasks.first { $0.department == "Food" }?.dueDate, "No date is invented")
+        XCTAssertTrue(MyAreaCard.belongs(tasks[0], to: UserRole(role: .coach, areas: ["Food"])))
+    }
+
     // MARK: Season Planner
 
     func testSeasonPrepStepBecomesATaskOnlyWhenAdded() throws {
