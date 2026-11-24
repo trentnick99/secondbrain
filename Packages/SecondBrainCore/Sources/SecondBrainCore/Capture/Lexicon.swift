@@ -133,7 +133,8 @@ enum Lexicon {
             "picks", "pick walk", "downstack", "breakpack", "casepack", "condense", "rework", "freight flow",
             "running freight", "working freight", "throwing freight", "throw freight", "working topstock",
             "chasing picks", "bin audit", "bin audits", "overstock verification", "live freight", "unworked freight",
-            "dsd", "fdd", "hvdc", "rdc", "truck process", "mixed pallet", "mixed pallets", "replenishment"
+            "dsd", "fdd", "hvdc", "rdc", "truck process", "mixed pallet", "mixed pallets", "replenishment", "pallet drop",
+            "pallet drops"
         ]),
         (.merchandising, [
             "modular", "modulars", "mod", "mods", "feature", "features", "endcap", "endcaps", "display", "displays",
@@ -142,7 +143,9 @@ enum Lexicon {
             "action alley", "seasonal set", "mod set", "mod sets", "mod flex", "mod reset", "modular integrity",
             "wing stack", "wing stacks", "sidekick", "sidekicks", "pdq", "pdqs", "stack base", "flexing", "plugging",
             "feature-to-home", "feature to home", "fast zone", "zone recovery", "facing up", "secondary location",
-            "end of aisle", "seasonal transition", "feature quantity", "price change", "osa"
+            "end of aisle", "seasonal transition", "feature quantity", "price change", "osa", "digital shelf labels",
+            "digital shelf label", "shelf labels", "dsl", "dsls", "esl", "esls", "halloween set", "christmas set",
+            "holiday set", "easter set", "back-to-school set", "back to school set", "summer set", "seasonal conversion"
         ]),
         (.operations, [
             "clean", "cleaned", "cleaning", "cleanup", "clean up", "cleaned up", "maintenance", "broken", "repair",
@@ -151,7 +154,8 @@ enum Lexicon {
             "door", "doors", "order", "ordering", "supplies", "supply", "bags", "trash", "cardboard", "keys",
             "cash office", "till", "opening", "closing", "store walk", "walk the store", "carts", "baler", "bale",
             "bales", "compactor", "clean backroom", "trailer", "trailers", "cash recycler", "tour ready",
-            "store ready", "customer ready", "walking the store"
+            "store ready", "customer ready", "walking the store", "queue line", "queue lines", "crowd plan",
+            "holiday hours", "store hours"
         ]),
         (.customer, [
             "customer", "customers", "complaint", "complaints", "guest", "guests", "shopper", "shoppers", "refund",
@@ -203,7 +207,8 @@ enum Lexicon {
             "why", "how", "new", "old", "all", "everyone", "anyone", "someone", "somebody", "nobody", "him", "her",
             "his", "hers", "their", "mine", "yes", "no", "hi", "hey", "thanks", "thank", "due", "until", "end",
             "first", "second", "third", "christmas", "thanksgiving", "easter", "halloween", "black",
-            "code", "stock", "cap", "remix", "mod", "feature", "vizpick", "topstock", "freight", "huddle",
+            "code", "stock", "cap", "remix", "mod", "feature", "vizpick", "topstock", "freight", "huddle", "vizio", "onn",
+            "cyber", "deals", "sparky",
             "regional", "green", "red", "dept", "department"
         ]
         words.formUnion(DepartmentLexicon.stopWords)

@@ -29,7 +29,7 @@ public enum DepartmentLexicon {
         Entry(name: "Grocery", aliases: ["grocery", "dry grocery", "groceries"]),
         Entry(name: "Health & Beauty", aliases: ["health and beauty", "health & beauty", "hba", "cosmetics"]),
         Entry(name: "Pharmacy", aliases: ["pharmacy"]),
-        Entry(name: "Electronics", aliases: ["electronics", "wireless"]),
+        Entry(name: "Electronics", aliases: ["electronics", "wireless", "vizio", "onn", "tv wall"]),
         Entry(name: "Toys", aliases: ["toys", "toy"]),
         Entry(name: "Home", aliases: ["home", "housewares", "bedding", "domestics"]),
         Entry(name: "Hardware", aliases: ["hardware", "paint"]),
@@ -63,7 +63,8 @@ public enum DepartmentLexicon {
 
     /// Returns the canonical department name for the first (longest) alias found in the text.
     public static func match(in text: String) -> String? {
-        let lower = text.lowercased()
+        // "Digital shelf labels" are store-wide price tags, not the Digital (OPD) area.
+        let lower = text.lowercased().replacingOccurrences(of: "digital shelf label", with: "dsl shelf label")
         var best: (name: String, length: Int, location: Int)?
         for entry in entries {
             for alias in entry.aliases {

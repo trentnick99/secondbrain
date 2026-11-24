@@ -26,6 +26,11 @@ enum SettingsKey {
     static let lastShiftEndedDay = "lastShiftEndedDay"
     static let externalChangeStamp = "externalChangeStamp"
     static let notificationPermissionAsked = "notificationPermissionAsked"
+    static let showSeasonOnHome = "showSeasonOnHome"
+    /// Newline-separated keys of season prep steps already added as tasks.
+    static let seasonAdded = "seasonAdded"
+    /// Newline-separated keys of season items the person hid.
+    static let seasonHidden = "seasonHidden"
 }
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
@@ -40,6 +45,7 @@ enum SettingsDefault {
     static let defaultReminderMinutes = 7 * 60
     static let overdueGraceMinutes = 60
     static let appearance = AppearanceMode.dark.rawValue
+    static let showSeasonOnHome = true
 }
 
 enum AppearanceMode: String, CaseIterable, Identifiable {

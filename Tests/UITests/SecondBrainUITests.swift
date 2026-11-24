@@ -69,6 +69,21 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.buttons["Home"].waitForExistence(timeout: 3))
     }
 
+    func testSeasonPlannerAddsAPrepTask() throws {
+        let settings = app.buttons["settingsButton"].firstMatch
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        settings.tap()
+        let planner = app.buttons["Season planner"].firstMatch
+        for _ in 0..<8 where !(planner.exists && planner.isHittable) { app.swipeUp() }
+        XCTAssertTrue(planner.waitForExistence(timeout: 3))
+        planner.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fiscalWeekLabel"].waitForExistence(timeout: 5))
+        let add = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Add ' AND NOT (label BEGINSWITH 'Add all')")).firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        XCTAssertTrue(element(containing: "Added").waitForExistence(timeout: 5), "The step shows as added")
+    }
+
     func testStoreTermsLookup() throws {
         let terms = app.buttons["storeTermsButton"].firstMatch
         XCTAssertTrue(terms.waitForExistence(timeout: 5))

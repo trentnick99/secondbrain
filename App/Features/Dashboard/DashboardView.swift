@@ -6,6 +6,7 @@ import SecondBrainCore
 struct DashboardView: View {
     @Environment(\.modelContext) private var context
     @Environment(AppRouter.self) private var router
+    @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @Query(sort: \TaskItem.createdAt, order: .reverse) private var tasks: [TaskItem]
     @State private var briefing: String = ""
     @State private var showCompleted = false
@@ -38,6 +39,7 @@ struct DashboardView: View {
                     TaskCard(title: "Upcoming reminders", systemImage: "bell", tint: Theme.accent,
                              tasks: items(agenda.upcomingReminders), limit: 4)
 
+                    if showSeasonOnHome { SeasonComingUpCard(now: now) }
                     upcoming(agenda, items: items)
                     completed(agenda, items: items)
                 }
@@ -58,6 +60,8 @@ struct DashboardView: View {
                     Button { router.open(.weeklyReview) } label: { Image(systemName: "chart.bar.doc.horizontal") }
                         .accessibilityLabel("Weekly review")
                     Button { router.open(.settings) } label: { Image(systemName: "gearshape") }
+                        .accessibilityLabel("Settings")
+                        .accessibilityIdentifier("settingsButton")
                         .accessibilityLabel("Settings")
                 }
             }

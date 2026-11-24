@@ -307,6 +307,18 @@ enum ScheduleExtraction {
         for m in scan.matches(prep + #"\b(tomorrow|tmrw|tmr|tmw|tomorow|tommorow|tommorrow)\b"#) {
             apply(math.addingDays(1, to: today), m, before: isBefore(m))
         }
+        // Holidays — only after "by", "before", "on", "until" or "ahead of", because a bare name
+        // ("the Halloween set", "Christmas trees") is a season or product, not a due date.
+        let holidayOrder: [RetailCalendar.Holiday] = [.christmasEve, .newYearsEve] +
+            RetailCalendar.Holiday.allCases.filter { $0 != .christmasEve && $0 != .newYearsEve }
+        for holiday in holidayOrder {
+            for m in scan.matches(#"\b(by|before|on|until|till|ahead\s+of)\s+(?:"# + holiday.spokenPattern + #")\b"#) {
+                let word = (scan.group(m, 1) ?? "").lowercased().replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+                let date = RetailCalendar.nextDate(of: holiday, onOrAfter: ctx.now, calendar: cal)
+                apply(date, m, before: word == "before" || word == "ahead of", label: holiday.title)
+            }
+        }
+
         // next / this week, weekend, month
         for m in scan.matches(prep + #"\b(next|this|coming)\s+(week|weekend|month)\b"#) {
             guard let which = scan.group(m, 2)?.lowercased(), let unit = scan.group(m, 3)?.lowercased() else { continue }

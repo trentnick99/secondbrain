@@ -3,13 +3,14 @@ import Foundation
 /// One entry in the store-terms reference.
 public struct GlossaryTerm: Identifiable, Hashable, Sendable {
     public enum Category: String, CaseIterable, Identifiable, Sendable {
-        case roles, leadership, stocking, inventory, digital, frontEnd, fresh, metrics, safety, equipment
+        case updates, roles, leadership, stocking, inventory, digital, frontEnd, fresh, metrics, safety, equipment
         case people, layout, departments, acronyms, slang
 
         public var id: String { rawValue }
 
         public var title: String {
             switch self {
+            case .updates: return "Recent changes"
             case .roles: return "Roles & titles"
             case .leadership: return "Leadership language"
             case .stocking: return "Stocking & backroom"
@@ -30,6 +31,7 @@ public struct GlossaryTerm: Identifiable, Hashable, Sendable {
 
         public var systemImage: String {
             switch self {
+            case .updates: return "sparkles"
             case .roles: return "person.badge.key"
             case .leadership: return "person.3"
             case .stocking: return "shippingbox"
@@ -193,9 +195,28 @@ public enum StoreGlossary {
     // Format: Term (Alias)|Meaning|usage — usage is blank (current), l (older term), i (informal) or v (varies).
 
     static let blocks: [(GlossaryTerm.Category, String)] = [
+        (.updates, """
+        Vizio|TV and soundbar brand Walmart bought in December 2024 for $2.3 billion; planned to be sold only at Walmart and Sam's Club as a private brand from the end of 2025
+        onn.|Walmart's own electronics brand; future onn. TVs were reported to move to Vizio's SmartCast software|v
+        SmartCast|Vizio's smart-TV operating system
+        Walmart Connect|Walmart's advertising business; Vizio's TV ad business was folded into it
+        DSL (Digital Shelf Labels)|Electronic shelf price labels — about 2,300 stores had them in March 2026, with every store planned within about a year. Price changes are pushed centrally but stay associate-led, usually outside shopping hours
+        AI Task Management|Associate-app tool that prioritizes and recommends tasks; it started with overnight stocking
+        Real-Time Translation|Associate-app feature for conversations in 44 languages
+        Associate Agent|AI assistant for the associate app that brings schedules, sales data and more into one place|v
+        Sparky|Walmart's AI shopping assistant for customers in the Walmart app
+        Walmart Deals|Summer deals event — June 22–28 in 2026, moved up from July
+        Black Friday Deals|2026: Early deals Nov 12–15; Black Friday Deals Nov 23–29 (in stores from Nov 27 at 6 AM); Cyber Monday Nov 30–Dec 2
+        Walmart+|Paid customer membership with early access to deal events and Scan & Go
+        Scan & Go|Walmart+ members scan and pay with the app as they shop
+        Rapid Remodel|Neighborhood Market remodel that closes the main salesfloor for about four weeks while pharmacy and fuel stay open
+        Summer Frights|Early Halloween ("Summerween") displays — about 1,000 stores had them in 2025
+        FY27|Fiscal year 2027: February 2026 through January 2027
+        """),
         (.roles, """
         SM|Store Manager — leads the whole store
-        SL|Store Lead|v
+        Emerging Store Manager|Added in 2026 when Store Lead was eliminated; manages associates and is first in line for Store Manager
+        SL|Store Lead — role eliminated in 2026; people moved to Emerging Store Manager or Coach|l
         Coach|Salaried manager over an area of the store (as a verb, a performance conversation)
         Coach Trainee|Associate training for a Coach role
         TL|Team Lead — leads a team of associates under a Coach
@@ -226,6 +247,7 @@ public enum StoreGlossary {
         CSM|Customer Service Manager|l
         APASM|Asset Protection Assistant Store Manager|l
         DAPM|District Asset Protection Manager|l
+        Market Coordinator|Assisted market managers; role eliminated in 2025|l
         """),
         (.leadership, """
         Span of Control|Number of direct reports a leader manages

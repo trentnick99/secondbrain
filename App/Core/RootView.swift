@@ -45,6 +45,7 @@ struct RootView: View {
         .sheet(isPresented: $router.showWeeklyReview) { WeeklyReviewView() }
         .sheet(isPresented: $router.showSettings) { SettingsView() }
         .sheet(isPresented: $router.showStoreTerms) { StoreTermsView(initialQuery: router.storeTermsQuery) }
+        .sheet(isPresented: $router.showSeasonPlanner) { SeasonPlannerView() }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }

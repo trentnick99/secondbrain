@@ -41,6 +41,8 @@ struct SettingsView: View {
     @State private var confirmDeleteAllAgain = false
     @State private var showRecurring = false
     @State private var showStoreTerms = false
+    @State private var showSeasonPlanner = false
+    @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @State private var calendarService = CalendarService.shared
 
     var body: some View {
@@ -62,6 +64,8 @@ struct SettingsView: View {
                 Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
                 Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
                 Button { showStoreTerms = true } label: { Label("Store terms", systemImage: "character.book.closed") }
+                Button { showSeasonPlanner = true } label: { Label("Season planner", systemImage: "leaf.arrow.triangle.circlepath") }
+                Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
                 Picker("Appearance", selection: $appearance) {
                     ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
                 }
@@ -112,6 +116,7 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
             .sheet(isPresented: $showStoreTerms) { StoreTermsView() }
+            .sheet(isPresented: $showSeasonPlanner) { SeasonPlannerView() }
     }
 
     // MARK: Sections

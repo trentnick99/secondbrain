@@ -51,6 +51,27 @@ Teams and groups (Stock 1–3, CAP 1–3, "the overnight team", "my TLs", "the s
 
 **Store Terms reference.** Tap the book icon on Home (or Settings › Store terms) to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Second Brain". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
 
+**Season Planner.** Open it from Settings › Season planner, or tap **Coming up** on Home, which shows the next three weeks along with the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
+- **Holidays**, worked out by the calendar: Valentine's Day, Easter, Mother's Day, Memorial Day, Father's Day, July 4th, Labor Day, Halloween, Thanksgiving, Black Friday, Cyber Monday, Christmas Eve, Christmas, New Year's Eve and New Year's Day.
+- **Announced sales events:** Walmart Deals (June 22–28, 2026), Early Black Friday Deals (Nov 12–15), Black Friday Deals (Nov 23–29; in stores from Nov 27 at 6 AM) and Cyber Monday Deals (Nov 30–Dec 2). Events for later years are added once Walmart announces them. Dates are never guessed.
+- **Typical seasonal timing**, labeled "confirm locally": Lawn & Garden, back-to-school, the Halloween set just after Labor Day, the holiday conversion after Halloween, and post-holiday clearance.
+- **Operations and safety:** the new fiscal year (Saturday of the week containing Feb 1), the two clock changes (overnight shifts run an hour shorter or longer), holiday staffing, summer heat, hurricane season and winter weather.
+
+Each item has prep steps, such as "Black Friday safety walk: aisles clear, PLE parked, crowd plan". Tap **Add** to make one a task, or **Add all** and confirm. Due dates move back to your last scheduled workday before the event, and reminders follow your shift start. Swipe an item to hide it if it doesn't apply to your store. You can turn the Home card off in Settings.
+
+Quick Capture also understands holidays after "by", "before", "on", "until" or "ahead of": "by Black Friday" or "before Thanksgiving". A bare name like "the Halloween set" or "Christmas trees" is never treated as a date.
+
+**Recent changes in Store Terms.** A new category covers:
+- Vizio, onn., SmartCast and Walmart Connect
+- Digital shelf labels
+- Emerging Store Manager (Store Lead is now marked as an older term)
+- Market Coordinator, an eliminated role
+- AI task management and real-time translation in the associate app
+- Walmart Deals and Black Friday Deals, Walmart+ and Scan & Go
+- Rapid remodels and "Summer Frights"
+
+Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labels as merchandising work rather than the Digital (OPD) area.
+
 **Privacy nudges.** If what you type in Quick Capture, a task, a note or a person's context looks like disciplinary detail ("write up", "DA"), attendance records ("NCNS", "attendance points"), medical or leave detail ("FMLA", "LOA"), an AP case, a password or WIN, or personal identifiers, a short note suggests keeping only the task and leaving the details in the approved system. It never blocks saving and never changes your text.
 
 **People by role.** Associates groups people as Store Manager, Coaches, Team Leads and Associates (with job titles like Stocker or Cashier), each with their area. To add a whole team at once, use **Add Several People**: choose a role and area, then enter one name per line. A team lead's page also shows the tasks handed to them that are still waiting.

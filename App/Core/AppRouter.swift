@@ -37,6 +37,7 @@ enum Route: Equatable {
     case settings
     case overdue
     case storeTerms(String?)
+    case seasonPlanner
 }
 
 /// Wraps an id so it can drive `.sheet(item:)`.
@@ -59,6 +60,7 @@ final class AppRouter {
     var showWeeklyReview = false
     var showSettings = false
     var showStoreTerms = false
+    var showSeasonPlanner = false
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
     var toast: String?
@@ -96,6 +98,9 @@ final class AppRouter {
             dismissSheets()
             storeTermsQuery = query
             showStoreTerms = true
+        case .seasonPlanner:
+            dismissSheets()
+            showSeasonPlanner = true
         }
     }
 
@@ -113,6 +118,7 @@ final class AppRouter {
         case "shift": open(.shift)
         case "planner": open(.planner)
         case "overdue": open(.overdue)
+        case "season": open(.seasonPlanner)
         case "terms":
             let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value
@@ -131,6 +137,7 @@ final class AppRouter {
         showWeeklyReview = false
         showSettings = false
         showStoreTerms = false
+        showSeasonPlanner = false
     }
 
     func showToast(_ message: String) {

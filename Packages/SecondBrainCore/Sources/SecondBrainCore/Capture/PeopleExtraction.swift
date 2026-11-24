@@ -53,7 +53,7 @@ enum PeopleExtraction {
         }
 
         // 2. Roles: "talk to the overnight coach", "tell the store manager".
-        let roleArea = #"(?:overnight|morning|evening|night|day|weekend|front\s+end|frontend|fe|o/n|(?:stock|cap)\s*[123]|backroom|pharmacy|deli|bakery|grocery|produce|frozen|dairy|meat|fresh|food|fashion|stocking|digital|opd|ap|acc|auto\s+care|online|pickup|apparel|electronics|hardlines|softlines|closing|opening|other|new|assistant|market|regional)"#
+        let roleArea = #"(?:overnight|morning|evening|night|day|weekend|front\s+end|frontend|fe|o/n|(?:stock|cap)\s*[123]|backroom|pharmacy|deli|bakery|grocery|produce|frozen|dairy|meat|fresh|food|fashion|stocking|digital|opd|ap|acc|auto\s+care|online|pickup|apparel|electronics|hardlines|softlines|closing|opening|other|new|assistant|market|regional|emerging)"#
         let roleNoun = #"(?:store\s+manager|market\s+manager|market\s+coach|regional\s+manager|people\s+lead|co-?manager|team\s+leads?(?:er)?|coach(?:es)?|manager|supervisor|asset\s+protection|tls?|sm|apa|apch|(?:stock|cap)\s*[123]|(?:overnight|o/n|stocking|night|unload|truck|opd|pickup|fresh|front\s+end)\s+(?:team|crew))"#
         let rolePattern = #"\b(?:with|to|tell|ask|remind|email|text|call|update|inform|from|for|let|see|have|get|by)\s+(?:the\s+|my\s+|our\s+|an?\s+)?((?:"# + roleArea + #"\s+)?"# + roleNoun + #")\b"#
         for m in scan.matches(rolePattern) {

@@ -24,5 +24,6 @@
 - **Apple Intelligence briefing** needs iOS 26 on an Apple Intelligence–capable iPhone. Otherwise the standard briefing is used.
 - **Week start** defaults to Saturday, since many retail schedules run Saturday–Friday. Change it in Settings.
 - **Store Terms is unofficial.** The reference was compiled from public employee discussions and retail references. Terms change and vary by store and market; entries are tagged older, informal or "varies" where known. Edit `StoreGlossary.swift` to correct or add terms.
+- **Season Planner dates.** Holidays and the fiscal week are calculated. Sales events are only those Walmart has announced (through Cyber Monday 2026) and must be added in an app update for later years. Seasonal set timing is typical only. Regional items (hurricanes, winter weather, Lawn & Garden, back-to-school) can be hidden.
 - **Privacy nudges are keyword-based.** They catch common phrasing ("write up", "DA", "NCNS", "FMLA"), not every way of describing sensitive information, and they never block saving.
 - **No employer integrations,** by design: no connection to internal systems, no scraping, no stored work credentials.

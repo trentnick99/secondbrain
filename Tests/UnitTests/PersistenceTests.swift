@@ -24,6 +24,23 @@ final class PersistenceTests: XCTestCase {
         return CaptureDraft(parsed: parsed)
     }
 
+    // MARK: Season Planner
+
+    func testSeasonPrepStepBecomesATaskOnlyWhenAdded() throws {
+        let christmas = RetailCalendar.moments(inYear: 2026, calendar: .current).first { $0.title == "Christmas" }!
+        let step = christmas.prep[0]
+        XCTAssertTrue(try context.fetch(FetchDescriptor<TaskItem>()).isEmpty, "Nothing is created until Add is tapped")
+        let now = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 23, hour: 10))!
+        let task = try XCTUnwrap(SeasonPlanActions.addTask(for: step, in: christmas, context: context, now: now))
+        XCTAssertEqual(task.title, step.title)
+        XCTAssertEqual(task.category, step.category)
+        XCTAssertNotNil(task.dueDate)
+        XCTAssertLessThan(task.dueDate!, christmas.start)
+        XCTAssertTrue(task.details.contains("Season Planner"))
+        XCTAssertTrue(SeasonPlanStore.addedKeys.contains(step.key))
+        XCTAssertEqual(try context.fetch(FetchDescriptor<TaskItem>()).count, 1)
+    }
+
     // MARK: Quick Capture → persistence
 
     func testCaptureCreatesFollowUpAndAssociate() throws {
