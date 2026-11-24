@@ -53,6 +53,7 @@ struct RootView: View {
             }
         }
         .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText) }
+        .sheet(isPresented: $router.showAsk) { AskView(initialQuestion: router.askQuestion) }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }

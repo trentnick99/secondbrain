@@ -12,6 +12,7 @@ struct SettingsView: View {
     @Environment(AppRouter.self) private var router
 
     @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
+    @AppStorage(SettingsKey.askUsesAI, store: AppGroup.defaults) private var askUsesAI = true
     @AppStorage(SettingsKey.reminderAtShiftStart, store: AppGroup.defaults) private var reminderAtShiftStart = SettingsDefault.reminderAtShiftStart
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @AppStorage(SettingsKey.defaultReminderEnabled, store: AppGroup.defaults) private var defaultReminderEnabled = SettingsDefault.defaultReminderEnabled
@@ -74,6 +75,7 @@ struct SettingsView: View {
                 }
                 .accessibilityIdentifier("roleSettingsRow")
                 Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
+                Button { router.open(.ask(nil)) } label: { Label("Ask", systemImage: "questionmark.bubble") }
                 Button { showSeasonPlanner = true } label: { Label("Season planner", systemImage: "leaf.arrow.triangle.circlepath") }
                 Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
                 Picker("Appearance", selection: $appearance) {
@@ -220,6 +222,8 @@ struct SettingsView: View {
         Section {
             Toggle("Smart suggestions", isOn: $smartSuggestions)
             Toggle("Apple Intelligence briefing", isOn: $appleIntelligence)
+                .disabled(!BriefingAssistant.isAppleIntelligenceAvailable)
+            Toggle("Apple Intelligence answers in Ask", isOn: $askUsesAI)
                 .disabled(!BriefingAssistant.isAppleIntelligenceAvailable)
             Text(BriefingAssistant.availabilityText).font(.caption).foregroundStyle(.secondary)
         } header: {

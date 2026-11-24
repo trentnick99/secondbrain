@@ -38,6 +38,10 @@ enum SettingsKey {
     /// Season Planner and Coming up show only the person's areas plus store-wide items.
     static let seasonMyAreasOnly = "seasonMyAreasOnly"
     static let dismissedRolePrompt = "dismissedRolePrompt"
+    /// Ask writes answers with Apple's on-device model when it's available.
+    static let askUsesAI = "askUsesAI"
+    /// The person's own store steps for each Ask guide (JSON of [guide id: text]).
+    static let askStoreSteps = "askStoreSteps"
 }
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
@@ -172,6 +176,22 @@ enum RoleStorage {
 
     static func encode(_ role: UserRole?) -> String {
         guard let role, let data = try? JSONEncoder().encode(role) else { return "" }
+        return String(decoding: data, as: UTF8.self)
+    }
+}
+
+/// The person's own steps for each Ask guide, kept on the phone.
+enum AskStepsStorage {
+    static func decode(_ json: String) -> [String: String] {
+        guard !json.isEmpty, let data = json.data(using: .utf8) else { return [:] }
+        return (try? JSONDecoder().decode([String: String].self, from: data)) ?? [:]
+    }
+
+    static func setting(_ id: String, to text: String, in json: String) -> String {
+        var all = decode(json)
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        all[id] = trimmed.isEmpty ? nil : text
+        guard let data = try? JSONEncoder().encode(all) else { return json }
         return String(decoding: data, as: UTF8.self)
     }
 }

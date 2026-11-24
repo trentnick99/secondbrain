@@ -60,5 +60,7 @@ screen 14-settings settings
 IMPORT_TEXT="Subject%3A%20Market%20walk%20follow-up%0ATotal%20store%3A%0A-%20Clear%20all%20fire%20exits%20and%20keep%20Action%20Alley%20open%20for%20Black%20Friday%0AFood%0A-%20Fill%20the%20holes%20in%20dairy%20and%20frozen%20by%20Wednesday%0A-%20Rotate%20the%20bread%20aisle%20and%20pull%20out%20of%20date%20product%0AFresh%3A%0A-%20Wet%20wall%20needs%20culling%2C%20fix%20signage%20by%20tomorrow%0A%0APlease%20send%20me%20the%20pallet%20drop%20map%20by%20Friday."
 screen 15-import-review "import?text=$IMPORT_TEXT" 12
 screen 16-routines routines
+screen 17-ask ask
+screen 18-ask-answer "ask?q=Short%20staffed%20tonight%20and%20freight%20is%20behind%2C%20what%20first%3F" 8
 
 ls -la "$OUT"

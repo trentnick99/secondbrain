@@ -41,6 +41,7 @@ enum Route: Equatable {
     case role
     case routines
     case importNotes(String?)
+    case ask(String?)
 }
 
 /// Wraps an id so it can drive `.sheet(item:)`.
@@ -70,6 +71,8 @@ final class AppRouter {
     var showRoutines = false
     var showImport = false
     var importText: String?
+    var showAsk = false
+    var askQuestion: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
     var toast: String?
@@ -121,6 +124,10 @@ final class AppRouter {
             dismissSheets()
             importText = text
             showImport = true
+        case .ask(let question):
+            dismissSheets()
+            askQuestion = question
+            showAsk = true
         }
     }
 
@@ -149,6 +156,9 @@ final class AppRouter {
         case "import":
             open(.importNotes(URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "text" }?.value))
+        case "ask":
+            open(.ask(URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "q" }?.value))
         case "terms":
             let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value
@@ -171,6 +181,7 @@ final class AppRouter {
         showRole = false
         showRoutines = false
         showImport = false
+        showAsk = false
     }
 
     func showToast(_ message: String) {

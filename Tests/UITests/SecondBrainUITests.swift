@@ -112,6 +112,29 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertEqual(app.buttons["Sunday shift"].firstMatch.value as? String, "7–5")
     }
 
+    func testAskFindsAGuideAndAddsAStepAsATask() throws {
+        let askBar = app.buttons["homeAskBar"].firstMatch
+        XCTAssertTrue(askBar.waitForExistence(timeout: 5))
+        askBar.tap()
+        let field = app.descendants(matching: .any).matching(identifier: "askQuestionField").firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("We're short staffed tonight, two call outs")
+        app.buttons["askSubmitButton"].firstMatch.tap()
+        let guide = app.buttons["guide-short-staffed"].firstMatch
+        XCTAssertTrue(guide.waitForExistence(timeout: 5), "The matching guide is listed")
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "askRedditLink").firstMatch.exists,
+                      "Reddit search is offered")
+        guide.tap()
+        let add = app.buttons["Add step 1 as a task"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        add.tap()
+        let confirm = app.buttons["Add task"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5), "Adding a step asks first")
+        confirm.tap()
+        XCTAssertTrue(element(containing: "Added to Tasks").waitForExistence(timeout: 5))
+    }
+
     func testImportNotesAddsReviewedItems() throws {
         let importButton = app.buttons["New Import"].firstMatch
         XCTAssertTrue(importButton.waitForExistence(timeout: 5))

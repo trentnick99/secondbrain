@@ -23,6 +23,7 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     header(agenda)
                     quickActions
+                    askBar
                     if !agenda.inbox.isEmpty { inboxBanner(count: agenda.inbox.count) }
 
                     focusCard(agenda, items: items)
@@ -171,6 +172,30 @@ struct DashboardView: View {
                 QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }
             }
         }
+    }
+
+    /// Looks like a search field; opens Ask.
+    private var askBar: some View {
+        Button { router.open(.ask(nil)) } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "questionmark.bubble.fill")
+                    .foregroundStyle(Theme.pink)
+                Text("Ask: what do I do if…")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .font(.subheadline)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.tint(Theme.pink, 0.35)))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Ask a question")
+        .accessibilityIdentifier("homeAskBar")
     }
 
     private func inboxBanner(count: Int) -> some View {

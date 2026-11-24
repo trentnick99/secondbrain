@@ -24,6 +24,21 @@ final class PersistenceTests: XCTestCase {
         return CaptureDraft(parsed: parsed)
     }
 
+    // MARK: Quick note (Action button)
+
+    func testQuickNoteSavesExactlyWhatWasSaid() throws {
+        let reply = QuickNoteSaver.save("  Check the dairy cooler temp log\nand call maintenance  ", in: context)
+        XCTAssertEqual(reply, "Saved to Notes.")
+        let notes = try context.fetch(FetchDescriptor<Note>())
+        XCTAssertEqual(notes.count, 1)
+        XCTAssertEqual(notes[0].title, "Check the dairy cooler temp log")
+        XCTAssertEqual(notes[0].body, "Check the dairy cooler temp log\nand call maintenance")
+        XCTAssertEqual(notes[0].tagsRaw, QuickNoteSaver.tag)
+        XCTAssertTrue(try context.fetch(FetchDescriptor<TaskItem>()).isEmpty, "A quick note never becomes a task on its own")
+        XCTAssertEqual(QuickNoteSaver.save("   ", in: context), "I didn't catch a note.")
+        XCTAssertTrue(QuickNoteSaver.save("Sam's write up is Friday", in: context).contains("Heads up"))
+    }
+
     // MARK: Importing notes
 
     func testImportedItemsSaveWithTheirAreaAndOnlyStatedDates() throws {

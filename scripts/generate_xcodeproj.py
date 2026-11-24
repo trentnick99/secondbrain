@@ -218,6 +218,8 @@ APP_SETTINGS = dict(IPHONE_ONLY, **{
     "GENERATE_INFOPLIST_FILE": "NO",
     "INFOPLIST_FILE": "Config/SecondBrain-Info.plist",
     "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks"],
+    # Apple's on-device model (iOS 26+) is optional; the app still runs on iOS 18.
+    "OTHER_LDFLAGS": ["$(inherited)", "-weak_framework", "FoundationModels"],
     "MARKETING_VERSION": "1.0",
     "PRODUCT_BUNDLE_IDENTIFIER": "$(BASE_BUNDLE_ID)",
     "PRODUCT_NAME": "$(TARGET_NAME)",

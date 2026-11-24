@@ -23,6 +23,49 @@ struct AddTaskIntent: AppIntent {
     }
 }
 
+/// "Quick note in Second Brain" — made for the Action button. Asks for a note (type or tap the mic) and
+/// saves it exactly as given, without opening the app. Nothing is interpreted, so no dates or people are added.
+struct QuickNoteIntent: AppIntent {
+    static var title: LocalizedStringResource = "Quick Note"
+    static var description = IntentDescription("Saves a note to Second Brain without opening the app. Great for the Action button.")
+
+    @Parameter(title: "Note", requestValueDialog: IntentDialog("What's the note?"))
+    var text: String
+
+    init() {}
+
+    init(text: String) { self.text = text }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        .result(dialog: IntentDialog(stringLiteral: QuickNoteSaver.save(text, in: PersistenceController.shared.mainContext)))
+    }
+}
+
+/// Saves a quick note verbatim. Shared by the intent and tests.
+enum QuickNoteSaver {
+    static let tag = "quick note"
+
+    @MainActor
+    @discardableResult
+    static func save(_ text: String, in context: ModelContext) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "I didn't catch a note." }
+        let firstLine = trimmed.components(separatedBy: .newlines).first ?? trimmed
+        let title = firstLine.count > 60 ? String(firstLine.prefix(57)) + "…" : firstLine
+        let note = Note(title: title, body: trimmed, type: .general)
+        note.tagsRaw = tag
+        context.insert(note)
+        try? context.save()
+        AppMaintenance.requestWidgetReload()
+        var reply = "Saved to Notes."
+        if let notice = SensitiveContent.check(trimmed) {
+            reply += " Heads up: " + notice.message
+        }
+        return reply
+    }
+}
+
 /// "Remind me in Second Brain" — e.g. "check the backroom tomorrow".
 struct AddReminderIntent: AppIntent {
     static var title: LocalizedStringResource = "Remind Me"
@@ -218,6 +261,11 @@ struct SecondBrainShortcuts: AppShortcutsProvider {
             "Add to \(.applicationName)",
             "Capture in \(.applicationName)"
         ], shortTitle: "Add Task", systemImageName: "plus.circle")
+        AppShortcut(intent: QuickNoteIntent(), phrases: [
+            "Quick note in \(.applicationName)",
+            "Take a note in \(.applicationName)",
+            "Note in \(.applicationName)"
+        ], shortTitle: "Quick Note", systemImageName: "square.and.pencil")
         AppShortcut(intent: AddReminderIntent(), phrases: [
             "Remind me in \(.applicationName)",
             "Set a reminder in \(.applicationName)"
