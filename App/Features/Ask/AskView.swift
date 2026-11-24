@@ -44,6 +44,7 @@ struct AskView: View {
                 if let guide = CoachGuides.guide(id: ref.id) { GuideDetailView(guide: guide) }
             }
             .navigationDestination(for: CoachGuide.Category.self) { CategoryGuidesView(category: $0) }
+            .navigationDestination(for: AnswerStepsRef.self) { AnswerStepsView(ref: $0) }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
             }
@@ -169,6 +170,12 @@ struct AskView: View {
                     Text(answer)
                         .textSelection(.enabled)
                         .accessibilityIdentifier("askAnswer")
+                    let steps = AskAssistant.steps(fromAnswer: answer)
+                    if !steps.isEmpty {
+                        NavigationLink(value: AnswerStepsRef(question: asked, steps: steps)) {
+                            Label("Add steps as tasks", systemImage: "checklist")
+                        }
+                    }
                     Button { saveAnswer(answer) } label: { Label("Save as note", systemImage: "square.and.arrow.down") }
                 } else if let answerError {
                     Text(answerError).foregroundStyle(.secondary)
@@ -214,6 +221,74 @@ struct AskView: View {
         context.insert(note)
         try? context.save()
         router.showToast("Saved to Notes")
+    }
+}
+
+/// The steps of a written answer, offered as tasks.
+struct AnswerStepsRef: Hashable {
+    let question: String
+    let steps: [String]
+}
+
+/// Pick which steps of a written answer become tasks. Nothing is added until you tap Add.
+private struct AnswerStepsView: View {
+    let ref: AnswerStepsRef
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
+    @State private var chosen: Set<Int>
+
+    init(ref: AnswerStepsRef) {
+        self.ref = ref
+        _chosen = State(initialValue: Set(ref.steps.indices))
+    }
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(Array(ref.steps.enumerated()), id: \.offset) { index, step in
+                    Button {
+                        if chosen.contains(index) { chosen.remove(index) } else { chosen.insert(index) }
+                    } label: {
+                        HStack(alignment: .firstTextBaseline) {
+                            Image(systemName: chosen.contains(index) ? "checkmark.circle.fill" : "circle")
+                                .foregroundStyle(chosen.contains(index) ? Theme.accent : .secondary)
+                            Text(step).foregroundStyle(.primary)
+                        }
+                    }
+                }
+            } footer: {
+                Text("Tick the steps you want as tasks. You can edit them in Tasks afterward.")
+            }
+        }
+        .navigationTitle("Add as tasks")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Add \(chosen.count)") { add() }.disabled(chosen.isEmpty)
+            }
+        }
+    }
+
+    private func add() {
+        for index in chosen.sorted() {
+            let step = ref.steps[index]
+            var draft = CaptureDraft()
+            draft.rawText = step
+            draft.title = step
+            draft.kind = .task
+            draft.details = "From Ask: \(ref.question)"
+            let classification = EisenhowerClassifier.classify(ClassificationInput(
+                text: step, category: .general, kind: .task, priority: .normal,
+                dueDate: nil, hasDueTime: false, now: Date(), calendar: .current))
+            draft.quadrant = classification.quadrant
+            draft.classificationReasons = classification.reasons
+            draft.isSafetyLocked = classification.isSafetyLocked
+            if classification.isSafetyLocked { draft.category = .safety }
+            _ = CaptureSaver.save(draft, in: context)
+        }
+        router.showToast(chosen.count == 1 ? "Added 1 task" : "Added \(chosen.count) tasks")
+        dismiss()
     }
 }
 

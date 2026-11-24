@@ -15,6 +15,8 @@ struct EndShiftView: View {
     @State private var confirmCarryAll = false
     @State private var showCompleted = false
     @State private var didInitFocus = false
+    @State private var handoffIncludesAssociates = false
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
 
     var body: some View {
         let now = Date()
@@ -33,7 +35,8 @@ struct EndShiftView: View {
                     }
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
-                    Text(BriefingBuilder.shiftSummary(review)).font(.subheadline).foregroundStyle(.secondary)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(BriefingBuilder.shiftSummary(review))
                 }
 
                 if !carryCandidates.isEmpty {
@@ -92,6 +95,27 @@ struct EndShiftView: View {
 
                 Section("Notes for tomorrow (optional)") {
                     TextField("Anything to remember?", text: $reflection, axis: .vertical).lineLimit(2...5)
+                }
+
+                Section {
+                    let handoff = ShiftHandoff.text(review: review, role: RoleStorage.decode(roleJSON),
+                                                    includeAssociateItems: handoffIncludesAssociates,
+                                                    note: reflection, now: now, calendar: .current)
+                    ShareLink(item: handoff, subject: Text("Shift handoff"), preview: SharePreview("Shift handoff")) {
+                        Label("Share handoff", systemImage: "square.and.arrow.up")
+                            .font(.headline)
+                    }
+                    .accessibilityIdentifier("shareHandoffButton")
+                    Toggle("Include associate follow-ups", isOn: $handoffIncludesAssociates)
+                    Text(handoff)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .lineLimit(8)
+                        .textSelection(.enabled)
+                } header: {
+                    Text("Hand off to the next coach")
+                } footer: {
+                    Text("Send what's still open to the next coach or overnight by text or email. Your notes above are included. Associate follow-ups stay out unless you turn them on.")
                 }
             }
             .scrollContentBackground(.hidden)

@@ -12,6 +12,7 @@ struct DashboardView: View {
     @State private var briefing: String = ""
     @State private var showCompleted = false
     @State private var now = Date()
+    private let weather = WeatherAlertService.shared
 
     var body: some View {
         let agenda = DayAgenda.build(tasks: tasks.map(\.snapshot), day: now, now: now, calendar: .current)
@@ -22,6 +23,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     header(agenda)
+                    WeatherAlertBanner(alerts: weather.current)
                     quickActions
                     askBar
                     if !agenda.inbox.isEmpty { inboxBanner(count: agenda.inbox.count) }
@@ -167,6 +169,8 @@ struct DashboardView: View {
                 QuickActionButton(title: "Capture", systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
                 QuickActionButton(title: "Task", systemImage: "checklist", tint: Theme.color(for: .schedule)) { router.open(.capture(.task)) }
                 QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock", tint: Theme.purple) { router.open(.capture(.followUp)) }
+                QuickActionButton(title: "Floor walk", systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
+                QuickActionButton(title: "Walk notes", systemImage: "mic.fill", tint: Theme.pink) { router.open(.importNotes(nil, mode: .speak)) }
                 QuickActionButton(title: "Import", systemImage: "square.and.arrow.down", tint: Theme.purple) { router.open(.importNotes(nil)) }
                 QuickActionButton(title: "Note", systemImage: "note.text", tint: Theme.warning) { router.open(.capture(.note)) }
                 QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }

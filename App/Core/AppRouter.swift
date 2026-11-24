@@ -40,8 +40,9 @@ enum Route: Equatable {
     case seasonPlanner
     case role
     case routines
-    case importNotes(String?)
+    case importNotes(String?, mode: ImportMode = .paste)
     case ask(String?)
+    case floorWalk
 }
 
 /// Wraps an id so it can drive `.sheet(item:)`.
@@ -71,7 +72,9 @@ final class AppRouter {
     var showRoutines = false
     var showImport = false
     var importText: String?
+    var importMode: ImportMode = .paste
     var showAsk = false
+    var showFloorWalk = false
     var askQuestion: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
@@ -120,14 +123,18 @@ final class AppRouter {
         case .routines:
             dismissSheets()
             showRoutines = true
-        case .importNotes(let text):
+        case .importNotes(let text, let mode):
             dismissSheets()
             importText = text
+            importMode = mode
             showImport = true
         case .ask(let question):
             dismissSheets()
             askQuestion = question
             showAsk = true
+        case .floorWalk:
+            dismissSheets()
+            showFloorWalk = true
         }
     }
 
@@ -156,6 +163,10 @@ final class AppRouter {
         case "import":
             open(.importNotes(URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "text" }?.value))
+        case "walknotes":
+            open(.importNotes(nil, mode: .speak))
+        case "walk":
+            open(.floorWalk)
         case "ask":
             open(.ask(URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value))
@@ -182,6 +193,7 @@ final class AppRouter {
         showRoutines = false
         showImport = false
         showAsk = false
+        showFloorWalk = false
     }
 
     func showToast(_ message: String) {

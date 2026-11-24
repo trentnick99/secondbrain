@@ -39,6 +39,28 @@ final class PersistenceTests: XCTestCase {
         XCTAssertTrue(QuickNoteSaver.save("Sam's write up is Friday", in: context).contains("Heads up"))
     }
 
+    // MARK: Lock Screen shift
+
+    func testShiftActivityShowsTheTopThreeOpenPriorities() throws {
+        let today = Date()
+        for (index, title) in ["Clear the fire exits", "Cover open SCO shifts", "Submit the cooler request", "Zone aisle 9"].enumerated() {
+            let task = TaskItem(title: title)
+            task.dueDate = today
+            task.quadrant = index < 3 ? .doFirst : .schedule
+            context.insert(task)
+        }
+        let done = TaskItem(title: "Huddle")
+        done.dueDate = today
+        context.insert(done)
+        try context.save()
+        _ = TaskActions.complete(done, in: context)
+        let state = ShiftActivityController.state(in: context, now: today)
+        XCTAssertEqual(state.priorities.count, 3)
+        XCTAssertFalse(state.priorities.contains("Huddle"), "Done work isn't a priority")
+        XCTAssertEqual(state.done, 1)
+        XCTAssertGreaterThanOrEqual(state.total, 5)
+    }
+
     // MARK: Importing notes
 
     func testImportedItemsSaveWithTheirAreaAndOnlyStatedDates() throws {
@@ -179,7 +201,7 @@ final class PersistenceTests: XCTestCase {
         let a = TaskActions.createTask(title: "A", due: today, in: context)
         let b = TaskActions.createTask(title: "B", due: cal.date(byAdding: .day, value: -1, to: today), in: context)
         let done = TaskActions.createTask(title: "Done", due: today, in: context)
-        TaskActions.complete(done, in: context)
+        _ = TaskActions.complete(done, in: context)
         let tomorrow = cal.date(byAdding: .day, value: 1, to: today)!
         TaskActions.carryForward([a, b, done], to: tomorrow, in: context)
         XCTAssertTrue(cal.isDate(a.dueDate!, inSameDayAs: tomorrow))

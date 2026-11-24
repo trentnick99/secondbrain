@@ -46,6 +46,17 @@ public enum AskAssistant {
 
     public static let redditNote = "Reddit posts are other people's opinions and experiences, not company policy. Don't post names or store details."
 
+    /// The numbered or bulleted steps in a written answer, cleaned up so each can become a task.
+    public static func steps(fromAnswer answer: String) -> [String] {
+        answer.components(separatedBy: .newlines).compactMap { line in
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            guard let range = trimmed.range(of: #"^(\d{1,2}[.)]|[-•*])\s+"#, options: .regularExpression) else { return nil }
+            var step = String(trimmed[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+            step = step.replacingOccurrences(of: "**", with: "")
+            return step.count >= 4 ? step : nil
+        }
+    }
+
     // MARK: On-device model prompt
 
     /// Instructions for Apple's on-device model. It knows nothing about this company's internal policies,

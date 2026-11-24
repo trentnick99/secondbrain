@@ -11,6 +11,11 @@ temporary keychain. Usage:
 Reads ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH, BUNDLE_ID, BUILD_NUMBER and RUNNER_TEMP. Older
 certificates that this workflow made are revoked only when Apple's certificate limit is reached; builds
 already uploaded to TestFlight aren't affected by revoking a distribution certificate.
+
+Certificate reuse: when CERT_CACHE_DIR is set (restored by actions/cache), the certificate and its private
+key are kept there between runs, encrypted with AES-256-GCM under a key derived from the App Store Connect
+API key, which only this repository's secrets hold. Each run reuses that certificate while Apple still lists
+it as valid, so builds don't create (or revoke) certificates every time.
 """
 import base64
 import json
@@ -28,6 +33,8 @@ import jwt
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.serialization import pkcs12
 from cryptography.x509.oid import NameOID
 
@@ -80,6 +87,60 @@ def env_out(name, value, mask=False):
         print(f"::add-mask::{value}")
     with open(os.environ["GITHUB_ENV"], "a") as env:
         env.write(f"{name}={value}\n")
+
+
+def cache_file():
+    folder = os.environ.get("CERT_CACHE_DIR")
+    return Path(folder) / "dist-cert.enc" if folder else None
+
+
+def cache_key():
+    material = Path(os.environ["ASC_KEY_PATH"]).read_bytes()
+    return HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
+                info=b"secondbrain distribution certificate cache v1").derive(material)
+
+
+def load_cached_certificate():
+    path = cache_file()
+    if not path or not path.exists():
+        return None
+    try:
+        blob = path.read_bytes()
+        payload = json.loads(AESGCM(cache_key()).decrypt(blob[:12], blob[12:], None))
+    except Exception:
+        print("Saved certificate couldn't be read (the API key may have changed); making a new one.")
+        return None
+    status, response = call("GET", f"/certificates/{payload['cert_id']}")
+    expires = (response.get("data", {}).get("attributes", {}) or {}).get("expirationDate", "") if status == 200 else ""
+    soon = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.time() + 3 * 86400))
+    if status != 200 or not expires or expires[:19] <= soon:
+        print("Saved certificate is no longer valid; making a new one.")
+        return None
+    p12_path = TEMP / "dist.p12"
+    p12_path.write_bytes(base64.b64decode(payload["p12"]))
+    print(f"Reusing the saved distribution certificate (valid until {expires[:10]}).")
+    return payload["cert_id"], p12_path, payload["password"]
+
+
+def save_certificate(cert_id, p12_path, p12_password):
+    path = cache_file()
+    if not path:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps({"cert_id": cert_id, "p12": base64.b64encode(p12_path.read_bytes()).decode(),
+                          "password": p12_password}).encode()
+    nonce = secrets.token_bytes(12)
+    path.write_bytes(nonce + AESGCM(cache_key()).encrypt(nonce, payload, None))
+    print("Saved the certificate (encrypted) for the next build.")
+
+
+def certificate():
+    return load_cached_certificate() or save_and_return(*create_certificate())
+
+
+def save_and_return(cert_id, p12_path, p12_password):
+    save_certificate(cert_id, p12_path, p12_password)
+    return cert_id, p12_path, p12_password
 
 
 def create_certificate():
@@ -178,7 +239,7 @@ def create_profile(identifier, bundle_id, cert_id, build):
 def setup():
     bundle = os.environ["BUNDLE_ID"]
     build = os.environ.get("BUILD_NUMBER", "0")
-    cert_id, p12_path, p12_password = create_certificate()
+    cert_id, p12_path, p12_password = certificate()
     keychain, keychain_password = install_keychain(p12_path, p12_password)
     app_profile_id, app_profile = create_profile(bundle, bundle_resource_id(bundle), cert_id, build)
     widget = f"{bundle}.widgets"

@@ -77,7 +77,16 @@ jobs:
           python3 -m pip install --quiet --break-system-packages "pyjwt[crypto]" || python3 -m pip install --quiet "pyjwt[crypto]"
           python3 scripts/ci/check_asc_key.py
 
+      - name: Restore the saved signing certificate
+        uses: actions/cache@v4
+        with:
+          path: .ci-cache/dist-cert
+          key: dist-cert-${{ github.run_id }}
+          restore-keys: dist-cert-
+
       - name: Create distribution certificate and App Store profiles
+        env:
+          CERT_CACHE_DIR: .ci-cache/dist-cert
         run: python3 scripts/ci/asc_signing.py setup
 
       - name: Archive (signed for App Store distribution)

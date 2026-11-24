@@ -477,7 +477,7 @@ public enum CoachGuides {
         case "Stocking", "Overnight": ids = ["freight-behind", "equipment", "blocked-exit"] + ids
         case "Fresh", "Food": ids = ["recall", "freight-behind", "spill"] + ids
         case "Front End": ids = ["upset-customer", "price-match", "crowd"] + ids
-        case "AP": ids = ["theft", "threat", "crowd"] + ids
+        case "Asset Protection": ids = ["theft", "threat", "crowd"] + ids
         default: ids = ["market-walk", "blocked-exit"] + ids
         }
         if role?.role == .storeManager { ids = ["conflicting-priorities", "follow-through", "crowd"] + ids }

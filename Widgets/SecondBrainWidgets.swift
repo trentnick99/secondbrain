@@ -9,6 +9,7 @@ struct SecondBrainWidgetsBundle: WidgetBundle {
         TodayWidget()
         LockScreenWidget()
         QuickCaptureControl()
+        ShiftLiveActivity()
     }
 }
 

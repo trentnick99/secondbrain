@@ -83,6 +83,23 @@ final class AskAssistantTests: XCTestCase {
         XCTAssertTrue(none.contains("No reference guide matched"))
     }
 
+    func testStepsFromAWrittenAnswer() {
+        let answer = """
+        Start with safety, then the customer.
+        1. Walk your areas for **blocked exits** and spills.
+        2) Re-rank tonight's work in the Matrix.
+        - Tell your store manager what will carry over.
+        Good luck!
+        3. ok
+        """
+        XCTAssertEqual(AskAssistant.steps(fromAnswer: answer), [
+            "Walk your areas for blocked exits and spills.",
+            "Re-rank tonight's work in the Matrix.",
+            "Tell your store manager what will carry over."
+        ])
+        XCTAssertTrue(AskAssistant.steps(fromAnswer: "Just a sentence.").isEmpty)
+    }
+
     func testInstructionsNeverLetTheModelInventPolicy() {
         let text = AskAssistant.instructions(role: UserRole(role: .coach, areas: ["Food"]))
         XCTAssertTrue(text.contains("food coach") || text.contains("coach"), text)

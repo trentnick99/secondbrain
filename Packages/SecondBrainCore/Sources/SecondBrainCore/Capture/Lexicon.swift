@@ -27,7 +27,10 @@ enum Lexicon {
         "emergency exits", "exits clear", "near miss", "near misses", "loto", "lockout/tagout",
         "lock out tag out", "pit", "ple", "pre-use", "pre-use inspection", "pre-use inspections", "equipment inspection",
         "walkie stacker", "walkie rider", "electric pallet jack", "epj", "scissor lift", "ergonomics", "spill response",
-        "evacuation", "fire drill", "emergency action plan", "code adam", "code white", "code blue", "active threat"
+        "evacuation", "fire drill", "emergency action plan", "code adam", "code white", "code blue", "active threat",
+        "leaking water", "leaking on the floor", "water on the floor", "puddle", "broken glass", "exposed wire",
+        "blocked aisle", "aisle blocked", "blocking the aisle", "blocking the exit", "left in action alley",
+        "pallet in action alley", "pallets in action alley"
     ]
 
     static let complianceWords = [

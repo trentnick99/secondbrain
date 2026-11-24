@@ -136,6 +136,25 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(element(containing: "Added to Tasks").waitForExistence(timeout: 5))
     }
 
+    func testFloorWalkTurnsAMissIntoATask() throws {
+        let walk = app.buttons["New Floor walk"].firstMatch
+        XCTAssertTrue(walk.waitForExistence(timeout: 5))
+        walk.tap()
+        let needsWork = app.buttons["Needs work: Exits and fire equipment clear"].firstMatch
+        XCTAssertTrue(needsWork.waitForExistence(timeout: 5))
+        needsWork.tap()
+        app.buttons["OK: No spills or trip hazards"].firstMatch.tap()
+        let finish = app.descendants(matching: .any).matching(identifier: "walkFinishButton").firstMatch
+        if !finish.isHittable { app.swipeUp(); app.swipeUp(); app.swipeUp() }
+        XCTAssertTrue(finish.waitForExistence(timeout: 5))
+        finish.tap()
+        let add = app.buttons["walkAddTasksButton"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5))
+        XCTAssertTrue(element(containing: "Clear the exits and fire equipment").exists, "The miss is listed for review")
+        add.tap()
+        XCTAssertTrue(element(containing: "Added 1 task").waitForExistence(timeout: 5))
+    }
+
     func testImportNotesAddsReviewedItems() throws {
         let importButton = app.buttons["New Import"].firstMatch
         XCTAssertTrue(importButton.waitForExistence(timeout: 5))

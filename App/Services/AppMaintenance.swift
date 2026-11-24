@@ -17,7 +17,8 @@ enum AppMaintenance {
     static func configure() {
         DataChange.handlers = [
             { NotificationService.shared.requestResync() },
-            { AppMaintenance.requestWidgetReload() }
+            { AppMaintenance.requestWidgetReload() },
+            { ShiftActivityController.requestRefresh() }
         ]
     }
 
@@ -27,7 +28,9 @@ enum AppMaintenance {
         RecurrenceService.materialize(in: context)
         await NotificationService.shared.resyncNow()
         WidgetCenter.shared.reloadAllTimelines()
+        ShiftActivityController.refresh(in: context)
         scheduleBackgroundRefresh()
+        await WeatherAlertService.shared.refresh()
     }
 
     static func runBackgroundRefresh() async {
@@ -36,6 +39,8 @@ enum AppMaintenance {
         await NotificationService.shared.resyncNow()
         WidgetCenter.shared.reloadAllTimelines()
         BackupService.writeAutomaticBackup(from: context)
+        ShiftActivityController.refresh(in: context)
+        if WeatherAlertService.isEnabled { await WeatherAlertService.shared.checkAndNotify() }
         scheduleBackgroundRefresh()
     }
 
@@ -49,11 +54,23 @@ enum AppMaintenance {
     }
 
     /// Asks iOS for a refresh early tomorrow so the next week of recurring tasks and reminders stays scheduled.
+    /// With weather alerts on, it asks for refreshes about every 30 minutes around the shift instead.
+    /// iOS still decides when (and whether) they run.
     static func scheduleBackgroundRefresh() {
         let request = BGAppRefreshTaskRequest(identifier: refreshTaskIdentifier)
         let cal = Calendar.current
-        let tomorrow = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: Date())) ?? Date()
-        request.earliestBeginDate = cal.date(byAdding: .hour, value: 3, to: tomorrow)
+        let now = Date()
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: now)) ?? now
+        var next = cal.date(byAdding: .hour, value: 3, to: tomorrow)
+        if WeatherAlertService.isEnabled, let window = AppSettings.shiftWindow(on: now) {
+            let watchStart = window.start.addingTimeInterval(-3600)
+            if now < watchStart {
+                next = watchStart
+            } else if now < window.end {
+                next = now.addingTimeInterval(30 * 60)
+            }
+        }
+        request.earliestBeginDate = next
         try? BGTaskScheduler.shared.submit(request)
     }
 }

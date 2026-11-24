@@ -13,6 +13,8 @@ struct SettingsView: View {
 
     @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
     @AppStorage(SettingsKey.askUsesAI, store: AppGroup.defaults) private var askUsesAI = true
+    @AppStorage(SettingsKey.weatherAlertsEnabled, store: AppGroup.defaults) private var weatherAlerts = false
+    @AppStorage(SettingsKey.shiftLiveActivity, store: AppGroup.defaults) private var shiftLiveActivity = true
     @AppStorage(SettingsKey.reminderAtShiftStart, store: AppGroup.defaults) private var reminderAtShiftStart = SettingsDefault.reminderAtShiftStart
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @AppStorage(SettingsKey.defaultReminderEnabled, store: AppGroup.defaults) private var defaultReminderEnabled = SettingsDefault.defaultReminderEnabled
@@ -76,6 +78,18 @@ struct SettingsView: View {
                 .accessibilityIdentifier("roleSettingsRow")
                 Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
                 Button { router.open(.ask(nil)) } label: { Label("Ask", systemImage: "questionmark.bubble") }
+                Button { router.open(.floorWalk) } label: { Label("Floor walk", systemImage: "figure.walk") }
+                NavigationLink { WeatherSettingsView() } label: {
+                    LabeledContent {
+                        Text(weatherAlerts ? "On" : "Off")
+                    } label: {
+                        Label("Severe weather alerts", systemImage: "cloud.bolt.rain")
+                    }
+                }
+                .accessibilityIdentifier("weatherSettingsRow")
+                Toggle(isOn: $shiftLiveActivity) {
+                    Label("Shift on Lock Screen", systemImage: "lock.rectangle.on.rectangle")
+                }
                 Button { showSeasonPlanner = true } label: { Label("Season planner", systemImage: "leaf.arrow.triangle.circlepath") }
                 Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
                 Picker("Appearance", selection: $appearance) {
@@ -88,7 +102,13 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         .task { await refreshStatus() }
-        .onChange(of: resyncKey) { _, _ in NotificationService.shared.requestResync() }
+        .onChange(of: resyncKey) { _, _ in
+            NotificationService.shared.requestResync()
+            ShiftActivityController.requestRefresh()
+        }
+        .onChange(of: shiftLiveActivity) { _, isOn in
+            if isOn { ShiftActivityController.refresh(in: context) } else { ShiftActivityController.endAll() }
+        }
     }
 
     /// Any setting that changes which notifications are scheduled.

@@ -42,6 +42,17 @@ enum SettingsKey {
     static let askUsesAI = "askUsesAI"
     /// The person's own store steps for each Ask guide (JSON of [guide id: text]).
     static let askStoreSteps = "askStoreSteps"
+    /// A floor walk in progress (JSON of `FloorWalkState`).
+    static let floorWalkState = "floorWalkState"
+    /// Severe weather alerts from the National Weather Service for the store's location.
+    static let weatherAlertsEnabled = "weatherAlertsEnabled"
+    static let storeLatitude = "storeLatitude"
+    static let storeLongitude = "storeLongitude"
+    static let storeLocationName = "storeLocationName"
+    static let weatherCache = "weatherCache"
+    static let weatherNotified = "weatherNotified"
+    /// Show today's shift as a Live Activity on the Lock Screen when the app opens during a shift.
+    static let shiftLiveActivity = "shiftLiveActivity"
 }
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
@@ -116,6 +127,15 @@ enum AppSettings {
         RelativeDateText.dayLabel(for: nextShiftDay(after: date), now: date, calendar: .current)
     }
     static var weekStartsOn: Int { int(SettingsKey.weekStartsOn, SettingsDefault.weekStartsOn) }
+
+    /// Today's shift as clock times, if there's a shift on that day.
+    static func shiftWindow(on date: Date = Date(), calendar: Calendar = .current) -> (start: Date, end: Date)? {
+        guard let shift = shiftSchedule.shift(on: date, calendar: calendar) else { return nil }
+        let day = calendar.startOfDay(for: date)
+        guard let start = calendar.date(byAdding: .minute, value: shift.startMinutes, to: day),
+              let end = calendar.date(byAdding: .minute, value: shift.endMinutes, to: day) else { return nil }
+        return (start, end)
+    }
     /// The person's role, once chosen in onboarding or Settings.
     static var userRole: UserRole? { RoleStorage.decode(defaults.string(forKey: SettingsKey.userRole) ?? "") }
     static var defaultReminderEnabled: Bool { bool(SettingsKey.defaultReminderEnabled, SettingsDefault.defaultReminderEnabled) }

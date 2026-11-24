@@ -1,7 +1,13 @@
+import PhotosUI
 import SwiftUI
 import SwiftData
 import UIKit
 import SecondBrainCore
+
+/// How the notes come in. Walk notes are your own observations, so they aren't filtered by role.
+enum ImportMode: Equatable {
+    case paste, speak
+}
 
 /// Paste a market manager's email or notes, review the action items sorted by area, and add the ones
 /// you choose. Nothing is saved until you tap Add. Items for other areas are left out.
@@ -18,15 +24,30 @@ struct ImportNotesView: View {
     @State private var titles: [Int: String] = [:]
     @State private var saveOriginal = true
     @State private var showHiddenNote = false
+    @State private var sortByRole: Bool
+    @State private var showScanner = false
+    @State private var photoItems: [PhotosPickerItem] = []
+    @State private var isReadingPhoto = false
+    @State private var photoMessage: String?
+    @State private var speech = SpeechCaptureService()
 
     private let startsWithText: Bool
+    private let mode: ImportMode
 
-    init(initialText: String? = nil) {
+    init(initialText: String? = nil, mode: ImportMode = .paste) {
         _text = State(initialValue: initialText ?? "")
+        _sortByRole = State(initialValue: mode != .speak)
         startsWithText = !(initialText ?? "").isEmpty
+        self.mode = mode
     }
 
+    /// The role used to sort items: none for walk notes, which are your own observations.
     private var role: UserRole? {
+        guard sortByRole, let role = savedRole else { return nil }
+        return role
+    }
+
+    private var savedRole: UserRole? {
         guard let role = RoleStorage.decode(roleJSON), role.seesWholeStore || role.primaryArea != nil else { return nil }
         return role
     }
@@ -39,6 +60,26 @@ struct ImportNotesView: View {
             .onAppear {
                 // Text from Shortcuts or a link goes straight to review (still nothing saved until Add).
                 if startsWithText && result == nil { read() }
+                if mode == .speak && !startsWithText && !speech.isListening {
+                    Task { await speech.start() }
+                }
+            }
+            .onDisappear { speech.stop() }
+            .onChange(of: speech.isListening) { wasListening, isListening in
+                if wasListening && !isListening { addSpokenItems() }
+            }
+            .onChange(of: photoItems) { _, items in
+                guard !items.isEmpty else { return }
+                Task { await readPhotos(items) }
+            }
+            .fullScreenCover(isPresented: $showScanner) {
+                DocumentScanner { pages in
+                    showScanner = false
+                    Task { await readImages(pages) }
+                } onCancel: {
+                    showScanner = false
+                }
+                .ignoresSafeArea()
             }
             .navigationTitle(result == nil ? "Import notes" : "Review items")
             .navigationBarTitleDisplayMode(.inline)
@@ -70,7 +111,7 @@ struct ImportNotesView: View {
                         .frame(minHeight: 220)
                         .accessibilityIdentifier("importTextEditor")
                 }
-                HStack {
+                HStack(spacing: 8) {
                     Button {
                         if let pasted = UIPasteboard.general.string, !pasted.isEmpty { text = pasted }
                     } label: {
@@ -78,14 +119,57 @@ struct ImportNotesView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("importPasteButton")
-                    Spacer()
-                    if !text.isEmpty {
-                        Button("Clear", role: .destructive) { text = "" }.buttonStyle(.bordered)
+                    if DocumentScanner.isSupported {
+                        Button { showScanner = true } label: { Label("Scan", systemImage: "doc.viewfinder") }
+                            .buttonStyle(.bordered)
+                            .accessibilityIdentifier("importScanButton")
                     }
+                    PhotosPicker(selection: $photoItems, maxSelectionCount: 5, matching: .images) {
+                        Label("Photo", systemImage: "photo")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("importPhotoButton")
+                    Spacer(minLength: 0)
+                }
+                .labelStyle(.titleAndIcon)
+                if isReadingPhoto {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                        Text("Reading the text…").font(.footnote).foregroundStyle(.secondary)
+                    }
+                } else if let photoMessage {
+                    Text(photoMessage).font(.footnote).foregroundStyle(.secondary)
+                }
+                if !text.isEmpty {
+                    Button("Clear", role: .destructive) { text = "" }.buttonStyle(.borderless)
                 }
                 SensitiveContentNotice(text: text)
             } footer: {
-                Text("Only bring in what you're allowed to keep on a personal device. Everything stays on this iPhone.")
+                Text("Paste, scan a page or pick a photo of notes or a whiteboard. Text is read on this iPhone, and photos aren't saved. Only bring in what you're allowed to keep on a personal device.")
+            }
+
+            Section {
+                Button {
+                    Task { await speech.toggle() }
+                } label: {
+                    Label(speech.isListening ? "Stop" : "Speak walk notes",
+                          systemImage: speech.isListening ? "stop.circle.fill" : "mic.circle.fill")
+                        .font(.headline)
+                        .foregroundStyle(speech.isListening ? Theme.danger : Theme.accent)
+                }
+                .accessibilityIdentifier("importSpeakButton")
+                if speech.isListening {
+                    Text(speech.transcript.isEmpty ? "Listening… say one thing per sentence." : speech.transcript)
+                        .font(.subheadline)
+                        .foregroundStyle(speech.transcript.isEmpty ? .secondary : .primary)
+                }
+                if case .unavailable(let message) = speech.state {
+                    Text(message).font(.footnote).foregroundStyle(Theme.warning)
+                }
+            } header: {
+                Text("Walk notes")
+            } footer: {
+                Text("Walk and talk: “Aisle 12 has holes. Dairy cooler door is leaking.” Each sentence becomes an item. Say “next item” to split, or pause and tap Stop.\(speech.isOnDevice ? " Recognized on this iPhone." : "")")
             }
 
             Section {
@@ -97,10 +181,53 @@ struct ImportNotesView: View {
                 }
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityIdentifier("importReviewButton")
+                if let savedRole {
+                    Toggle("Only my areas (\(savedRole.seesWholeStore ? "whole store" : savedRole.areasSummary))", isOn: $sortByRole)
+                }
             } footer: {
                 Text(role.map { "Sorted for \($0.title): your areas and total-store items. Items for other areas are left out." }
-                     ?? "Tip: choose your role in Settings to sort items by area.")
+                     ?? (savedRole == nil ? "Tip: choose your role in Settings to sort items by area."
+                                          : "Every item is kept, whatever area it mentions."))
             }
+        }
+    }
+
+    // MARK: Scan, photo and speech
+
+    private func addSpokenItems() {
+        let items = RecognizedText.walkNoteItems(from: speech.transcript)
+        guard !items.isEmpty else { return }
+        let lines = RecognizedText.bulleted(items)
+        text = text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? lines : text + "\n" + lines
+        sortByRole = false
+    }
+
+    private func readPhotos(_ items: [PhotosPickerItem]) async {
+        var images: [UIImage] = []
+        isReadingPhoto = true
+        for item in items {
+            if let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data) {
+                images.append(image)
+            }
+        }
+        photoItems = []
+        await readImages(images)
+    }
+
+    private func readImages(_ images: [UIImage]) async {
+        guard !images.isEmpty else {
+            isReadingPhoto = false
+            return
+        }
+        isReadingPhoto = true
+        photoMessage = nil
+        let found = await TextRecognizer.text(in: images)
+        isReadingPhoto = false
+        if found.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            photoMessage = "No text found. Try a closer, well-lit photo."
+        } else {
+            text = text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? found : text + "\n\n" + found
+            photoMessage = "Text added below the existing notes. Check it, then tap Find action items."
         }
     }
 

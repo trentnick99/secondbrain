@@ -52,8 +52,9 @@ struct RootView: View {
                 RoutinesView().toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { router.showRoutines = false } } }
             }
         }
-        .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText) }
+        .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText, mode: router.importMode) }
         .sheet(isPresented: $router.showAsk) { AskView(initialQuestion: router.askQuestion) }
+        .sheet(isPresented: $router.showFloorWalk) { FloorWalkView() }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }

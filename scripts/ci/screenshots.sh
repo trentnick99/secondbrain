@@ -34,7 +34,8 @@ screen() {
   local name="$1" link="$2" wait="${3:-14}"
   for attempt in 1 2 3 4; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
-    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -sampleRole -openURL "secondbrain://$link" >/dev/null
+    # shellcheck disable=SC2086
+    xcrun simctl launch "$UDID" "$BUNDLE" -uiTesting -sampleData -sampleSchedule -sampleRole ${EXTRA_ARGS:-} -openURL "secondbrain://$link" >/dev/null
     sleep $((wait + attempt * 5))
     shot "$name"
     # Still launching, or still on Home? The slow simulator missed the screen — retry with more time.
@@ -62,5 +63,8 @@ screen 15-import-review "import?text=$IMPORT_TEXT" 12
 screen 16-routines routines
 screen 17-ask ask
 screen 18-ask-answer "ask?q=Short%20staffed%20tonight%20and%20freight%20is%20behind%2C%20what%20first%3F" 8
+screen 19-floor-walk walk
+screen 20-import-scan-speak import
+EXTRA_ARGS="-sampleWeather" screen 21-weather-alert home
 
 ls -la "$OUT"
