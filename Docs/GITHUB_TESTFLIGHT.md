@@ -48,7 +48,7 @@ At **developer.apple.com/account**, open **Certificates, Identifiers & Profiles 
 ## Step 6 — Create an API key for GitHub (once)
 
 1. In App Store Connect, go to **Users and Access › Integrations › App Store Connect API**. If asked, tap **Request Access** and accept.
-2. Under **Team Keys**, tap **+**. Set Name to `GitHub` and Access to **Admin**. Admin is required so the cloud Mac can create the signing certificates for you.
+2. Under **Team Keys**, tap **+**. Set Name to `GitHub` and Access to **Admin**. Admin is required because each run creates an Apple Distribution certificate and App Store profiles for the app and widget through the API. No Mac and no registered iPhone are needed.
 3. Tap **Download** to get the `.p8` file. **You can only download it once.** Keep it somewhere safe, and never put it in the repository.
 4. Note the **Key ID**, shown in the list, and the **Issuer ID**, shown above the list.
 
@@ -93,7 +93,8 @@ TestFlight builds last 90 days. Every time you run the TestFlight workflow, a ne
 | `Missing repository settings: …` | A secret or the `BUNDLE_ID` variable from step 7 is missing or misspelled |
 | `No profiles for '…' were found` / `doesn't include the App Groups entitlement` | Check step 4: both App IDs exist, both have App Groups ticked and assigned to `group.<BUNDLE_ID>` |
 | `You haven't been given access to cloud-managed distribution certificates` | The API key must have **Admin** access (step 6). Create a new key with Admin and update the three secrets. |
-| `maximum number of … certificates` | Each run creates a short-lived "Created via API" development certificate. In Certificates, Identifiers & Profiles › Certificates, revoke old ones named "Created via API", then re-run. |
+| `API key check` fails with 401 | The Key ID, Issuer ID and .p8 don't belong together. The workflow already trims spaces and rebuilds a key pasted onto one line; if it still fails, make a new Admin key and update all three secrets. |
+| Certificate limit | When Apple's distribution-certificate limit is reached, the workflow revokes its oldest distribution certificates and tries again. Revoking doesn't affect builds already in TestFlight. Profiles named "SecondBrain CI …" are replaced on every run. |
 | `No suitable application records were found` | The app record from step 5 is missing, or its bundle ID doesn't match `BUNDLE_ID` |
 | `The bundle version must be higher…` | Just run the workflow again. The build number is the run number, which always increases. |
 | Compile errors in **Build & Test** | Open the failed run, where the **Summary** lists the errors with file and line. Tell Claude, or paste them, and they'll be fixed. |
