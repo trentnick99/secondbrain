@@ -2,6 +2,7 @@
 # Runs an xcodebuild command, keeps the full log, and on failure prints a clean list of compiler
 # errors to the job log and the run summary (so they're easy to read from a phone).
 #   scripts/ci/xcodebuild_step.sh <log-name> xcodebuild <args...>
+# Set STEP_PROGRESS=1 to also stream each compile, link and signing step (to see where a slow build is).
 set -uo pipefail
 name="$1"; shift
 mkdir -p build/logs
@@ -13,7 +14,7 @@ for arg in "$@"; do [ "$prev" = "-resultBundlePath" ] && bundle="$arg"; prev="$a
 
 # Keep the full log in a file, and stream test progress and errors live to the job log.
 run() {
-  "$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
+  "$@" 2>&1 | tee "$log" | grep --line-buffered -E "${STEP_PROGRESS:+^(SwiftCompile|SwiftEmitModule|CodeSign|Ld) .*|}Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
   status=${PIPESTATUS[0]}
 }
 run "$@"

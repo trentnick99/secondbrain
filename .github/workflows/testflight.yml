@@ -90,6 +90,9 @@ jobs:
         run: python3 scripts/ci/asc_signing.py setup
 
       - name: Archive (signed for App Store distribution)
+        timeout-minutes: 30
+        env:
+          STEP_PROGRESS: "1"
         run: |
           scripts/ci/xcodebuild_step.sh "Archive" xcodebuild archive \
             -project SecondBrain.xcodeproj -scheme SecondBrain -configuration Release \
