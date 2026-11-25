@@ -11,6 +11,15 @@
 			isa = PBXBuildFile;
 			productRef = EAB154C03E3D0C824421508E;
 		};
+		4F2DDEDA3EA48B31C444C73A = {
+			isa = PBXBuildFile;
+			fileRef = 2600747DA1476F1808EFC4CD;
+			settings = {
+				ATTRIBUTES = (
+					RemoveHeadersOnCopy,
+				);
+			};
+		};
 		A665E0911ADFEF68C5950D0C = {
 			isa = PBXBuildFile;
 			productRef = 99D0C1E9C3C8A4922F537184;
@@ -33,6 +42,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4D135D0CE15BD7C4E19A2C31;
 			remoteInfo = SecondBrain;
+		};
+		214A8A2FEADFF6431CC94011 = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3A2D788A5688814AC8C814AD;
+			proxyType = 1;
+			remoteGlobalIDString = B9683C8652B498BFDA22E0F7;
+			remoteInfo = SecondBrainWatch;
 		};
 		CB4BED9DFB63234B77E992F0 = {
 			isa = PBXContainerItemProxy;
@@ -62,6 +78,17 @@
 			dstSubfolderSpec = 13;
 			name = "Embed Foundation Extensions";
 		};
+		D22C61FA3A2FCC6209326742 = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F2DDEDA3EA48B31C444C73A,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			name = "Embed Watch Content";
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +97,13 @@
 			explicitFileType = wrapper.cfbundle;
 			includeInIndex = 0;
 			path = SecondBrainUITests.xctest;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		2600747DA1476F1808EFC4CD = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			path = SecondBrainWatch.app;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3C4B72BAB6A9669B3E479FA5 = {
@@ -139,6 +173,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		19FD9AAE16B666DBCD2781EF = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Watch;
+			sourceTree = "<group>";
+		};
 		1C3E5016E0FA620CA7AF0F6A = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = UITests;
@@ -177,6 +216,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				04DBAAC97197729339F72A25,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7230EE316BD9A5980F698A88 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +270,7 @@
 				8242BFBAA7EA78A31C262BB6,
 				B76C6981CD77C354BB56F15A,
 				B60FB7F247B3EBDD8FBA93EC,
+				19FD9AAE16B666DBCD2781EF,
 				3C4B72BAB6A9669B3E479FA5,
 				E72E293B3F9290FF4B80328F,
 				49A622380807A0BD81EFC6A0,
@@ -237,6 +284,7 @@
 			children = (
 				881FB70197ACA4652BA9A097,
 				57587ED5D90669792F1A0619,
+				2600747DA1476F1808EFC4CD,
 				83FBC9D37AE991C42BFE146D,
 				0F7F8B8E621473483A6270E2,
 			);
@@ -310,11 +358,13 @@
 				6F3DE94185D26A3944955383,
 				38487845C8AB2CCD3B3DFD41,
 				7D73DD9D5556CF1A32A1BDC2,
+				D22C61FA3A2FCC6209326742,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				25DD091BA489F55C0FD35E25,
+				C5028B39AD9CB7D4AAC18D71,
 			);
 			fileSystemSynchronizedGroups = (
 				8242BFBAA7EA78A31C262BB6,
@@ -351,6 +401,28 @@
 			productReference = 83FBC9D37AE991C42BFE146D;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		B9683C8652B498BFDA22E0F7 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D0A890C153E8F6CEE90B1D87;
+			buildPhases = (
+				174EF9415496C66D7F3345A6,
+				7230EE316BD9A5980F698A88,
+				85F43A1996772D1B9575832C,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				19FD9AAE16B666DBCD2781EF,
+			);
+			name = SecondBrainWatch;
+			packageProductDependencies = (
+			);
+			productName = SecondBrainWatch;
+			productReference = 2600747DA1476F1808EFC4CD;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -365,6 +437,9 @@
 						CreatedOnToolsVersion = 16.0;
 					};
 					1B8D89CA19130E16AC45CF05 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					B9683C8652B498BFDA22E0F7 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 					65D20E7E8FAB8018492A470B = {
@@ -393,6 +468,7 @@
 			targets = (
 				4D135D0CE15BD7C4E19A2C31,
 				1B8D89CA19130E16AC45CF05,
+				B9683C8652B498BFDA22E0F7,
 				65D20E7E8FAB8018492A470B,
 				3AE8238A190375B2378D8731,
 			);
@@ -421,6 +497,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		85F43A1996772D1B9575832C = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		98A053B6E5B4EE740E86EBCA = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -431,6 +514,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		174EF9415496C66D7F3345A6 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33957C67A04D6B35207668CC = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -477,6 +567,11 @@
 			target = 4D135D0CE15BD7C4E19A2C31;
 			targetProxy = CB4BED9DFB63234B77E992F0;
 		};
+		C5028B39AD9CB7D4AAC18D71 = {
+			isa = PBXTargetDependency;
+			target = B9683C8652B498BFDA22E0F7;
+			targetProxy = 214A8A2FEADFF6431CC94011;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -506,6 +601,34 @@
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
+		};
+		0940FBFC487373CC9C0E083D = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Second Brain";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BASE_BUNDLE_ID)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
 		};
 		1CDB0C98BFF77780F1FEC5BB = {
 			isa = XCBuildConfiguration;
@@ -728,6 +851,34 @@
 			};
 			name = Release;
 		};
+		EBE91C712A590E236CEF9FAF = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Second Brain";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BASE_BUNDLE_ID)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
 		F94F513463F95DE20C6E535E = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -783,6 +934,15 @@
 			buildConfigurations = (
 				82BF6A6CC06C425B4DF9DFEC,
 				41325E7DFD45F209ED4C289D,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D0A890C153E8F6CEE90B1D87 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EBE91C712A590E236CEF9FAF,
+				0940FBFC487373CC9C0E083D,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

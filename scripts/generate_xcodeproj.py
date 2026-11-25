@@ -64,12 +64,15 @@ TESTS_GROUP = oid("group.tests")
 
 T_APP, T_WID, T_UNIT, T_UI = oid("target.app"), oid("target.widgets"), oid("target.unit"), oid("target.ui")
 P_APP, P_WID, P_UNIT, P_UI = oid("product.app"), oid("product.widgets"), oid("product.unit"), oid("product.ui")
+T_WATCH, P_WATCH = oid("target.watch"), oid("product.watch")
 
 # ── File references ─────────────────────────────────────────────────────────
 add("product.app", {"isa": "PBXFileReference", "explicitFileType": "wrapper.application", "includeInIndex": "0",
                     "path": "SecondBrain.app", "sourceTree": "BUILT_PRODUCTS_DIR"})
 add("product.widgets", {"isa": "PBXFileReference", "explicitFileType": "wrapper.app-extension", "includeInIndex": "0",
                         "path": "SecondBrainWidgets.appex", "sourceTree": "BUILT_PRODUCTS_DIR"})
+add("product.watch", {"isa": "PBXFileReference", "explicitFileType": "wrapper.application", "includeInIndex": "0",
+                      "path": "SecondBrainWatch.app", "sourceTree": "BUILT_PRODUCTS_DIR"})
 add("product.unit", {"isa": "PBXFileReference", "explicitFileType": "wrapper.cfbundle", "includeInIndex": "0",
                      "path": "SecondBrainTests.xctest", "sourceTree": "BUILT_PRODUCTS_DIR"})
 add("product.ui", {"isa": "PBXFileReference", "explicitFileType": "wrapper.cfbundle", "includeInIndex": "0",
@@ -99,6 +102,7 @@ README_REF = add("file.readme", {"isa": "PBXFileReference", "lastKnownFileType":
 G_APP = add("sync.app", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "App", "sourceTree": "<group>"})
 G_SHARED = add("sync.shared", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "Shared", "sourceTree": "<group>"})
 G_WIDGETS = add("sync.widgets", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "Widgets", "sourceTree": "<group>"})
+G_WATCH = add("sync.watch", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "Watch", "sourceTree": "<group>"})
 G_UNIT = add("sync.unit", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "UnitTests", "sourceTree": "<group>"})
 G_UI = add("sync.ui", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "UITests", "sourceTree": "<group>"})
 G_DOCS = add("sync.docs", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": "Docs", "sourceTree": "<group>"})
@@ -106,9 +110,9 @@ G_DOCS = add("sync.docs", {"isa": "PBXFileSystemSynchronizedRootGroup", "path": 
 # ── Groups ──────────────────────────────────────────────────────────────────
 add("group.config", {"isa": "PBXGroup", "children": config_refs, "path": "Config", "sourceTree": "<group>"})
 add("group.tests", {"isa": "PBXGroup", "children": [G_UNIT, G_UI], "path": "Tests", "sourceTree": "<group>"})
-add("group.products", {"isa": "PBXGroup", "children": [P_APP, P_WID, P_UNIT, P_UI], "name": "Products", "sourceTree": "<group>"})
+add("group.products", {"isa": "PBXGroup", "children": [P_APP, P_WID, P_WATCH, P_UNIT, P_UI], "name": "Products", "sourceTree": "<group>"})
 add("group.main", {"isa": "PBXGroup",
-                   "children": [README_REF, G_APP, G_SHARED, G_WIDGETS, PKG_REF, TESTS_GROUP, CONFIG_GROUP, G_DOCS, PRODUCTS_GROUP],
+                   "children": [README_REF, G_APP, G_SHARED, G_WIDGETS, G_WATCH, PKG_REF, TESTS_GROUP, CONFIG_GROUP, G_DOCS, PRODUCTS_GROUP],
                    "sourceTree": "<group>"})
 
 # ── Package product dependencies ────────────────────────────────────────────
@@ -118,6 +122,8 @@ BF_APP_CORE = add("bf.app.core", {"isa": "PBXBuildFile", "productRef": PD_APP})
 BF_WID_CORE = add("bf.widgets.core", {"isa": "PBXBuildFile", "productRef": PD_WID})
 BF_EMBED = add("bf.embed.widgets", {"isa": "PBXBuildFile", "fileRef": P_WID,
                                      "settings": {"ATTRIBUTES": ["RemoveHeadersOnCopy"]}})
+BF_EMBED_WATCH = add("bf.embed.watch", {"isa": "PBXBuildFile", "fileRef": P_WATCH,
+                                         "settings": {"ATTRIBUTES": ["RemoveHeadersOnCopy"]}})
 
 # ── Build phases ────────────────────────────────────────────────────────────
 def phase(name, isa, files=None, extra=None):
@@ -133,6 +139,13 @@ APP_PHASES = [
     phase("phase.app.resources", "PBXResourcesBuildPhase"),
     phase("phase.app.embed", "PBXCopyFilesBuildPhase", [BF_EMBED],
           {"dstPath": "", "dstSubfolderSpec": "13", "name": "Embed Foundation Extensions"}),
+    phase("phase.app.embedwatch", "PBXCopyFilesBuildPhase", [BF_EMBED_WATCH],
+          {"dstPath": "$(CONTENTS_FOLDER_PATH)/Watch", "dstSubfolderSpec": "16", "name": "Embed Watch Content"}),
+]
+WATCH_PHASES = [
+    phase("phase.watch.sources", "PBXSourcesBuildPhase"),
+    phase("phase.watch.frameworks", "PBXFrameworksBuildPhase"),
+    phase("phase.watch.resources", "PBXResourcesBuildPhase"),
 ]
 WID_PHASES = [
     phase("phase.wid.sources", "PBXSourcesBuildPhase"),
@@ -158,6 +171,7 @@ def dependency(name, target, remote_name):
 
 
 TD_WID = dependency("dep.app.widgets", T_WID, "SecondBrainWidgets")
+TD_WATCH = dependency("dep.app.watch", T_WATCH, "SecondBrainWatch")
 TD_UNIT = dependency("dep.unit.app", T_APP, "SecondBrain")
 TD_UI = dependency("dep.ui.app", T_APP, "SecondBrain")
 
@@ -240,6 +254,28 @@ WID_SETTINGS = dict(IPHONE_ONLY, **{
     "SWIFT_EMIT_LOC_STRINGS": "YES",
     "SWIFT_VERSION": "5.0",
 })
+# The Apple Watch app (watchOS 10+), embedded in the iPhone app.
+WATCH_SETTINGS = {
+    "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
+    "CODE_SIGN_STYLE": "Automatic",
+    "CURRENT_PROJECT_VERSION": "1",
+    "ENABLE_PREVIEWS": "YES",
+    "GENERATE_INFOPLIST_FILE": "YES",
+    "INFOPLIST_KEY_CFBundleDisplayName": "Second Brain",
+    "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown",
+    "INFOPLIST_KEY_WKCompanionAppBundleIdentifier": "$(BASE_BUNDLE_ID)",
+    "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks"],
+    "MARKETING_VERSION": "1.0",
+    "PRODUCT_BUNDLE_IDENTIFIER": "$(BASE_BUNDLE_ID).watchkitapp",
+    "PRODUCT_NAME": "$(TARGET_NAME)",
+    "SDKROOT": "watchos",
+    "SKIP_INSTALL": "YES",
+    "SUPPORTED_PLATFORMS": "watchos watchsimulator",
+    "SWIFT_EMIT_LOC_STRINGS": "YES",
+    "SWIFT_VERSION": "5.0",
+    "TARGETED_DEVICE_FAMILY": "4",
+    "WATCHOS_DEPLOYMENT_TARGET": "10.0",
+}
 UNIT_SETTINGS = dict(IPHONE_ONLY, **{
     "BUNDLE_LOADER": "$(TEST_HOST)",
     "CODE_SIGN_STYLE": "Automatic",
@@ -280,18 +316,23 @@ CL_PROJECT = config_list("cl.project", PROJECT_DEBUG, PROJECT_RELEASE, base=XCCO
 # Keep every Core symbol available to the unit-test bundle in Debug.
 CL_APP = config_list("cl.app", dict(APP_SETTINGS, DEAD_CODE_STRIPPING="NO"), APP_SETTINGS)
 CL_WID = config_list("cl.widgets", WID_SETTINGS, WID_SETTINGS)
+CL_WATCH = config_list("cl.watch", WATCH_SETTINGS, WATCH_SETTINGS)
 CL_UNIT = config_list("cl.unit", UNIT_SETTINGS, UNIT_SETTINGS)
 CL_UI = config_list("cl.ui", UI_SETTINGS, UI_SETTINGS)
 
 # ── Targets ─────────────────────────────────────────────────────────────────
 objects[T_APP] = {"isa": "PBXNativeTarget", "buildConfigurationList": CL_APP, "buildPhases": APP_PHASES, "buildRules": [],
-                  "dependencies": [TD_WID], "fileSystemSynchronizedGroups": [G_APP, G_SHARED], "name": "SecondBrain",
+                  "dependencies": [TD_WID, TD_WATCH], "fileSystemSynchronizedGroups": [G_APP, G_SHARED], "name": "SecondBrain",
                   "packageProductDependencies": [PD_APP], "productName": "SecondBrain", "productReference": P_APP,
                   "productType": "com.apple.product-type.application"}
 objects[T_WID] = {"isa": "PBXNativeTarget", "buildConfigurationList": CL_WID, "buildPhases": WID_PHASES, "buildRules": [],
                   "dependencies": [], "fileSystemSynchronizedGroups": [G_WIDGETS, G_SHARED], "name": "SecondBrainWidgets",
                   "packageProductDependencies": [PD_WID], "productName": "SecondBrainWidgets", "productReference": P_WID,
                   "productType": "com.apple.product-type.app-extension"}
+objects[T_WATCH] = {"isa": "PBXNativeTarget", "buildConfigurationList": CL_WATCH, "buildPhases": WATCH_PHASES, "buildRules": [],
+                    "dependencies": [], "fileSystemSynchronizedGroups": [G_WATCH], "name": "SecondBrainWatch",
+                    "packageProductDependencies": [], "productName": "SecondBrainWatch", "productReference": P_WATCH,
+                    "productType": "com.apple.product-type.application"}
 objects[T_UNIT] = {"isa": "PBXNativeTarget", "buildConfigurationList": CL_UNIT, "buildPhases": UNIT_PHASES, "buildRules": [],
                    "dependencies": [TD_UNIT], "fileSystemSynchronizedGroups": [G_UNIT], "name": "SecondBrainTests",
                    "packageProductDependencies": [], "productName": "SecondBrainTests", "productReference": P_UNIT,
@@ -310,6 +351,7 @@ objects[PROJECT] = {
         "TargetAttributes": {
             T_APP: {"CreatedOnToolsVersion": "16.0"},
             T_WID: {"CreatedOnToolsVersion": "16.0"},
+            T_WATCH: {"CreatedOnToolsVersion": "16.0"},
             T_UNIT: {"CreatedOnToolsVersion": "16.0", "TestTargetID": T_APP},
             T_UI: {"CreatedOnToolsVersion": "16.0", "TestTargetID": T_APP},
         },
@@ -324,7 +366,7 @@ objects[PROJECT] = {
     "productRefGroup": PRODUCTS_GROUP,
     "projectDirPath": "",
     "projectRoot": "",
-    "targets": [T_APP, T_WID, T_UNIT, T_UI],
+    "targets": [T_APP, T_WID, T_WATCH, T_UNIT, T_UI],
 }
 
 # ── Write project.pbxproj ───────────────────────────────────────────────────

@@ -101,6 +101,7 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             SB_PROFILE_SecondBrain="$SB_PROFILE_APP" \
             SB_PROFILE_SecondBrainWidgets="$SB_PROFILE_WIDGETS" \
+            SB_PROFILE_SecondBrainWatch="$SB_PROFILE_WATCH" \
             OTHER_CODE_SIGN_FLAGS="--keychain $SB_KEYCHAIN" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 
@@ -119,6 +120,7 @@ jobs:
             <dict>
               <key>${BUNDLE_ID}</key><string>${SB_PROFILE_APP}</string>
               <key>${BUNDLE_ID}.widgets</key><string>${SB_PROFILE_WIDGETS}</string>
+              <key>${BUNDLE_ID}.watchkitapp</key><string>${SB_PROFILE_WATCH}</string>
             </dict>
             <key>teamID</key><string>${TEAM_ID}</string>
             <key>uploadSymbols</key><true/>

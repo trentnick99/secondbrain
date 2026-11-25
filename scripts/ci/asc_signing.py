@@ -202,13 +202,21 @@ def install_keychain(p12_path, p12_password):
     return keychain, password
 
 
-def bundle_resource_id(identifier):
+def bundle_resource_id(identifier, register_as=None):
     status, response = call("GET", "/bundleIds?" + urllib.parse.urlencode({"filter[identifier]": identifier, "limit": 200}))
     if status >= 400:
         fail(f"Couldn't look up the App ID {identifier} ({status}): {describe(response)}")
     for item in response.get("data", []):
         if item["attributes"].get("identifier") == identifier:
             return item["id"]
+    if register_as:
+        # The Apple Watch app needs no capabilities, so the workflow can register its App ID itself.
+        body = {"data": {"type": "bundleIds", "attributes": {"identifier": identifier, "name": register_as, "platform": "IOS"}}}
+        status, response = call("POST", "/bundleIds", body)
+        if status >= 400:
+            fail(f"Apple wouldn't register the App ID {identifier} ({status}): {describe(response)}")
+        print(f"Registered the App ID {identifier}.")
+        return response["data"]["id"]
     fail(f"There's no App ID {identifier} in Certificates, Identifiers & Profiles › Identifiers. Register it (with App Groups) and run again.")
 
 
@@ -244,12 +252,16 @@ def setup():
     app_profile_id, app_profile = create_profile(bundle, bundle_resource_id(bundle), cert_id, build)
     widget = f"{bundle}.widgets"
     widget_profile_id, widget_profile = create_profile(widget, bundle_resource_id(widget), cert_id, build)
-    STATE.write_text(json.dumps({"keychain": keychain, "profiles": [app_profile_id, widget_profile_id]}))
+    watch = f"{bundle}.watchkitapp"
+    watch_profile_id, watch_profile = create_profile(watch, bundle_resource_id(watch, register_as="Second Brain Watch"),
+                                                     cert_id, build)
+    STATE.write_text(json.dumps({"keychain": keychain, "profiles": [app_profile_id, widget_profile_id, watch_profile_id]}))
     env_out("SB_PROFILE_APP", app_profile)
     env_out("SB_PROFILE_WIDGETS", widget_profile)
+    env_out("SB_PROFILE_WATCH", watch_profile)
     env_out("SB_KEYCHAIN", keychain)
     env_out("SB_KEYCHAIN_PASSWORD", keychain_password, mask=True)
-    print(f"Created App Store profiles “{app_profile}” and “{widget_profile}”.")
+    print(f"Created App Store profiles “{app_profile}”, “{widget_profile}” and “{watch_profile}”.")
 
 
 def cleanup():

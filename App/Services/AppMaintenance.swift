@@ -18,8 +18,10 @@ enum AppMaintenance {
         DataChange.handlers = [
             { NotificationService.shared.requestResync() },
             { AppMaintenance.requestWidgetReload() },
-            { ShiftActivityController.requestRefresh() }
+            { ShiftActivityController.requestRefresh() },
+            { WatchSyncService.shared.requestPush() }
         ]
+        WatchSyncService.shared.activate()
     }
 
     /// Launch / foreground: create recurring occurrences, reschedule notifications, refresh widgets.
@@ -29,6 +31,7 @@ enum AppMaintenance {
         await NotificationService.shared.resyncNow()
         WidgetCenter.shared.reloadAllTimelines()
         ShiftActivityController.refresh(in: context)
+        WatchSyncService.shared.push()
         scheduleBackgroundRefresh()
         await ShiftPlanNotifier.reschedule()
         await WeatherAlertService.shared.refresh()
