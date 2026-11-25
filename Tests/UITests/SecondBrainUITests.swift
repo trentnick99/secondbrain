@@ -189,7 +189,7 @@ final class SecondBrainUITests: XCTestCase {
     private func openMoreTool(_ title: String) {
         tapTool("more")
         let row = app.buttons["moreTool-\(title)"].firstMatch
-        XCTAssertTrue(row.waitForExistence(timeout: 5), "\(title) is in More tools")
+        XCTAssertTrue(scrollTo(row), "\(title) is in More tools")
         if !row.isHittable { app.swipeUp() }
         row.tap()
     }
@@ -237,7 +237,19 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(add.waitForExistence(timeout: 5))
         XCTAssertTrue(element(containing: "Clear the exits and fire equipment").exists, "The miss is listed for review")
         add.tap()
-        XCTAssertTrue(element(containing: "Added 1 task").waitForExistence(timeout: 5))
+        if !element(containing: "Added 1 task").waitForExistence(timeout: 5) {
+            // On a slow simulator the toast can come and go before it's read, so check the task itself.
+            let walk = app.navigationBars["Floor walk"].firstMatch
+            expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: walk)
+            waitForExpectations(timeout: 15)
+            app.tabBars.buttons["Tasks"].tap()
+            let search = app.searchFields.firstMatch
+            XCTAssertTrue(search.waitForExistence(timeout: 10))
+            search.tap()
+            search.typeText("exits")
+            XCTAssertTrue(element(containing: "Clear the exits and fire equipment").waitForExistence(timeout: 10),
+                          "The miss became a task")
+        }
     }
 
     func testImportNotesAddsReviewedItems() throws {

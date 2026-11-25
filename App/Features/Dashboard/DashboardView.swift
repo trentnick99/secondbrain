@@ -523,7 +523,7 @@ struct MoreToolsSheet: View {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
     }
 
     private func row(_ title: String, _ systemImage: String, _ tint: Color, _ route: Route) -> some View {
