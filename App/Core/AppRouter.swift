@@ -43,6 +43,8 @@ enum Route: Equatable {
     case importNotes(String?, mode: ImportMode = .paste)
     case ask(String?)
     case floorWalk
+    case huddle
+    case timeline
 }
 
 /// Wraps an id so it can drive `.sheet(item:)`.
@@ -75,6 +77,8 @@ final class AppRouter {
     var importMode: ImportMode = .paste
     var showAsk = false
     var showFloorWalk = false
+    var showHuddle = false
+    var showTimeline = false
     var askQuestion: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
@@ -135,6 +139,12 @@ final class AppRouter {
         case .floorWalk:
             dismissSheets()
             showFloorWalk = true
+        case .huddle:
+            dismissSheets()
+            showHuddle = true
+        case .timeline:
+            dismissSheets()
+            showTimeline = true
         }
     }
 
@@ -167,6 +177,10 @@ final class AppRouter {
             open(.importNotes(nil, mode: .speak))
         case "walk":
             open(.floorWalk)
+        case "huddle":
+            open(.huddle)
+        case "timeline":
+            open(.timeline)
         case "ask":
             open(.ask(URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value))
@@ -194,6 +208,8 @@ final class AppRouter {
         showImport = false
         showAsk = false
         showFloorWalk = false
+        showHuddle = false
+        showTimeline = false
     }
 
     func showToast(_ message: String) {

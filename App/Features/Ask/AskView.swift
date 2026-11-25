@@ -12,6 +12,7 @@ struct AskView: View {
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @AppStorage(SettingsKey.askUsesAI, store: AppGroup.defaults) private var usesAI = true
     @AppStorage(SettingsKey.askStoreSteps, store: AppGroup.defaults) private var storeStepsJSON = ""
+    @AppStorage(SettingsKey.customGuides, store: AppGroup.defaults) private var customJSON = ""
     @State private var question: String
     @State private var asked: String
     @State private var answer: String?
@@ -27,6 +28,8 @@ struct AskView: View {
 
     private var role: UserRole? { RoleStorage.decode(roleJSON) }
     private var trimmed: String { question.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var customGuides: [CustomGuide] { CustomGuideStorage.decode(customJSON) }
+    private var custom: [CoachGuide] { customGuides.filter(\.isValid).map(\.guide) }
 
     var body: some View {
         NavigationStack {
@@ -41,7 +44,10 @@ struct AskView: View {
             .navigationTitle("Ask")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: GuideRef.self) { ref in
-                if let guide = CoachGuides.guide(id: ref.id) { GuideDetailView(guide: guide) }
+                if let guide = CoachGuides.guide(id: ref.id, including: custom) { GuideDetailView(guide: guide) }
+            }
+            .navigationDestination(for: CustomGuideRef.self) { ref in
+                CustomGuideEditor(existing: customGuides.first { $0.id == ref.id })
             }
             .navigationDestination(for: CoachGuide.Category.self) { CategoryGuidesView(category: $0) }
             .navigationDestination(for: AnswerStepsRef.self) { AnswerStepsView(ref: $0) }
@@ -98,6 +104,17 @@ struct AskView: View {
         } header: {
             Text(role.map { "Suggested for a \($0.title.lowercased())" } ?? "Suggested")
         }
+        Section {
+            ForEach(custom) { GuideRow(guide: $0) }
+            NavigationLink(value: CustomGuideRef(id: nil)) {
+                Label("Write a guide for your store", systemImage: "square.and.pencil")
+            }
+            .accessibilityIdentifier("askNewGuide")
+        } header: {
+            Text("Your guides")
+        } footer: {
+            Text("Write the steps your store trained you on. Ask finds them first and uses them in answers.")
+        }
         Section("Browse by topic") {
             ForEach(CoachGuide.Category.allCases, id: \.self) { category in
                 NavigationLink(value: category) {
@@ -127,7 +144,7 @@ struct AskView: View {
             }
         }
         if usesAI { answerSection }
-        let guides = CoachGuides.search(asked)
+        let guides = CoachGuides.search(asked, including: custom)
         Section {
             if guides.isEmpty {
                 Text("No guide matches that yet. Try other words, or search online below.")
@@ -203,7 +220,7 @@ struct AskView: View {
         defer { isThinking = false }
         do {
             let text = try await OnDeviceAssistant.answer(
-                question: asked, guides: CoachGuides.search(asked, limit: 3), role: role,
+                question: asked, guides: CoachGuides.search(asked, limit: 3, including: custom), role: role,
                 storeSteps: AskStepsStorage.decode(storeStepsJSON))
             guard !Task.isCancelled else { return }
             answer = text.isEmpty ? nil : text
@@ -288,6 +305,94 @@ private struct AnswerStepsView: View {
             _ = CaptureSaver.save(draft, in: context)
         }
         router.showToast(chosen.count == 1 ? "Added 1 task" : "Added \(chosen.count) tasks")
+        dismiss()
+    }
+}
+
+/// Navigation value for writing (nil) or editing one of your own guides.
+struct CustomGuideRef: Hashable {
+    let id: UUID?
+}
+
+enum CustomGuideStorage {
+    static func decode(_ json: String) -> [CustomGuide] { JSONStorage.decode([CustomGuide].self, from: json) ?? [] }
+}
+
+/// Write or edit a guide for your store.
+struct CustomGuideEditor: View {
+    let existing: CustomGuide?
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage(SettingsKey.customGuides, store: AppGroup.defaults) private var customJSON = ""
+    @State private var draft = CustomGuide()
+    @State private var stepsText = ""
+    @State private var loaded = false
+    @State private var confirmDelete = false
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("What situation? e.g. Baler won't start", text: $draft.title)
+                    .accessibilityIdentifier("customGuideTitle")
+                Picker("Topic", selection: $draft.category) {
+                    ForEach(CoachGuide.Category.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+            }
+            Section {
+                TextField("One step per line", text: $stepsText, axis: .vertical)
+                    .lineLimit(4...12)
+                    .accessibilityIdentifier("customGuideSteps")
+                SensitiveContentNotice(text: stepsText)
+            } header: {
+                Text("Steps")
+            } footer: {
+                Text("The steps your store trained you on. Don't include passwords, codes or anyone's personal details.")
+            }
+            Section {
+                TextField("Who to check with (optional)", text: $draft.checkWith)
+                TextField("Other words people might use (optional, commas)", text: $draft.extraKeywords)
+            }
+            if existing != nil {
+                Section {
+                    Button("Delete guide", role: .destructive) { confirmDelete = true }
+                }
+            }
+        }
+        .navigationTitle(existing == nil ? "New guide" : "Edit guide")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") { save() }.disabled(!current.isValid)
+            }
+        }
+        .confirmationDialog("Delete this guide?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                customJSON = JSONStorage.encode(CustomGuideStorage.decode(customJSON).filter { $0.id != draft.id })
+                dismiss()
+            }
+        }
+        .onAppear {
+            guard !loaded else { return }
+            if let existing {
+                draft = existing
+                stepsText = existing.steps.joined(separator: "\n")
+            }
+            loaded = true
+        }
+    }
+
+    private var current: CustomGuide {
+        var guide = draft
+        guide.steps = stepsText.components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .map { $0.replacingOccurrences(of: #"^(\d{1,2}[.)]|[-•*])\s*"#, with: "", options: .regularExpression) }
+            .filter { !$0.isEmpty }
+        return guide
+    }
+
+    private func save() {
+        var all = CustomGuideStorage.decode(customJSON)
+        if let index = all.firstIndex(where: { $0.id == draft.id }) { all[index] = current } else { all.append(current) }
+        customJSON = JSONStorage.encode(all)
         dismiss()
     }
 }
@@ -377,6 +482,7 @@ struct GuideDetailView: View {
                     Label(check, systemImage: "person.badge.shield.checkmark")
                 }
             }
+            if !guide.isCustom {
             Section {
                 TextField("The steps your store trained you on…", text: $ownSteps, axis: .vertical)
                     .lineLimit(3...10)
@@ -386,6 +492,7 @@ struct GuideDetailView: View {
                 Text("Your store's steps")
             } footer: {
                 Text("Kept on your phone. Ask uses them when it writes answers.")
+            }
             }
             if !guide.sources.isEmpty {
                 Section("Sources") {
@@ -406,6 +513,13 @@ struct GuideDetailView: View {
         }
         .navigationTitle(guide.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if guide.isCustom, let id = UUID(uuidString: String(guide.id.dropFirst(CustomGuide.idPrefix.count))) {
+                ToolbarItem(placement: .primaryAction) {
+                    NavigationLink("Edit", value: CustomGuideRef(id: id))
+                }
+            }
+        }
         .onAppear {
             guard !loaded else { return }
             ownSteps = AskStepsStorage.decode(storeStepsJSON)[guide.id] ?? ""

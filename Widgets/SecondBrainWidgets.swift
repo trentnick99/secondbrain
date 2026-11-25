@@ -9,6 +9,8 @@ struct SecondBrainWidgetsBundle: WidgetBundle {
         TodayWidget()
         LockScreenWidget()
         QuickCaptureControl()
+        FloorWalkControl()
+        WalkNotesControl()
         ShiftLiveActivity()
     }
 }
@@ -34,11 +36,27 @@ struct TodayWidgetView: View {
     let entry: WidgetEntry
 
     var body: some View {
-        switch family {
-        case .systemSmall: SmallView(entry: entry)
-        case .systemMedium: MediumView(entry: entry)
-        default: LargeView(entry: entry)
+        if AppGroup.defaults.bool(forKey: SettingsKey.offDuty) {
+            OffDutyView()
+        } else {
+            switch family {
+            case .systemSmall: SmallView(entry: entry)
+            case .systemMedium: MediumView(entry: entry)
+            default: LargeView(entry: entry)
+            }
         }
+    }
+}
+
+/// Shown while an "Off duty" Focus filter is on.
+private struct OffDutyView: View {
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "moon.stars.fill").font(.title2).foregroundStyle(Theme.accent)
+            Text("Off duty").font(.headline)
+            Text("Work can wait.").font(.caption).foregroundStyle(.secondary)
+        }
+        .widgetURL(DeepLink.home)
     }
 }
 
@@ -217,6 +235,16 @@ struct LockScreenWidgetView: View {
     let entry: WidgetEntry
 
     var body: some View {
+        if AppGroup.defaults.bool(forKey: SettingsKey.offDuty) {
+            Label("Off duty", systemImage: "moon.stars.fill")
+                .widgetURL(DeepLink.home)
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch family {
         case .accessoryCircular:
             ZStack {
@@ -267,5 +295,29 @@ struct QuickCaptureControl: ControlWidget {
         }
         .displayName("Quick Capture")
         .description("Open Second Brain ready to capture.")
+    }
+}
+
+struct FloorWalkControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "SecondBrainFloorWalk") {
+            ControlWidgetButton(action: OpenFloorWalkIntent()) {
+                Label("Floor Walk", systemImage: "figure.walk")
+            }
+        }
+        .displayName("Floor Walk")
+        .description("Start a floor walk of your areas.")
+    }
+}
+
+struct WalkNotesControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "SecondBrainWalkNotes") {
+            ControlWidgetButton(action: OpenWalkNotesIntent()) {
+                Label("Walk Notes", systemImage: "mic.fill")
+            }
+        }
+        .displayName("Walk Notes")
+        .description("Talk through what you see; each sentence becomes an item.")
     }
 }

@@ -66,5 +66,8 @@ screen 18-ask-answer "ask?q=Short%20staffed%20tonight%20and%20freight%20is%20beh
 screen 19-floor-walk walk
 screen 20-import-scan-speak import
 EXTRA_ARGS="-sampleWeather" screen 21-weather-alert home
+screen 22-huddle huddle
+screen 23-timeline timeline
+screen 24-ask-freezer "ask?q=The%20frozen%20and%20dairy%20truck%20needs%20breaking%20down%20but%20the%20freezer%20door%20will%20not%20open%2C%20only%20manually" 8
 
 ls -la "$OUT"

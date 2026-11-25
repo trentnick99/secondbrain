@@ -13,6 +13,8 @@ struct DashboardView: View {
     @State private var showCompleted = false
     @State private var now = Date()
     private let weather = WeatherAlertService.shared
+    @AppStorage(SettingsKey.offDuty, store: AppGroup.defaults) private var offDuty = false
+    @AppStorage(SettingsKey.shiftPlanBlocks, store: AppGroup.defaults) private var planJSON = ""
 
     var body: some View {
         let agenda = DayAgenda.build(tasks: tasks.map(\.snapshot), day: now, now: now, calendar: .current)
@@ -23,7 +25,16 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     header(agenda)
+                    if offDuty {
+                        Label("Off duty. Your Focus is on, so work can wait.", systemImage: "moon.stars.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.accent)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(12)
+                            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
                     WeatherAlertBanner(alerts: weather.current)
+                    nowBlock
                     quickActions
                     askBar
                     if !agenda.inbox.isEmpty { inboxBanner(count: agenda.inbox.count) }
@@ -169,12 +180,42 @@ struct DashboardView: View {
                 QuickActionButton(title: "Capture", systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
                 QuickActionButton(title: "Task", systemImage: "checklist", tint: Theme.color(for: .schedule)) { router.open(.capture(.task)) }
                 QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock", tint: Theme.purple) { router.open(.capture(.followUp)) }
+                QuickActionButton(title: "Huddle", systemImage: "megaphone.fill", tint: Theme.warning) { router.open(.huddle) }
                 QuickActionButton(title: "Floor walk", systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
+                QuickActionButton(title: "Timeline", systemImage: "clock.fill", tint: Theme.accent) { router.open(.timeline) }
                 QuickActionButton(title: "Walk notes", systemImage: "mic.fill", tint: Theme.pink) { router.open(.importNotes(nil, mode: .speak)) }
                 QuickActionButton(title: "Import", systemImage: "square.and.arrow.down", tint: Theme.purple) { router.open(.importNotes(nil)) }
                 QuickActionButton(title: "Note", systemImage: "note.text", tint: Theme.warning) { router.open(.capture(.note)) }
                 QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }
             }
+        }
+        .accessibilityIdentifier("quickActions")
+    }
+
+    /// "Now: Work the freight · until 11:00 AM" from the shift plan, while on shift.
+    @ViewBuilder
+    private var nowBlock: some View {
+        if let window = AppSettings.shiftWindow(on: now),
+           let current = ShiftPlan.current(
+               ShiftPlan.entries(blocks: ShiftPlanStorage.blocks(planJSON, role: RoleStorage.decode(roleJSON)),
+                                 shiftStart: window.start, shiftEnd: window.end, tasks: []), now: now) {
+            Button { router.open(.timeline) } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "clock.fill").foregroundStyle(Theme.accent)
+                    Text("Now: ").foregroundStyle(.secondary) + Text(current.title).fontWeight(.semibold)
+                    Spacer()
+                    Text("until " + current.end.formatted(date: .omitted, time: .shortened))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                }
+                .font(.subheadline)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 11)
+                .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("homeNowBlock")
         }
     }
 

@@ -53,6 +53,13 @@ enum SettingsKey {
     static let weatherNotified = "weatherNotified"
     /// Show today's shift as a Live Activity on the Lock Screen when the app opens during a shift.
     static let shiftLiveActivity = "shiftLiveActivity"
+    /// The shift plan's blocks (JSON of [PlanBlock]) and whether to nudge when each starts.
+    static let shiftPlanBlocks = "shiftPlanBlocks"
+    static let shiftPlanNudges = "shiftPlanNudges"
+    /// The person's own Ask guides (JSON of [CustomGuide]).
+    static let customGuides = "customGuides"
+    /// Set by the Focus filter: when off duty, widgets and Home stay quiet.
+    static let offDuty = "offDuty"
 }
 
 /// Default values, shared by `AppSettings` and every `@AppStorage` declaration.
@@ -197,6 +204,18 @@ enum RoleStorage {
     static func encode(_ role: UserRole?) -> String {
         guard let role, let data = try? JSONEncoder().encode(role) else { return "" }
         return String(decoding: data, as: UTF8.self)
+    }
+}
+
+/// JSON helpers for small Codable values kept in the App Group.
+enum JSONStorage {
+    static func decode<T: Decodable>(_ type: T.Type, from json: String) -> T? {
+        guard !json.isEmpty, let data = json.data(using: .utf8) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
+    }
+
+    static func encode<T: Encodable>(_ value: T) -> String {
+        (try? JSONEncoder().encode(value)).map { String(decoding: $0, as: UTF8.self) } ?? ""
     }
 }
 

@@ -42,6 +42,11 @@ struct AssociatesView: View {
             .navigationTitle("Associates")
             .searchable(text: $search, prompt: mode == .followUps ? "Search follow-ups" : "Search people")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink { TeamListsView() } label: { Image(systemName: "list.bullet.clipboard") }
+                        .accessibilityLabel("Team lead lists")
+                        .accessibilityIdentifier("teamListsButton")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button { showNewFollowUp = true } label: { Label("New Follow-up", systemImage: "person.crop.circle.badge.clock") }

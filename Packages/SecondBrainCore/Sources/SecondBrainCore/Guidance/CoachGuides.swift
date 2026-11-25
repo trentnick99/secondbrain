@@ -16,7 +16,7 @@ public struct GuideSource: Hashable, Sendable {
 /// Guides hold general leadership and safety practice plus facts from public sources. They never
 /// invent company procedures: where a store procedure matters, they say to follow it and who to ask.
 public struct CoachGuide: Identifiable, Hashable, Sendable {
-    public enum Category: String, CaseIterable, Sendable {
+    public enum Category: String, CaseIterable, Codable, Sendable {
         case safety, people, operations, customers, ethics
 
         public var title: String {
@@ -51,6 +51,60 @@ public struct CoachGuide: Identifiable, Hashable, Sendable {
     public let sources: [GuideSource]
 
     public var isSafety: Bool { category == .safety }
+
+    /// A guide the person wrote for their own store.
+    public var isCustom: Bool { id.hasPrefix(CustomGuide.idPrefix) }
+
+    public init(id: String, title: String, category: Category, summary: String, steps: [String], checkWith: String?,
+                keywords: [String], sources: [GuideSource]) {
+        self.id = id
+        self.title = title
+        self.category = category
+        self.summary = summary
+        self.steps = steps
+        self.checkWith = checkWith
+        self.keywords = keywords
+        self.sources = sources
+    }
+}
+
+/// A "what do I do if…" guide the person writes for their store. Kept on the phone; Ask searches it
+/// alongside the built-in guides and uses it in written answers.
+public struct CustomGuide: Codable, Hashable, Identifiable, Sendable {
+    public static let idPrefix = "custom-"
+
+    public var id: UUID
+    public var title: String
+    public var category: CoachGuide.Category
+    public var steps: [String]
+    public var checkWith: String
+    public var extraKeywords: String
+
+    public init(id: UUID = UUID(), title: String = "", category: CoachGuide.Category = .operations,
+                steps: [String] = [], checkWith: String = "", extraKeywords: String = "") {
+        self.id = id
+        self.title = title
+        self.category = category
+        self.steps = steps
+        self.checkWith = checkWith
+        self.extraKeywords = extraKeywords
+    }
+
+    public var guideID: String { Self.idPrefix + id.uuidString }
+
+    public var guide: CoachGuide {
+        let cleanSteps = steps.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        let titleWords = CoachGuides.tokens(CoachGuides.normalize(title)).filter { !CoachGuides.stopWords.contains($0) && $0.count > 2 }
+        let extras = extraKeywords.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        return CoachGuide(id: guideID, title: title.trimmingCharacters(in: .whitespaces), category: category,
+                          summary: "Your store's own guide.", steps: cleanSteps,
+                          checkWith: checkWith.trimmingCharacters(in: .whitespaces).isEmpty ? nil : checkWith,
+                          keywords: [CoachGuides.normalize(title)] + titleWords + extras, sources: [])
+    }
+
+    public var isValid: Bool {
+        !title.trimmingCharacters(in: .whitespaces).isEmpty && steps.contains { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    }
 }
 
 public enum CoachGuides {
@@ -121,7 +175,7 @@ public enum CoachGuides {
             keywords: ["tornado", "storm", "weather", "hurricane", "snow", "ice", "winter storm", "lightning", "flood", "shelter"],
             sources: [weather]),
         CoachGuide(
-            id: "crowd", title: "Big crowd at the doors", category: .safety,
+            id: "crowd", title: "Big crowds for Black Friday or a launch", category: .safety,
             summary: "For Black Friday and launches: plan, set up early, control entry.",
             steps: [
                 "Plan ahead: trained security or police on site when large crowds are expected, plus a staffing plan with a spot for each associate.",
@@ -159,6 +213,63 @@ public enum CoachGuides {
             checkWith: "Your store's equipment training and authorization records.",
             keywords: ["pallet jack", "electric pallet jack", "forklift", "ladder", "equipment", "reach truck", "cherry picker", "lift", "certified", "certification"],
             sources: [forklifts]),
+        CoachGuide(
+            id: "freezer-door", title: "Freezer or cooler door won't open on its own", category: .operations,
+            summary: "Open it manually if you've been shown how, secure it, keep product cold, and get it fixed.",
+            steps: [
+                "Use the door's manual open (pull chain, hand crank or manual release) if you've been shown how. Don't force a jammed door.",
+                "Raise it all the way and make sure it stays up before anyone works under it or drives a pallet jack through.",
+                "Check that the inside release works before anyone goes in, so nobody can get shut in.",
+                "Keep the freight moving: break the frozen and dairy pallets down at the door, frozen first, and get product inside fast.",
+                "Lower it by hand between loads to hold the temperature.",
+                "Report the door through your store's maintenance process and tell the manager on duty."
+            ],
+            checkWith: "Your store's maintenance request process and the manager on duty.",
+            keywords: ["freezer door", "cooler door", "roll up door", "roll-up door", "dock door", "door won't open", "door will not open",
+                       "won't open", "will not open", "doesn't open", "open manually", "manually", "manual", "stuck door", "door stuck",
+                       "freezer", "cooler"],
+            sources: []),
+        CoachGuide(
+            id: "frozen-truck", title: "Breaking down a frozen and dairy truck", category: .operations,
+            summary: "Frozen first, one pallet at a time, and keep product cold.",
+            steps: [
+                "Pull frozen pallets first, then dairy, then dry grocery.",
+                "Break down and sort inside the freezer or cooler, or right at its door, by aisle or department.",
+                "Work one pallet at a time so product isn't left sitting out.",
+                "Get soft items like ice cream put away or into the freezer first.",
+                "If product sat out too long, follow your store's cold-chain rules before it goes on the shelf.",
+                "Keep the freezer floor clear, and wear gloves and freezer gear."
+            ],
+            checkWith: "Your store's cold-chain time limits.",
+            keywords: ["frozen", "dairy", "break down", "broke down", "breakdown", "break the pallets", "sort", "sorted", "separate",
+                       "separated", "cold chain", "frozen truck", "dairy truck", "ice cream", "perishable"],
+            sources: []),
+        CoachGuide(
+            id: "broken-equipment", title: "Broken equipment (baler, compactor, cooler, pallet jack)", category: .operations,
+            summary: "Stop using it, tag it, use a backup, and report it.",
+            steps: [
+                "Stop using it, and keep people away if it's unsafe.",
+                "Tag it out of service so nobody else uses it.",
+                "Use a backup: another pallet jack, the other baler, or space in another cooler.",
+                "Report it through your store's maintenance process and tell the manager on duty.",
+                "Never reach into a baler or compactor, or bypass a guard or switch."
+            ],
+            checkWith: "Your store's maintenance request process.",
+            keywords: ["broken", "broke", "not working", "doesn't work", "won't work", "baler", "compactor", "jammed", "jam",
+                       "out of order", "maintenance", "repair", "dead battery", "won't charge", "won't start"],
+            sources: []),
+        CoachGuide(
+            id: "warm-case", title: "Cooler or freezer running warm", category: .safety,
+            summary: "Protect the product, find the cause, report it, and follow food safety rules.",
+            steps: [
+                "Check the obvious first: a door left open, an overloaded case, ice buildup or blocked vents.",
+                "Move product to a working cooler or freezer if the temperature keeps climbing.",
+                "Report it through your store's maintenance process right away.",
+                "Follow your store's food safety rules for product that got too warm. Don't guess."
+            ],
+            checkWith: "Your store's food safety and temperature procedures.",
+            keywords: ["warm", "temperature", "temp", "too warm", "not cold", "thawing", "melting", "temp alarm", "alarm"],
+            sources: [fdaRecalls]),
         CoachGuide(
             id: "theft", title: "Suspected shoplifting", category: .safety,
             summary: "Safety over merchandise. Don't chase or confront.",
@@ -439,20 +550,24 @@ public enum CoachGuides {
             sources: [walmartEthics])
     ]
 
-    public static func guide(id: String) -> CoachGuide? { all.first { $0.id == id } }
+    public static func guide(id: String, including extra: [CoachGuide] = []) -> CoachGuide? {
+        (extra + all).first { $0.id == id }
+    }
 
-    /// Guides that best match a question, best first. Works offline.
-    public static func search(_ query: String, limit: Int = 5) -> [CoachGuide] {
+    /// Guides that best match a question, best first, including the person's own guides. Works offline.
+    public static func search(_ query: String, limit: Int = 5, including extra: [CoachGuide] = []) -> [CoachGuide] {
         let q = normalize(query)
         let words = Set(tokens(q)).subtracting(stopWords)
         guard !words.isEmpty || !q.isEmpty else { return [] }
-        let scored: [(CoachGuide, Int)] = all.map { guide in
+        let scored: [(CoachGuide, Int)] = (extra + all).map { guide in
             var score = 0
+            var used = Set<String>()   // each word of the question counts once per guide
             for keyword in guide.keywords {
                 let k = normalize(keyword)
                 if k.contains(" ") || k.contains("-") {
                     if q.contains(k) { score += 6 }
-                } else if words.contains(k) || words.contains(where: { $0.count > 3 && (k.hasPrefix($0) || $0.hasPrefix(k)) }) {
+                } else if let word = (words.contains(k) ? k : words.first(where: { $0.count > 3 && (k.hasPrefix($0) || $0.hasPrefix(k)) })),
+                          used.insert(word).inserted {
                     score += 4
                 }
             }
@@ -461,8 +576,8 @@ public enum CoachGuides {
             let strong = score > 0
             let bodyWords = Set(tokens(normalize(guide.summary + " " + guide.steps.joined(separator: " ")))).subtracting(stopWords)
             score += words.intersection(bodyWords).count
-            // Body words alone are weak evidence; they need to agree several times over.
-            return (guide, strong || score >= 5 ? score : 0)
+            // A guide needs a keyword or title match; body words only add to that.
+            return (guide, strong ? score + (guide.isCustom ? 2 : 0) : 0)
         }
         return scored.filter { $0.1 >= 3 }
             .sorted { $0.1 != $1.1 ? $0.1 > $1.1 : $0.0.title < $1.0.title }

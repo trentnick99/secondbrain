@@ -42,6 +42,14 @@ final class CoachGuideTests: XCTestCase {
         XCTAssertEqual(Set(rush.prefix(2)), ["short-staffed", "freight-behind"])
         XCTAssertFalse(rush.contains("new-associate"), "“what first?” isn't about a first week")
         XCTAssertEqual(CoachGuides.search("new associate first week").first?.id, "new-associate")
+        let freezer = "the frozen and dairy truck needs to be broke down-meaning sorted and separated - but the freezer door will not open it will only open manually, what should I do"
+        let freezerGuides = CoachGuides.search(freezer, limit: 3).map(\.id)
+        XCTAssertEqual(Set(freezerGuides.prefix(2)), ["freezer-door", "frozen-truck"], "\(freezerGuides)")
+        XCTAssertFalse(freezerGuides.contains("crowd"), "A door question isn't about crowds")
+        XCTAssertNil(AskAssistant.emergency(in: freezer))
+        XCTAssertFalse(AskAssistant.prompt(question: freezer, guides: CoachGuides.search(freezer, limit: 3)).contains("first responders"))
+        XCTAssertEqual(CoachGuides.search("the baler is jammed").first?.id, "broken-equipment")
+        XCTAssertEqual(CoachGuides.search("dairy cooler is running warm").first?.id, "warm-case")
         XCTAssertTrue(CoachGuides.search("zzzz qqqq").isEmpty)
         XCTAssertTrue(CoachGuides.search("").isEmpty)
     }
@@ -104,6 +112,7 @@ final class AskAssistantTests: XCTestCase {
         let text = AskAssistant.instructions(role: UserRole(role: .coach, areas: ["Food"]))
         XCTAssertTrue(text.contains("food coach") || text.contains("coach"), text)
         XCTAssertTrue(text.contains("never make them up"))
-        XCTAssertTrue(text.contains("call 911"))
+        XCTAssertTrue(text.contains("Only mention 911 if the question says someone is hurt, trapped"))
+        XCTAssertTrue(text.contains("don't mention 911, police or emergencies"))
     }
 }

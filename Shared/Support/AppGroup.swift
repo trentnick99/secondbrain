@@ -44,6 +44,8 @@ enum DeepLink {
 
     static var home: URL { url("home") }
     static var capture: URL { url("capture") }
+    static var floorWalk: URL { url("walk") }
+    static var walkNotes: URL { url("walknotes") }
     static var tasks: URL { url("tasks") }
     static var matrix: URL { url("matrix") }
     static var associates: URL { url("associates") }

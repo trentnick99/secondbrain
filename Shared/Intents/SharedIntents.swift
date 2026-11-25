@@ -48,6 +48,36 @@ struct OpenQuickCaptureIntent: AppIntent {
     }
 }
 
+/// Opens the floor walk checklist. Backs the Control Center control.
+struct OpenFloorWalkIntent: AppIntent {
+    static var title: LocalizedStringResource = "Floor Walk"
+    static var description = IntentDescription("Opens the floor walk checklist for your areas.")
+    static var openAppWhenRun: Bool = true
+
+    init() {}
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        RouteRequest.post(DeepLink.floorWalk)
+        return .result()
+    }
+}
+
+/// Opens Import ready to speak walk notes. Backs the Control Center control.
+struct OpenWalkNotesIntent: AppIntent {
+    static var title: LocalizedStringResource = "Walk Notes"
+    static var description = IntentDescription("Opens Second Brain listening for walk notes.")
+    static var openAppWhenRun: Bool = true
+
+    init() {}
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        RouteRequest.post(DeepLink.walkNotes)
+        return .result()
+    }
+}
+
 /// Hands a navigation request to the app, whether the request comes from an intent running in the
 /// app process or from another process (stored until the app becomes active).
 enum RouteRequest {

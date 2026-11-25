@@ -27,7 +27,7 @@ enum ShiftActivityController {
     static func refresh(in context: ModelContext, now: Date = Date()) {
         guard !PersistenceController.isUITesting else { return }
         let running = Activity<ShiftActivityAttributes>.activities
-        guard isEnabled, ActivityAuthorizationInfo().areActivitiesEnabled,
+        guard isEnabled, !AppGroup.defaults.bool(forKey: SettingsKey.offDuty), ActivityAuthorizationInfo().areActivitiesEnabled,
               let window = AppSettings.shiftWindow(on: now),
               now >= window.start.addingTimeInterval(-30 * 60), now < window.end else {
             end(running)

@@ -30,6 +30,7 @@ enum AppMaintenance {
         WidgetCenter.shared.reloadAllTimelines()
         ShiftActivityController.refresh(in: context)
         scheduleBackgroundRefresh()
+        await ShiftPlanNotifier.reschedule()
         await WeatherAlertService.shared.refresh()
     }
 

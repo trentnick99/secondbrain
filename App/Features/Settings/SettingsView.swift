@@ -79,6 +79,9 @@ struct SettingsView: View {
                 Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
                 Button { router.open(.ask(nil)) } label: { Label("Ask", systemImage: "questionmark.bubble") }
                 Button { router.open(.floorWalk) } label: { Label("Floor walk", systemImage: "figure.walk") }
+                Button { router.open(.huddle) } label: { Label("Huddle", systemImage: "megaphone") }
+                Button { router.open(.timeline) } label: { Label("Shift timeline", systemImage: "clock") }
+                NavigationLink { TeamListsView() } label: { Label("Team lead lists", systemImage: "list.bullet.clipboard") }
                 NavigationLink { WeatherSettingsView() } label: {
                     LabeledContent {
                         Text(weatherAlerts ? "On" : "Off")
@@ -105,6 +108,7 @@ struct SettingsView: View {
         .onChange(of: resyncKey) { _, _ in
             NotificationService.shared.requestResync()
             ShiftActivityController.requestRefresh()
+            Task { await ShiftPlanNotifier.reschedule() }
         }
         .onChange(of: shiftLiveActivity) { _, isOn in
             if isOn { ShiftActivityController.refresh(in: context) } else { ShiftActivityController.endAll() }

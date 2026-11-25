@@ -136,10 +136,54 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(element(containing: "Added to Tasks").waitForExistence(timeout: 5))
     }
 
+    /// Taps a Home quick action, scrolling the row if it's off screen.
+    private func tapQuickAction(_ title: String) {
+        let button = app.buttons["New \(title)"].firstMatch
+        XCTAssertTrue(button.waitForExistence(timeout: 5), "\(title) quick action exists")
+        let row = app.scrollViews["quickActions"].firstMatch
+        var tries = 0
+        while !button.isHittable && tries < 4 {
+            row.swipeLeft()
+            tries += 1
+        }
+        button.tap()
+    }
+
+    func testHuddleIsBuiltFromToday() throws {
+        tapQuickAction("Huddle")
+        XCTAssertTrue(app.navigationBars["Huddle"].waitForExistence(timeout: 5))
+        XCTAssertTrue(element(containing: "Today's top three").exists || element(containing: "TODAY'S TOP THREE").exists)
+        let shout = app.descendants(matching: .any).matching(identifier: "huddleShoutOuts").firstMatch
+        XCTAssertTrue(shout.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "huddleShareButton").firstMatch.exists
+                      || element(containing: "Share with your team leads").exists)
+    }
+
+    func testYourOwnGuideIsFoundInAsk() throws {
+        let askBar = app.buttons["homeAskBar"].firstMatch
+        XCTAssertTrue(askBar.waitForExistence(timeout: 5))
+        askBar.tap()
+        let newGuide = app.descendants(matching: .any).matching(identifier: "askNewGuide").firstMatch
+        XCTAssertTrue(newGuide.waitForExistence(timeout: 5))
+        newGuide.tap()
+        let title = app.descendants(matching: .any).matching(identifier: "customGuideTitle").firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        title.tap()
+        title.typeText("Baler won't start")
+        let steps = app.descendants(matching: .any).matching(identifier: "customGuideSteps").firstMatch
+        steps.tap()
+        steps.typeText("Check the e-stop is pulled out")
+        app.navigationBars.buttons["Save"].firstMatch.tap()
+        let field = app.descendants(matching: .any).matching(identifier: "askQuestionField").firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("the baler won't start")
+        app.buttons["askSubmitButton"].firstMatch.tap()
+        XCTAssertTrue(element(containing: "Your store's own guide").waitForExistence(timeout: 5), "Your guide is listed")
+    }
+
     func testFloorWalkTurnsAMissIntoATask() throws {
-        let walk = app.buttons["New Floor walk"].firstMatch
-        XCTAssertTrue(walk.waitForExistence(timeout: 5))
-        walk.tap()
+        tapQuickAction("Floor walk")
         let needsWork = app.buttons["Needs work: Exits and fire equipment clear"].firstMatch
         XCTAssertTrue(needsWork.waitForExistence(timeout: 5))
         needsWork.tap()
@@ -156,9 +200,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testImportNotesAddsReviewedItems() throws {
-        let importButton = app.buttons["New Import"].firstMatch
-        XCTAssertTrue(importButton.waitForExistence(timeout: 5))
-        importButton.tap()
+        tapQuickAction("Import")
         let editor = app.textViews["importTextEditor"].firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         editor.tap()

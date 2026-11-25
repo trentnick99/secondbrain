@@ -55,6 +55,8 @@ struct RootView: View {
         .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText, mode: router.importMode) }
         .sheet(isPresented: $router.showAsk) { AskView(initialQuestion: router.askQuestion) }
         .sheet(isPresented: $router.showFloorWalk) { FloorWalkView() }
+        .sheet(isPresented: $router.showHuddle) { HuddleView() }
+        .sheet(isPresented: $router.showTimeline) { ShiftTimelineView() }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }

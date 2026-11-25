@@ -200,6 +200,22 @@ struct TodayPrioritiesIntent: AppIntent {
     }
 }
 
+/// "What's next in Second Brain?" Answers without opening the app: the next timed item today,
+/// the top priority, and anything overdue.
+struct WhatsNextIntent: AppIntent {
+    static var title: LocalizedStringResource = "What's Next"
+    static var description = IntentDescription("Tells you what's next today: the next timed item, your top priority and anything overdue.")
+
+    init() {}
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        let context = PersistenceController.shared.mainContext
+        let summary = NextUp.summary(tasks: TaskActions.allTasks(in: context).map(\.snapshot), now: Date(), calendar: .current)
+        return .result(dialog: IntentDialog(stringLiteral: summary))
+    }
+}
+
 /// "Show my overdue tasks."
 struct OverdueTasksIntent: AppIntent {
     static var title: LocalizedStringResource = "Show Overdue Tasks"
@@ -275,10 +291,12 @@ struct SecondBrainShortcuts: AppShortcutsProvider {
             "What are my priorities today in \(.applicationName)",
             "Brief me with \(.applicationName)"
         ], shortTitle: "Today's Priorities", systemImageName: "star")
-        AppShortcut(intent: OverdueTasksIntent(), phrases: [
-            "Show my overdue tasks in \(.applicationName)",
+        AppShortcut(intent: WhatsNextIntent(), phrases: [
+            "What's next in \(.applicationName)",
+            "What's next on \(.applicationName)",
+            "What should I do next in \(.applicationName)",
             "What's overdue in \(.applicationName)"
-        ], shortTitle: "Overdue", systemImageName: "exclamationmark.circle")
+        ], shortTitle: "What's Next", systemImageName: "arrow.forward.circle")
         AppShortcut(intent: FollowUpsIntent(), phrases: [
             "Show my associate follow-ups in \(.applicationName)",
             "Show my follow-ups in \(.applicationName)"

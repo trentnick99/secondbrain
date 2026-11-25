@@ -11,6 +11,7 @@ struct WeeklyReviewView: View {
     @Query(sort: \ShiftLog.day, order: .reverse) private var shiftLogs: [ShiftLog]
     @AppStorage(SettingsKey.weekStartsOn, store: AppGroup.defaults) private var weekStartsOn = SettingsDefault.weekStartsOn
     @State private var confirmArchive: TaskItem?
+    @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
 
     var body: some View {
         let now = Date()
@@ -38,6 +39,12 @@ struct WeeklyReviewView: View {
                             .tint(Theme.accent)
                         }
                         QuadrantBalance(counts: review.quadrantCounts)
+                        ShareLink(item: WeeklyRecap.text(review: review, role: RoleStorage.decode(roleJSON), calendar: .current),
+                                  subject: Text("Week recap"), preview: SharePreview("Week recap")) {
+                            Label("Share recap with your store manager", systemImage: "square.and.arrow.up")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .accessibilityIdentifier("shareRecapButton")
                     }
                     .listRowBackground(Color.clear)
                     Text(BriefingBuilder.weeklySummary(review)).font(.subheadline)
