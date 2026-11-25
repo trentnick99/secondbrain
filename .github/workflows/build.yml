@@ -72,6 +72,7 @@ jobs:
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -derivedDataPath build/DerivedData \
             -only-testing:SecondBrainTests \
+            -collect-test-diagnostics never \
             -resultBundlePath build/IntegrationTests.xcresult
 
       - name: UI tests (end-to-end workflow)
@@ -84,6 +85,7 @@ jobs:
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -derivedDataPath build/DerivedData \
             -only-testing:SecondBrainUITests \
+            -collect-test-diagnostics never \
             -resultBundlePath build/UITests.xcresult
 
       - name: Upload logs and test results

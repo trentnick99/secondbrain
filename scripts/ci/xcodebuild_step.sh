@@ -7,12 +7,29 @@ name="$1"; shift
 mkdir -p build/logs
 log="build/logs/${name}.log"
 
+# The result bundle, if the command writes one: failure messages from parallel test runs only live there.
+bundle=""; prev=""
+for arg in "$@"; do [ "$prev" = "-resultBundlePath" ] && bundle="$arg"; prev="$arg"; done
+
 # Keep the full log in a file, and stream test progress and errors live to the job log.
 "$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
 status=${PIPESTATUS[0]}
 
 grep -E "^\*\* .* (SUCCEEDED|FAILED) \*\*" "$log" | tail -2 || true
 if [ $status -ne 0 ]; then
+  if [ -n "$bundle" ] && [ -d "$bundle" ]; then
+    echo "::group::Test failures from ${name}"
+    xcrun xcresulttool get test-results summary --path "$bundle" 2>/dev/null | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+for f in data.get("testFailures", []):
+    print("TEST FAILURE:", f.get("testIdentifierString") or f.get("testName"), "-", f.get("failureText"))
+' | tee -a "$log" || true
+    echo "::endgroup::"
+  fi
   errors=$(grep -E "(error:|Error:|Testing failed|failed \(|XCTAssert)" "$log" | grep -v "^note:" | sort -u | head -150)
   echo "::group::Errors from ${name}"
   if [ -n "$errors" ]; then echo "$errors"; else tail -80 "$log"; fi
