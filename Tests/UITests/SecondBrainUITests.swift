@@ -21,9 +21,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testQuickCaptureSavesATask() throws {
-        let capture = app.buttons["quickCaptureButton"].firstMatch
-        XCTAssertTrue(capture.waitForExistence(timeout: 5))
-        capture.tap()
+        tapTool("capture")
 
         XCTAssertTrue(captureField.waitForExistence(timeout: 3))
         captureField.tap()
@@ -36,7 +34,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testAmbiguousCaptureAsksForConfirmation() throws {
-        app.buttons["quickCaptureButton"].firstMatch.tap()
+        tapTool("capture")
         XCTAssertTrue(captureField.waitForExistence(timeout: 3))
         captureField.tap()
         captureField.typeText("Follow up with Dana about availability next week")
@@ -281,9 +279,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testStoreTermsLookup() throws {
-        let terms = app.buttons["storeTermsButton"].firstMatch
-        XCTAssertTrue(terms.waitForExistence(timeout: 5))
-        terms.tap()
+        openMoreTool("Store terms")
         let search = app.searchFields.firstMatch
         XCTAssertTrue(search.waitForExistence(timeout: 5))
         search.tap()
@@ -292,7 +288,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testCaptureNudgesAwayFromDisciplinaryDetail() throws {
-        app.buttons["quickCaptureButton"].firstMatch.tap()
+        tapTool("capture")
         XCTAssertTrue(captureField.waitForExistence(timeout: 3))
         captureField.tap()
         captureField.typeText("Write up Tasha for being late")
