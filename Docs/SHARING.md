@@ -13,7 +13,7 @@ In **App Store Connect › Apps › Second Brain for Coaches › TestFlight › 
 
 ### Beta App Description (paste)
 
-> Second Brain for Coaches is a personal organizer for retail store leaders. Capture tasks and follow-ups in plain language and see what matters in an Eisenhower Matrix. You can also run a floor walk, build a 5-minute huddle, plan your shift hour by hour, and hand off to the next coach with End My Shift. Ask gives practical "what do I do if…" guidance, and on supported iPhones Apple Intelligence writes answers on the device. Everything stays on your iPhone, with no accounts and no tracking. This is an independent app, not affiliated with or endorsed by any retailer. Don't store medical, disciplinary or other confidential personnel information.
+> Second Brain for Coaches is a personal organizer for retail store leaders. Capture tasks and follow-ups in plain language and see what matters in an Eisenhower Matrix. You can also run a floor walk, build a 5-minute huddle, plan your shift hour by hour, and hand off to the next coach with End My Shift. Ask suggests practical "what do I do if…" guides, and you can add your own store's steps. Everything stays on your iPhone, with no accounts and no tracking. This is an independent app, not affiliated with or endorsed by any retailer. Don't store medical, disciplinary or other confidential personnel information.
 
 ### What to Test (paste for each build)
 

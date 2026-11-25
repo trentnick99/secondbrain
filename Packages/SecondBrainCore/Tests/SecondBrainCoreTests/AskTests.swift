@@ -47,7 +47,6 @@ final class CoachGuideTests: XCTestCase {
         XCTAssertEqual(Set(freezerGuides.prefix(2)), ["freezer-door", "frozen-truck"], "\(freezerGuides)")
         XCTAssertFalse(freezerGuides.contains("crowd"), "A door question isn't about crowds")
         XCTAssertNil(AskAssistant.emergency(in: freezer))
-        XCTAssertFalse(AskAssistant.prompt(question: freezer, guides: CoachGuides.search(freezer, limit: 3)).contains("first responders"))
         XCTAssertEqual(CoachGuides.search("the baler is jammed").first?.id, "broken-equipment")
         XCTAssertEqual(CoachGuides.search("dairy cooler is running warm").first?.id, "warm-case")
         XCTAssertTrue(CoachGuides.search("zzzz qqqq").isEmpty)
@@ -78,41 +77,5 @@ final class AskAssistantTests: XCTestCase {
         XCTAssertTrue(reddit.hasPrefix("https://www.reddit.com/r/walmart/search/?q=short%20staffed%20on%20truck%20day"), reddit)
         XCTAssertTrue(reddit.contains("restrict_sr=1"))
         XCTAssertEqual(AskAssistant.webSearchURL("price match")?.absoluteString, "https://www.google.com/search?q=price%20match")
-    }
-
-    func testPromptUsesGuidesAndStaysShort() {
-        let guides = CoachGuides.search("short staffed and freight is behind")
-        let prompt = AskAssistant.prompt(question: "Short staffed and freight is behind, what first?", guides: guides,
-                                         storeSteps: ["short-staffed": "Text the SM before 9."])
-        XCTAssertTrue(prompt.contains("Short-staffed for the shift"))
-        XCTAssertTrue(prompt.contains("Text the SM before 9."))
-        XCTAssertLessThan(prompt.count, 3_200, "Fits the on-device model's context window")
-        let none = AskAssistant.prompt(question: "zzzz", guides: [])
-        XCTAssertTrue(none.contains("No reference guide matched"))
-    }
-
-    func testStepsFromAWrittenAnswer() {
-        let answer = """
-        Start with safety, then the customer.
-        1. Walk your areas for **blocked exits** and spills.
-        2) Re-rank tonight's work in the Matrix.
-        - Tell your store manager what will carry over.
-        Good luck!
-        3. ok
-        """
-        XCTAssertEqual(AskAssistant.steps(fromAnswer: answer), [
-            "Walk your areas for blocked exits and spills.",
-            "Re-rank tonight's work in the Matrix.",
-            "Tell your store manager what will carry over."
-        ])
-        XCTAssertTrue(AskAssistant.steps(fromAnswer: "Just a sentence.").isEmpty)
-    }
-
-    func testInstructionsNeverLetTheModelInventPolicy() {
-        let text = AskAssistant.instructions(role: UserRole(role: .coach, areas: ["Food"]))
-        XCTAssertTrue(text.contains("food coach") || text.contains("coach"), text)
-        XCTAssertTrue(text.contains("never make them up"))
-        XCTAssertTrue(text.contains("Only mention 911 if the question says someone is hurt, trapped"))
-        XCTAssertTrue(text.contains("don't mention 911, police or emergencies"))
     }
 }

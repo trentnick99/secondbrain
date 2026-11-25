@@ -103,14 +103,51 @@ Copy and paste only content you're allowed to keep on a personal device. If your
 
 ## Ask
 
-Tap **Ask: what do I do if…** on Home (or Settings › Ask) and type a question, like "We're short-staffed tonight and freight is behind, what first?" or "How do I give feedback to a team lead who keeps missing deadlines?"
+Tap **Ask: what do I do if…** on Home (or Settings › Ask) and type a question, like "The freezer door won't open, only manually" or "We're short-staffed tonight, what first?" Ask **suggests guides** that match. It doesn't write its own answers, so it can't make up steps that don't fit your store.
 
-- **Guides (offline):** there are 28 short guides across Safety, Leading people, Running the floor, Customers, and Ethics & conduct. They're built from general leadership and safety practice and public sources: OSHA, FDA/USDA/CPSC recalls, the National Weather Service, and Walmart's public policies and Code of Conduct. Before you ask, Ask suggests guides for your role. Guides never invent store procedures; where one matters, they say to follow your store's procedure and who to check with.
-- **Written answers (Apple Intelligence, iOS 26+):** on an Apple Intelligence iPhone, Apple's on-device model writes a short answer from the matching guides and your own store steps. Your question never leaves the phone, and it works offline. You can turn this off in Settings › Intelligence. Answers can be wrong, so your store's procedures come first. **Save as note** keeps an answer.
+- **Guides (offline):** short, vetted guides across Safety, Leading people, Running the floor, Customers, and Ethics & conduct, including equipment and freight problems such as a freezer door that won't open on its own, breaking down a frozen and dairy truck, broken equipment, and a cooler running warm. They're built from general leadership and safety practice and public sources: OSHA, FDA/USDA/CPSC recalls, the National Weather Service, and Walmart's public policies and Code of Conduct. Before you ask, Ask suggests guides for your role. Where a store procedure matters, a guide says to follow it and who to check with.
+- **Your own guides:** under **Your guides**, tap **Write a guide for your store** and add the steps your store trained you on (for example "Baler won't start"). Ask shows them first when they match. Don't include passwords, codes or anyone's personal details.
+- **Your store's steps:** each built-in guide also has a spot for your store's own steps, kept on your phone.
 - **Emergencies:** if a question sounds like an emergency (someone hurt, a weapon, smoke), Ask shows "call 911 now, then get the manager on duty" first.
 - **Search online:** **Search Reddit (r/walmart)** and **Search the web** open in your browser. Reddit posts are other people's opinions, not company policy, and the app doesn't read Reddit itself.
-- **Your store's steps:** each guide has a place to write the steps your store trained you on. They're kept on your phone and used in written answers.
-- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks. For a written answer, **Add steps as tasks** lets you pick the steps to add.
+- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks.
+
+## Huddle
+
+Tap **Huddle** on Home for a 5-minute script built from today:
+- **Safety:** a safety message, seasonal when it matters (Black Friday week, wet entrances in winter, heat in summer). Tap **Another safety message** for a different one.
+- **Yesterday:** what got done.
+- **Today's top three:** with the team lead each item is handed to.
+- **Shout-outs:** type names and why.
+- **Questions:** a closing prompt.
+
+Read it from your phone, **Share** it with your team leads, or **Save to Notes**. Shout-outs are kept only if you save.
+
+## Shift timeline
+
+Tap **Timeline** on Home to see your shift hour by hour: your plan blocks plus any tasks with a due time. The suggested plan has a check-in, huddle, floor walk, a main block for your area, lunch, follow-ups, a second walk, projects, and End My Shift.
+- **Edit my plan:** change titles, start times and lengths. Blocks are placed from the start of your shift, so one plan works for 7–5, 10–8 and 12–10.
+- **Nudges:** turn on **Nudge me when each block starts** for a quiet notification at each block today and next shift.
+- **Home:** while you're on shift, Home shows **Now: [block] · until [time]**.
+
+## Team lead lists
+
+In **Associates**, tap the clipboard icon (top left), or go to **Settings › Team lead lists**. Each team lead (anyone whose role contains "lead") shows how many handed-off tasks are open.
+- **Hand off tasks:** pick tasks and confirm. They show as waiting until the person confirms.
+- **Send list:** texts them just the task titles and due times.
+- **Take back:** swipe a task to return it to you.
+
+## Weekly recap
+
+In **Weekly Review**, **Share recap with your store manager** sends a short summary: tasks done (and how many were safety items), highlights, what's still overdue, and follow-up counts. It doesn't name associates.
+
+## Apple Watch
+
+The Second Brain watch app shows your shift's time left, how many tasks are done, and your top three. Tap one and confirm to mark it done on your iPhone. **Quick note** takes dictation, Scribble or the keyboard and saves exactly what you said to Notes on your iPhone. If the phone is out of range, the watch queues changes and sends them when it reconnects. The iPhone app does all the saving.
+
+## Off duty (Focus filter)
+
+In iOS **Settings › Focus**, choose a Focus such as Personal or Sleep, then **Focus Filters › Add Filter › Second Brain › Off duty**. While that Focus is on, widgets show "Off duty", Home says work can wait, and the shift Live Activity is removed. Nothing is deleted or rescheduled.
 
 ## Floor walk
 
@@ -216,7 +253,9 @@ Widgets read the same database through the App Group. They refresh after every c
 
 ## Siri & Shortcuts
 
-"Add a task to Second Brain" · "Remind me in Second Brain" · "What are my priorities in Second Brain" · "Show my overdue tasks in Second Brain" · "Show my follow-ups in Second Brain" · "End my shift in Second Brain" · "Quick capture in Second Brain" · "Quick note in Second Brain" · "Import notes into Second Brain" · "Look up a store term in Second Brain". Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
+"Add a task to Second Brain" · "Remind me in Second Brain" · "What are my priorities in Second Brain" · "Show my overdue tasks in Second Brain" · "Show my follow-ups in Second Brain" · "End my shift in Second Brain" · "Quick capture in Second Brain" · "Quick note in Second Brain" · "Import notes into Second Brain" · "Look up a store term in Second Brain" · "What's next in Second Brain".
+
+**Control Center:** add **Quick Capture**, **Floor Walk** and **Walk Notes** buttons from the Control Center editor. You can also put them on the Lock Screen or the Action button. Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
 
 ## Intelligence (optional, on-device)
 

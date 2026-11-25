@@ -2,22 +2,16 @@ import SwiftUI
 import SwiftData
 import SecondBrainCore
 
-/// Ask: management questions, suggestions and "what do I do if…".
-/// Offline guides always work; Apple's on-device model writes an answer when available;
-/// Reddit and web searches open in the browser. Nothing is saved unless the person taps to save it.
+/// Ask: "what do I do if…". Suggests vetted guides (and the person's own store guides) that match the
+/// question, plus Reddit and web searches that open in the browser. It doesn't generate answers, so it
+/// never makes up steps that don't fit the store. Works offline.
 struct AskView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var context
-    @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
-    @AppStorage(SettingsKey.askUsesAI, store: AppGroup.defaults) private var usesAI = true
     @AppStorage(SettingsKey.askStoreSteps, store: AppGroup.defaults) private var storeStepsJSON = ""
     @AppStorage(SettingsKey.customGuides, store: AppGroup.defaults) private var customJSON = ""
     @State private var question: String
     @State private var asked: String
-    @State private var answer: String?
-    @State private var answerError: String?
-    @State private var isThinking = false
     @FocusState private var fieldFocused: Bool
 
     init(initialQuestion: String? = nil) {
@@ -50,11 +44,9 @@ struct AskView: View {
                 CustomGuideEditor(existing: customGuides.first { $0.id == ref.id })
             }
             .navigationDestination(for: CoachGuide.Category.self) { CategoryGuidesView(category: $0) }
-            .navigationDestination(for: AnswerStepsRef.self) { AnswerStepsView(ref: $0) }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
             }
-            .task(id: asked) { await writeAnswer() }
             .onAppear { if asked.isEmpty { fieldFocused = true } }
         }
     }
@@ -91,7 +83,7 @@ struct AskView: View {
         } header: {
             Text("Ask anything about running your area")
         } footer: {
-            Text("Guides work offline. Written answers come from Apple Intelligence on your iPhone, so your question stays on your phone.")
+            Text("Ask suggests guides that match your question. They're general steps, so your store's procedures and your store manager come first. Works offline.")
         }
     }
 
@@ -113,7 +105,7 @@ struct AskView: View {
         } header: {
             Text("Your guides")
         } footer: {
-            Text("Write the steps your store trained you on. Ask finds them first and uses them in answers.")
+            Text("Write the steps your store trained you on. Ask shows them first when they match.")
         }
         Section("Browse by topic") {
             ForEach(CoachGuide.Category.allCases, id: \.self) { category in
@@ -143,7 +135,6 @@ struct AskView: View {
                     .accessibilityIdentifier("askEmergencyNotice")
             }
         }
-        if usesAI { answerSection }
         let guides = CoachGuides.search(asked, including: custom)
         Section {
             if guides.isEmpty {
@@ -153,7 +144,7 @@ struct AskView: View {
                 ForEach(guides) { GuideRow(guide: $0) }
             }
         } header: {
-            Text("Guides")
+            Text("Suggested guides")
         }
         Section {
             if let url = AskAssistant.redditSearchURL(asked) {
@@ -171,141 +162,6 @@ struct AskView: View {
             Text(AskAssistant.redditNote + " These open in your browser.")
         }
         Section {} footer: { Text(CoachGuides.disclaimer) }
-    }
-
-    @ViewBuilder
-    private var answerSection: some View {
-        let availability = OnDeviceAssistant.availability
-        if availability == .ready {
-            Section {
-                if isThinking {
-                    HStack(spacing: 10) {
-                        ProgressView()
-                        Text("Writing an answer on your iPhone…").foregroundStyle(.secondary)
-                    }
-                } else if let answer {
-                    Text(answer)
-                        .textSelection(.enabled)
-                        .accessibilityIdentifier("askAnswer")
-                    let steps = AskAssistant.steps(fromAnswer: answer)
-                    if !steps.isEmpty {
-                        NavigationLink(value: AnswerStepsRef(question: asked, steps: steps)) {
-                            Label("Add steps as tasks", systemImage: "checklist")
-                        }
-                    }
-                    Button { saveAnswer(answer) } label: { Label("Save as note", systemImage: "square.and.arrow.down") }
-                } else if let answerError {
-                    Text(answerError).foregroundStyle(.secondary)
-                }
-            } header: {
-                Label("Answer", systemImage: "sparkles")
-            } footer: {
-                Text("Written by Apple Intelligence on your iPhone. It can be wrong. Your store's procedures and your store manager come first.")
-            }
-        } else {
-            Section {
-                Label(availability.message, systemImage: "info.circle")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("askAIStatus")
-            }
-        }
-    }
-
-    private func writeAnswer() async {
-        answer = nil
-        answerError = nil
-        guard !asked.isEmpty, usesAI, OnDeviceAssistant.availability == .ready else { return }
-        isThinking = true
-        defer { isThinking = false }
-        do {
-            let text = try await OnDeviceAssistant.answer(
-                question: asked, guides: CoachGuides.search(asked, limit: 3, including: custom), role: role,
-                storeSteps: AskStepsStorage.decode(storeStepsJSON))
-            guard !Task.isCancelled else { return }
-            answer = text.isEmpty ? nil : text
-            if text.isEmpty { answerError = "No answer this time. The guides below still apply." }
-        } catch is CancellationError {
-        } catch {
-            answerError = "Apple Intelligence couldn't answer that one. Try rewording it, or use the guides below."
-        }
-    }
-
-    private func saveAnswer(_ text: String) {
-        let title = "Ask: " + (asked.count > 50 ? String(asked.prefix(47)) + "…" : asked)
-        let note = Note(title: title, body: "Q: \(asked)\n\n\(text)\n\n(Written by Apple Intelligence on this iPhone. Check store policy.)", type: .general)
-        note.tagsRaw = "ask"
-        context.insert(note)
-        try? context.save()
-        router.showToast("Saved to Notes")
-    }
-}
-
-/// The steps of a written answer, offered as tasks.
-struct AnswerStepsRef: Hashable {
-    let question: String
-    let steps: [String]
-}
-
-/// Pick which steps of a written answer become tasks. Nothing is added until you tap Add.
-private struct AnswerStepsView: View {
-    let ref: AnswerStepsRef
-    @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
-    @Environment(AppRouter.self) private var router
-    @State private var chosen: Set<Int>
-
-    init(ref: AnswerStepsRef) {
-        self.ref = ref
-        _chosen = State(initialValue: Set(ref.steps.indices))
-    }
-
-    var body: some View {
-        List {
-            Section {
-                ForEach(Array(ref.steps.enumerated()), id: \.offset) { index, step in
-                    Button {
-                        if chosen.contains(index) { chosen.remove(index) } else { chosen.insert(index) }
-                    } label: {
-                        HStack(alignment: .firstTextBaseline) {
-                            Image(systemName: chosen.contains(index) ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(chosen.contains(index) ? Theme.accent : .secondary)
-                            Text(step).foregroundStyle(.primary)
-                        }
-                    }
-                }
-            } footer: {
-                Text("Tick the steps you want as tasks. You can edit them in Tasks afterward.")
-            }
-        }
-        .navigationTitle("Add as tasks")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Add \(chosen.count)") { add() }.disabled(chosen.isEmpty)
-            }
-        }
-    }
-
-    private func add() {
-        for index in chosen.sorted() {
-            let step = ref.steps[index]
-            var draft = CaptureDraft()
-            draft.rawText = step
-            draft.title = step
-            draft.kind = .task
-            draft.details = "From Ask: \(ref.question)"
-            let classification = EisenhowerClassifier.classify(ClassificationInput(
-                text: step, category: .general, kind: .task, priority: .normal,
-                dueDate: nil, hasDueTime: false, now: Date(), calendar: .current))
-            draft.quadrant = classification.quadrant
-            draft.classificationReasons = classification.reasons
-            draft.isSafetyLocked = classification.isSafetyLocked
-            if classification.isSafetyLocked { draft.category = .safety }
-            _ = CaptureSaver.save(draft, in: context)
-        }
-        router.showToast(chosen.count == 1 ? "Added 1 task" : "Added \(chosen.count) tasks")
-        dismiss()
     }
 }
 
@@ -491,7 +347,7 @@ struct GuideDetailView: View {
             } header: {
                 Text("Your store's steps")
             } footer: {
-                Text("Kept on your phone. Ask uses them when it writes answers.")
+                Text("Kept on your phone and shown with this guide.")
             }
             }
             if !guide.sources.isEmpty {

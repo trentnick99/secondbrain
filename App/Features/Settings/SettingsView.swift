@@ -12,7 +12,6 @@ struct SettingsView: View {
     @Environment(AppRouter.self) private var router
 
     @AppStorage(SettingsKey.shiftSchedule, store: AppGroup.defaults) private var scheduleJSON = ""
-    @AppStorage(SettingsKey.askUsesAI, store: AppGroup.defaults) private var askUsesAI = true
     @AppStorage(SettingsKey.weatherAlertsEnabled, store: AppGroup.defaults) private var weatherAlerts = false
     @AppStorage(SettingsKey.shiftLiveActivity, store: AppGroup.defaults) private var shiftLiveActivity = true
     @AppStorage(SettingsKey.reminderAtShiftStart, store: AppGroup.defaults) private var reminderAtShiftStart = SettingsDefault.reminderAtShiftStart
@@ -246,8 +245,6 @@ struct SettingsView: View {
         Section {
             Toggle("Smart suggestions", isOn: $smartSuggestions)
             Toggle("Apple Intelligence briefing", isOn: $appleIntelligence)
-                .disabled(!BriefingAssistant.isAppleIntelligenceAvailable)
-            Toggle("Apple Intelligence answers in Ask", isOn: $askUsesAI)
                 .disabled(!BriefingAssistant.isAppleIntelligenceAvailable)
             Text(BriefingAssistant.availabilityText).font(.caption).foregroundStyle(.secondary)
         } header: {

@@ -38,8 +38,6 @@ enum SettingsKey {
     /// Season Planner and Coming up show only the person's areas plus store-wide items.
     static let seasonMyAreasOnly = "seasonMyAreasOnly"
     static let dismissedRolePrompt = "dismissedRolePrompt"
-    /// Ask writes answers with Apple's on-device model when it's available.
-    static let askUsesAI = "askUsesAI"
     /// The person's own store steps for each Ask guide (JSON of [guide id: text]).
     static let askStoreSteps = "askStoreSteps"
     /// A floor walk in progress (JSON of `FloorWalkState`).

@@ -149,12 +149,23 @@ final class SecondBrainUITests: XCTestCase {
         button.tap()
     }
 
+    /// Lists only build rows as they scroll into view; swipe until the element exists.
+    @discardableResult
+    private func scrollTo(_ element: XCUIElement, tries: Int = 6) -> Bool {
+        var count = 0
+        while !element.exists && count < tries {
+            app.swipeUp()
+            count += 1
+        }
+        return element.waitForExistence(timeout: 3)
+    }
+
     func testHuddleIsBuiltFromToday() throws {
         tapQuickAction("Huddle")
         XCTAssertTrue(app.navigationBars["Huddle"].waitForExistence(timeout: 5))
         XCTAssertTrue(element(containing: "Today's top three").exists || element(containing: "TODAY'S TOP THREE").exists)
         let shout = app.descendants(matching: .any).matching(identifier: "huddleShoutOuts").firstMatch
-        XCTAssertTrue(shout.waitForExistence(timeout: 5))
+        XCTAssertTrue(scrollTo(shout), "Shout-outs can be typed")
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "huddleShareButton").firstMatch.exists
                       || element(containing: "Share with your team leads").exists)
     }
@@ -164,7 +175,7 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(askBar.waitForExistence(timeout: 5))
         askBar.tap()
         let newGuide = app.descendants(matching: .any).matching(identifier: "askNewGuide").firstMatch
-        XCTAssertTrue(newGuide.waitForExistence(timeout: 5))
+        XCTAssertTrue(scrollTo(newGuide), "Write a guide is offered")
         newGuide.tap()
         let title = app.descendants(matching: .any).matching(identifier: "customGuideTitle").firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 5))
