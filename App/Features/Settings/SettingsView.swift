@@ -27,7 +27,6 @@ struct SettingsView: View {
     @AppStorage(SettingsKey.showBadge, store: AppGroup.defaults) private var showBadge = true
     @AppStorage(SettingsKey.appLockEnabled, store: AppGroup.defaults) private var appLockEnabled = false
     @AppStorage(SettingsKey.smartSuggestions, store: AppGroup.defaults) private var smartSuggestions = true
-    @AppStorage(SettingsKey.appleIntelligence, store: AppGroup.defaults) private var appleIntelligence = false
     @AppStorage(SettingsKey.calendarEnabled, store: AppGroup.defaults) private var calendarEnabled = false
     @AppStorage(SettingsKey.iCloudSync, store: AppGroup.defaults) private var iCloudSync = false
     @AppStorage(SettingsKey.autoBackup, store: AppGroup.defaults) private var autoBackup = true
@@ -127,7 +126,7 @@ struct SettingsView: View {
     private func dialogs(on content: some View) -> some View {
         content
             .fileExporter(isPresented: $showExporter, document: exportDocument, contentType: .json,
-                          defaultFilename: "SecondBrain-Backup-\(NotificationPlannerKey.today())") { result in
+                          defaultFilename: "CoachSpark-Backup-\(NotificationPlannerKey.today())") { result in
                 if case .failure(let error) = result { alertMessage = "Export failed: \(error.localizedDescription)" }
             }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.json]) { result in
@@ -141,12 +140,13 @@ struct SettingsView: View {
             .confirmationDialog("Delete all Coach Spark data?", isPresented: $confirmDeleteAll, titleVisibility: .visible) {
                 Button("Delete Everything", role: .destructive) { confirmDeleteAllAgain = true }
             } message: {
-                Text("Export a backup first if you might want this data later.")
+                Text("Deletes every task, note and associate, plus your Standards lists, schedule, role, shift plan, floor walk, store location and every automatic backup on this iPhone. Notification and appearance settings stay. Export a backup first if you might want any of it later.")
             }
             .confirmationDialog("This can't be undone.", isPresented: $confirmDeleteAllAgain, titleVisibility: .visible) {
                 Button("Yes, delete all data", role: .destructive) {
                     BackupService.deleteEverything(in: context)
-                    alertMessage = "All data deleted."
+                    Task { await ShiftPlanNotifier.reschedule() }
+                    alertMessage = "All data deleted, including automatic backups."
                 }
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
@@ -244,13 +244,10 @@ struct SettingsView: View {
     private var intelligenceSection: some View {
         Section {
             Toggle("Smart suggestions", isOn: $smartSuggestions)
-            Toggle("Apple Intelligence briefing", isOn: $appleIntelligence)
-                .disabled(!BriefingAssistant.isAppleIntelligenceAvailable)
-            Text(BriefingAssistant.availabilityText).font(.caption).foregroundStyle(.secondary)
         } header: {
-            Text("Intelligence")
+            Text("Suggestions")
         } footer: {
-            Text("Capture interpretation, Eisenhower suggestions, follow-up detection and reviews run on your iPhone with built-in rules — no account, subscription or internet needed. Suggestions never change anything until you confirm.")
+            Text("Capture interpretation, Eisenhower suggestions, follow-up detection and reviews run on your iPhone with built-in rules — no AI, account, subscription or internet needed. Suggestions never change anything until you confirm.")
         }
     }
 
@@ -300,7 +297,7 @@ struct SettingsView: View {
         } header: {
             Text("Data")
         } footer: {
-            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Coach Spark › Backups. Restoring merges: newer records win, nothing is deleted. iCloud sync needs the iCloud capability added when building (see Docs/SIGNING.md) and takes effect after relaunch; without it, data stays on this iPhone.")
+            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Coach Spark › Backups. Backups include your Standards lists, schedule, role and settings. Restoring merges: newer records win, and nothing already on this iPhone is deleted or overwritten. iCloud sync needs the iCloud capability added when building (see Docs/SIGNING.md) and takes effect after relaunch; without it, data stays on this iPhone.")
         }
     }
 

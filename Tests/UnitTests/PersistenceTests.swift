@@ -316,6 +316,97 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(try other.fetch(FetchDescriptor<TaskItem>()).count, taskCount)
     }
 
+    func testBackupCarriesListsAndSettingsAndRestoreNeverOverwrites() throws {
+        let source = try XCTUnwrap(UserDefaults(suiteName: "backup-source-\(UUID())"))
+        let cooler = StandardList(title: "Cooler temps", kind: .temperatures,
+                                  items: [StandardItem(name: "Ice cream", value: "-10°F or colder")])
+        let role = RoleStorage.encode(UserRole(role: .coach, areas: ["Food"]))
+        source.set(JSONStorage.encode([cooler]), forKey: SettingsKey.standardLists)
+        source.set(role, forKey: SettingsKey.userRole)
+        source.set(true, forKey: SettingsKey.hidePreviews)
+        source.set(45, forKey: SettingsKey.overdueGraceMinutes)
+        source.set("thanksgiving.a\nthanksgiving.b", forKey: SettingsKey.seasonAdded)
+        source.set(Data([1, 2, 3]), forKey: SettingsKey.weatherCache)   // a cache, never backed up
+        _ = CaptureSaver.save(draft("Idea: new endcap"), in: context)
+
+        let data = try BackupService.makeBackup(from: context, defaults: source)
+        let file = try BackupService.decode(data)
+        XCTAssertEqual(file.formatVersion, 2)
+        XCTAssertNil(file.settings?[SettingsKey.weatherCache])
+
+        // This phone already has its own list and a different preview setting.
+        let target = try XCTUnwrap(UserDefaults(suiteName: "backup-target-\(UUID())"))
+        let deli = StandardList(title: "Deli temps", kind: .temperatures,
+                                items: [StandardItem(name: "Hot case", value: "135°F or hotter")])
+        target.set(JSONStorage.encode([deli]), forKey: SettingsKey.standardLists)
+        target.set(false, forKey: SettingsKey.hidePreviews)
+        target.set("thanksgiving.b\nchristmas.a", forKey: SettingsKey.seasonAdded)
+
+        let other = ModelContext(PersistenceController.makeInMemory())
+        let summary = try BackupService.restore(data, into: other, defaults: target)
+        XCTAssertGreaterThan(summary.settings, 0)
+        XCTAssertEqual(try other.fetch(FetchDescriptor<Note>()).count, 1)
+
+        let lists = JSONStorage.decode([StandardList].self, from: target.string(forKey: SettingsKey.standardLists) ?? "") ?? []
+        XCTAssertEqual(Set(lists.map(\.title)), ["Deli temps", "Cooler temps"], "Lists are added, never replaced")
+        XCTAssertFalse(target.bool(forKey: SettingsKey.hidePreviews), "A setting already on this phone is kept")
+        XCTAssertEqual(target.integer(forKey: SettingsKey.overdueGraceMinutes), 45, "A missing setting is filled in")
+        XCTAssertEqual(target.string(forKey: SettingsKey.userRole), role)
+        XCTAssertEqual(SeasonPlanStore.keys(target.string(forKey: SettingsKey.seasonAdded) ?? ""),
+                       ["thanksgiving.a", "thanksgiving.b", "christmas.a"])
+        XCTAssertNil(target.object(forKey: SettingsKey.weatherCache))
+
+        // Restoring again changes nothing.
+        XCTAssertEqual(try BackupService.restore(data, into: other, defaults: target).settings, 0)
+    }
+
+    func testVersionOneBackupStillRestores() throws {
+        let json = """
+        {"formatVersion":1,"exportedAt":"2026-11-20T10:00:00Z","appVersion":"1.0","tasks":[],"associates":[],
+         "notes":[],"checklist":[],"series":[],"activity":[],"shiftLogs":[]}
+        """
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "backup-v1-\(UUID())"))
+        let summary = try BackupService.restore(Data(json.utf8), into: context, defaults: defaults)
+        XCTAssertEqual(summary.inserted, 0)
+        XCTAssertEqual(summary.settings, 0)
+    }
+
+    func testDeleteEverythingRemovesListsPersonalSettingsAndBackups() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "delete-\(UUID())"))
+        defaults.set(JSONStorage.encode([StandardList(title: "Cooler temps", items: [StandardItem(name: "Milk", value: "41°F")])]),
+                     forKey: SettingsKey.standardLists)
+        defaults.set(RoleStorage.encode(UserRole(role: .coach, areas: ["Food"])), forKey: SettingsKey.userRole)
+        defaults.set("{}", forKey: SettingsKey.floorWalkState)
+        defaults.set(true, forKey: SettingsKey.hidePreviews)   // an app preference, kept
+
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("backups-\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data("{}".utf8).write(to: folder.appendingPathComponent("CoachSpark-2026-11-24.json"))
+        try Data("{}".utf8).write(to: folder.appendingPathComponent("SecondBrain-2026-11-20.json"))
+        try Data("mine".utf8).write(to: folder.appendingPathComponent("my notes.txt"))
+        _ = CaptureSaver.save(draft("Call the vendor tomorrow"), in: context)
+
+        BackupService.deleteEverything(in: context, defaults: defaults, backupsFolder: folder)
+
+        XCTAssertTrue(try context.fetch(FetchDescriptor<TaskItem>()).isEmpty)
+        XCTAssertNil(defaults.object(forKey: SettingsKey.standardLists))
+        XCTAssertNil(defaults.object(forKey: SettingsKey.userRole))
+        XCTAssertNil(defaults.object(forKey: SettingsKey.floorWalkState))
+        XCTAssertTrue(defaults.bool(forKey: SettingsKey.hidePreviews))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: folder.path), ["my notes.txt"],
+                       "Automatic backups are deleted; other files are left alone")
+    }
+
+    func testAutomaticBackupsSortNewestFirstAcrossTheRename() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("auto-\(UUID())", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        for name in ["SecondBrain-2026-11-23.json", "CoachSpark-2026-11-25.json", "SecondBrain-2026-11-24.json"] {
+            try Data("{}".utf8).write(to: folder.appendingPathComponent(name))
+        }
+        XCTAssertEqual(BackupService.automaticBackups(in: folder).map(\.lastPathComponent),
+                       ["CoachSpark-2026-11-25.json", "SecondBrain-2026-11-24.json", "SecondBrain-2026-11-23.json"])
+    }
+
     // MARK: Notifications plan from real models
 
     func testNotificationPlanFromModels() throws {

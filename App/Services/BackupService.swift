@@ -6,7 +6,8 @@ import UniformTypeIdentifiers
 // MARK: - Backup file format (JSON, versioned, human-readable)
 
 struct BackupFile: Codable {
-    static let currentVersion = 1
+    /// 2 added `settings`: Standards lists, schedule, role, shift plan and preferences. Version 1 files still restore.
+    static let currentVersion = 2
 
     var formatVersion: Int = BackupFile.currentVersion
     var exportedAt: Date = Date()
@@ -18,6 +19,8 @@ struct BackupFile: Codable {
     var series: [SeriesDTO] = []
     var activity: [ActivityDTO] = []
     var shiftLogs: [ShiftLogDTO] = []
+    /// Content and preferences kept in settings (see `UserContent`). Missing in version 1 files.
+    var settings: [String: BackupSetting]? = nil
 
     struct TaskDTO: Codable {
         var id: UUID; var title: String; var details: String; var kindRaw: String; var statusRaw: String
@@ -69,15 +72,22 @@ struct RestoreSummary {
     var inserted = 0
     var updated = 0
     var skipped = 0
-    var text: String { "Restored: \(inserted) added, \(updated) updated, \(skipped) already current." }
+    /// Settings and lists brought back from the backup (only ones the phone didn't already have).
+    var settings = 0
+    var text: String {
+        var text = "Restored: \(inserted) added, \(updated) updated, \(skipped) already current."
+        if settings > 0 { text += " \(settings) setting\(settings == 1 ? "" : "s") or list\(settings == 1 ? "" : "s") brought back." }
+        return text
+    }
 }
 
 /// Export / import of everything in the store, plus a daily automatic backup in the app's
 /// Documents folder (visible in the Files app under On My iPhone › Coach Spark).
 @MainActor
 enum BackupService {
-    static func makeBackup(from context: ModelContext) throws -> Data {
+    static func makeBackup(from context: ModelContext, defaults: UserDefaults = AppGroup.defaults) throws -> Data {
         var file = BackupFile()
+        file.settings = UserContent.snapshot(from: defaults)
         file.appVersion = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "1.0"
 
         let tasks = try context.fetch(FetchDescriptor<TaskItem>())
@@ -143,11 +153,13 @@ enum BackupService {
     }
 
     /// Merges a backup into the store: new records are added, records that are newer in the backup
-    /// replace older local copies, and nothing local is deleted.
+    /// replace older local copies, and nothing local is deleted. Settings and lists are merged the same
+    /// way: anything already on the phone stays as it is.
     @discardableResult
-    static func restore(_ data: Data, into context: ModelContext) throws -> RestoreSummary {
+    static func restore(_ data: Data, into context: ModelContext, defaults: UserDefaults = AppGroup.defaults) throws -> RestoreSummary {
         let file = try decode(data)
         var summary = RestoreSummary()
+        if let settings = file.settings { summary.settings = UserContent.merge(settings, into: defaults) }
 
         var associates: [UUID: Associate] = [:]
         for a in try context.fetch(FetchDescriptor<Associate>()) { associates[a.id] = a }
@@ -297,21 +309,37 @@ enum BackupService {
     static func writeAutomaticBackup(from context: ModelContext) {
         guard AppSettings.autoBackup, !PersistenceController.isUITesting, let folder = backupsFolder,
               let data = try? makeBackup(from: context) else { return }
-        let name = "SecondBrain-\(NotificationPlannerKey.today()).json"
+        let name = "\(automaticPrefix)\(NotificationPlannerKey.today()).json"
         try? data.write(to: folder.appendingPathComponent(name), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        for old in automaticBackups(in: folder).dropFirst(14) { try? FileManager.default.removeItem(at: old) }
+    }
+
+    /// Automatic backups are named by date, so the newest sorts first within each prefix.
+    static let automaticPrefix = "CoachSpark-"
+    private static let olderPrefixes = ["SecondBrain-"]
+
+    /// Automatic backups, newest first (including ones made before the app was renamed).
+    static func automaticBackups(in folder: URL) -> [URL] {
         let files = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
-        let backups = files.filter { $0.lastPathComponent.hasPrefix("SecondBrain-") }.sorted { $0.lastPathComponent > $1.lastPathComponent }
-        for old in backups.dropFirst(14) { try? FileManager.default.removeItem(at: old) }
+        let prefixes = [automaticPrefix] + olderPrefixes
+        func date(_ url: URL) -> String {
+            let name = url.lastPathComponent
+            return prefixes.first { name.hasPrefix($0) }.map { String(name.dropFirst($0.count)) } ?? name
+        }
+        return files.filter { url in url.pathExtension == "json" && prefixes.contains { url.lastPathComponent.hasPrefix($0) } }
+            .sorted { date($0) > date($1) }
     }
 
     static func automaticBackups() -> [URL] {
         guard let folder = backupsFolder else { return [] }
-        let files = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? []
-        return files.filter { $0.pathExtension == "json" }.sorted { $0.lastPathComponent > $1.lastPathComponent }
+        return automaticBackups(in: folder)
     }
 
-    /// Permanently removes all records (requires double confirmation in the UI).
-    static func deleteEverything(in context: ModelContext) {
+    /// Permanently removes everything personal (requires double confirmation in the UI): every
+    /// record, the content kept in settings (Standards lists, schedule, role, shift plan, floor walk,
+    /// store location) and every automatic backup on this iPhone. App preferences stay.
+    static func deleteEverything(in context: ModelContext, defaults: UserDefaults = AppGroup.defaults,
+                                 backupsFolder folder: URL? = BackupService.backupsFolder) {
         try? context.delete(model: ActivityEvent.self)
         try? context.delete(model: ChecklistItem.self)
         try? context.delete(model: TaskItem.self)
@@ -320,6 +348,10 @@ enum BackupService {
         try? context.delete(model: Associate.self)
         try? context.delete(model: ShiftLog.self)
         TaskActions.save(context)
+        UserContent.deletePersonal(from: defaults)
+        if let folder {
+            for file in automaticBackups(in: folder) { try? FileManager.default.removeItem(at: file) }
+        }
     }
 }
 

@@ -48,6 +48,25 @@ final class PlanningTests: XCTestCase {
         XCTAssertEqual(a.primaryTask?.title, "Prep market visit")
     }
 
+    func testGreetingFollowsTheClockAndCarriesNoCounts() {
+        XCTAssertEqual(BriefingBuilder.greeting(now: Fixtures.date(2026, 11, 23, 6, 30), calendar: cal), "Good morning")
+        XCTAssertEqual(BriefingBuilder.greeting(now: Fixtures.date(2026, 11, 23, 11, 59), calendar: cal), "Good morning")
+        XCTAssertEqual(BriefingBuilder.greeting(now: Fixtures.date(2026, 11, 23, 12, 0), calendar: cal), "Good afternoon")
+        XCTAssertEqual(BriefingBuilder.greeting(now: Fixtures.date(2026, 11, 23, 17, 0), calendar: cal), "Good evening")
+        XCTAssertEqual(BriefingBuilder.greeting(now: Fixtures.date(2026, 11, 23, 23, 30), calendar: cal), "Good evening")
+    }
+
+    func testHomeAgendaMovesToTheNewDayAtMidnight() {
+        // Home rebuilds its agenda from a refreshed clock; just after midnight "today" is the new day.
+        let lateNight = Fixtures.date(2026, 11, 23, 23, 50)
+        let afterMidnight = Fixtures.date(2026, 11, 24, 0, 5)
+        let before = DayAgenda.build(tasks: sample, day: lateNight, now: lateNight, calendar: cal)
+        let after = DayAgenda.build(tasks: sample, day: afterMidnight, now: afterMidnight, calendar: cal)
+        XCTAssertTrue(before.dueToday.map(\.title).contains("Spill in aisle 9"))
+        XCTAssertTrue(after.dueToday.map(\.title).contains("Check results"))
+        XCTAssertTrue(after.overdue.map(\.title).contains("Spill in aisle 9"))
+    }
+
     func testUnfinishedWorkNeverDisappearsOvernight() {
         // The next morning, yesterday's unfinished items are overdue — not gone.
         let tomorrowMorning = Fixtures.date(2026, 11, 24, 7)

@@ -18,7 +18,6 @@ enum SettingsKey {
     static let showBadge = "showBadge"
     static let appLockEnabled = "appLockEnabled"
     static let smartSuggestions = "smartSuggestions"
-    static let appleIntelligence = "appleIntelligence"
     static let calendarEnabled = "calendarEnabled"
     static let iCloudSync = "iCloudSync"
     static let autoBackup = "autoBackup"
@@ -58,6 +57,8 @@ enum SettingsKey {
     static let shiftPlanNudges = "shiftPlanNudges"
     /// Guides written in an earlier version (JSON of [CustomGuide]). Standards moves them into lists.
     static let customGuides = "customGuides"
+    /// Season planner events the person added for their store (JSON of [StoreEvent]).
+    static let customSeasonEvents = "customSeasonEvents"
     /// Set by the Focus filter: when off duty, widgets and Home stay quiet.
     static let offDuty = "offDuty"
 }
@@ -152,7 +153,6 @@ enum AppSettings {
     static var showBadge: Bool { bool(SettingsKey.showBadge, true) }
     static var appLockEnabled: Bool { bool(SettingsKey.appLockEnabled, false) }
     static var smartSuggestions: Bool { bool(SettingsKey.smartSuggestions, true) }
-    static var appleIntelligence: Bool { bool(SettingsKey.appleIntelligence, false) }
     static var calendarEnabled: Bool { bool(SettingsKey.calendarEnabled, false) }
     static var iCloudSync: Bool { bool(SettingsKey.iCloudSync, false) }
     static var autoBackup: Bool { bool(SettingsKey.autoBackup, true) }

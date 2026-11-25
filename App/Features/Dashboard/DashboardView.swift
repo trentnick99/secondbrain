@@ -13,9 +13,10 @@ struct DashboardView: View {
     @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
     @State private var showMoreTools = false
     @State private var pendingTool: Route?
-    @State private var briefing: String = ""
     @State private var showCompleted = false
+    /// The clock Home is built from. Refreshed every minute, when the app comes back, and at midnight.
     @State private var now = Date()
+    @Environment(\.scenePhase) private var scenePhase
     private let weather = WeatherAlertService.shared
     @AppStorage(SettingsKey.offDuty, store: AppGroup.defaults) private var offDuty = false
     @AppStorage(SettingsKey.shiftPlanBlocks, store: AppGroup.defaults) private var planJSON = ""
@@ -104,10 +105,11 @@ struct DashboardView: View {
                 now = Date()
                 await AppMaintenance.runForegroundUpkeep()
             }
-            .task(id: tasks.count) {
-                now = Date()
-                briefing = await BriefingAssistant.briefing(for: agenda, now: now)
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { now = Date() }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in now = Date() }
+            .onReceive(Timer.publish(every: 60, on: .main, in: .common).autoconnect()) { now = $0 }
         }
     }
 
@@ -119,9 +121,9 @@ struct DashboardView: View {
         let progress = total == 0 ? 0 : Double(done) / Double(total)
         return VStack(alignment: .leading, spacing: 12) {
             Text(greeting)
-                .font(.title3.weight(.semibold))
+                .font(.title2.weight(.semibold))
                 .foregroundStyle(Theme.heroText)
-                .lineLimit(2)
+                .accessibilityAddTraits(.isHeader)
             Text(dateLine)
                 .font(.subheadline)
                 .foregroundStyle(Theme.heroSecondary)
@@ -164,12 +166,7 @@ struct DashboardView: View {
     }
 
     /// First line of the briefing ("Good evening. You have 6 tasks due today…"), or a plain greeting.
-    private var greeting: String {
-        let first = briefing.split(separator: "\n").first.map(String.init) ?? ""
-        if !first.isEmpty { return first }
-        let hour = Calendar.current.component(.hour, from: now)
-        return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
-    }
+    private var greeting: String { BriefingBuilder.greeting(now: now, calendar: .current) }
 
     /// "Tue, Nov 24 · Shift 7–5 · Wk 43"
     private var dateLine: String {
@@ -181,10 +178,10 @@ struct DashboardView: View {
     private var shiftLine: String {
         let schedule = AppSettings.shiftSchedule
         let cal = Calendar.current
-        if let shift = schedule.shift(on: Date(), calendar: cal) { return "Shift \(shift.shortLabel)" }
-        let next = schedule.nextWorkday(after: Date(), calendar: cal)
+        if let shift = schedule.shift(on: now, calendar: cal) { return "Shift \(shift.shortLabel)" }
+        let next = schedule.nextWorkday(after: now, calendar: cal)
         let label = schedule.shift(on: next, calendar: cal)?.shortLabel ?? ""
-        return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: Date(), calendar: cal)) \(label)"
+        return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: now, calendar: cal)) \(label)"
     }
 
     /// Four big tools. Everything else is one tap away in More tools.
