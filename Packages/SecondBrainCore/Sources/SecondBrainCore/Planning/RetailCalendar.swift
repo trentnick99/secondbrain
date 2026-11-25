@@ -213,10 +213,15 @@ public enum RetailCalendar {
         let today = math.startOfDay(now)
         let horizon = math.addingDays(days, to: today)
         let year = calendar.component(.year, from: today)
-        return (((year - 1)...(year + 1)).flatMap { moments(inYear: $0, calendar: calendar) }
-                + storeEvents.filter(\.isValid).map { $0.moment(calendar: calendar) })
-            .filter { ($0.end ?? $0.start) >= today && $0.start <= horizon }
-            .sorted { $0.start != $1.start ? $0.start < $1.start : $0.title < $1.title }
+        var all: [RetailMoment] = []
+        for y in (year - 1)...(year + 1) { all += moments(inYear: y, calendar: calendar) }
+        for event in storeEvents where event.isValid { all.append(event.moment(calendar: calendar)) }
+        let inRange = all.filter { (moment: RetailMoment) -> Bool in
+            (moment.end ?? moment.start) >= today && moment.start <= horizon
+        }
+        return inRange.sorted { (a: RetailMoment, b: RetailMoment) -> Bool in
+            a.start != b.start ? a.start < b.start : a.title < b.title
+        }
     }
 
     /// Every moment for one calendar year.
