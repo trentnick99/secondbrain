@@ -12,8 +12,21 @@ bundle=""; prev=""
 for arg in "$@"; do [ "$prev" = "-resultBundlePath" ] && bundle="$arg"; prev="$arg"; done
 
 # Keep the full log in a file, and stream test progress and errors live to the job log.
-"$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
-status=${PIPESTATUS[0]}
+run() {
+  "$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
+  status=${PIPESTATUS[0]}
+}
+run "$@"
+
+# A cloud simulator sometimes never finishes starting accessibility, so no UI test runs at all.
+# That's the machine, not the app: restart the simulators once and try again.
+if [ $status -ne 0 ] && grep -q "failed to initialize for UI testing" "$log"; then
+  echo "::warning::The simulator didn't start UI testing; restarting it and trying once more."
+  xcrun simctl shutdown all >/dev/null 2>&1 || true
+  sleep 10
+  [ -n "$bundle" ] && rm -rf "$bundle"
+  run "$@"
+fi
 
 grep -E "^\*\* .* (SUCCEEDED|FAILED) \*\*" "$log" | tail -2 || true
 if [ $status -ne 0 ]; then
