@@ -298,7 +298,7 @@ enum BackupService {
 
     // MARK: Automatic daily backup
 
-    static var backupsFolder: URL? {
+    nonisolated static var backupsFolder: URL? {
         guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
         let folder = docs.appendingPathComponent("Backups", isDirectory: true)
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
