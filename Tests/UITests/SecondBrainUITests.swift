@@ -122,10 +122,12 @@ final class SecondBrainUITests: XCTestCase {
         field.tap()
         field.typeText("We're short staffed tonight, two call outs")
         app.buttons["askSubmitButton"].firstMatch.tap()
+        hideKeyboard()
         let guide = app.buttons["guide-short-staffed"].firstMatch
-        XCTAssertTrue(guide.waitForExistence(timeout: 5), "The matching guide is listed")
-        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "askRedditLink").firstMatch.exists,
+        XCTAssertTrue(scrollTo(guide), "The matching guide is listed")
+        XCTAssertTrue(scrollTo(app.descendants(matching: .any).matching(identifier: "askRedditLink").firstMatch),
                       "Reddit search is offered")
+        scrollTo(guide, up: true)
         guide.tap()
         let add = app.buttons["Add step 1 as a task"].firstMatch
         XCTAssertTrue(add.waitForExistence(timeout: 5))
@@ -151,13 +153,21 @@ final class SecondBrainUITests: XCTestCase {
 
     /// Lists only build rows as they scroll into view; swipe until the element exists.
     @discardableResult
-    private func scrollTo(_ element: XCUIElement, tries: Int = 6) -> Bool {
+    private func scrollTo(_ element: XCUIElement, up: Bool = false, tries: Int = 6) -> Bool {
+        if element.waitForExistence(timeout: 2) { return true }
         var count = 0
         while !element.exists && count < tries {
-            app.swipeUp()
+            if up { app.swipeDown() } else { app.swipeUp() }
             count += 1
         }
         return element.waitForExistence(timeout: 3)
+    }
+
+    /// Hides the keyboard so rows underneath it are built.
+    private func hideKeyboard() {
+        if app.keyboards.firstMatch.exists {
+            app.navigationBars.firstMatch.tap()
+        }
     }
 
     func testHuddleIsBuiltFromToday() throws {
@@ -186,11 +196,12 @@ final class SecondBrainUITests: XCTestCase {
         steps.typeText("Check the e-stop is pulled out")
         app.navigationBars.buttons["Save"].firstMatch.tap()
         let field = app.descendants(matching: .any).matching(identifier: "askQuestionField").firstMatch
-        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertTrue(scrollTo(field, up: true), "Back on Ask")
         field.tap()
         field.typeText("the baler won't start")
         app.buttons["askSubmitButton"].firstMatch.tap()
-        XCTAssertTrue(element(containing: "Your store's own guide").waitForExistence(timeout: 5), "Your guide is listed")
+        hideKeyboard()
+        XCTAssertTrue(scrollTo(element(containing: "Your store's own guide")), "Your guide is listed")
     }
 
     func testFloorWalkTurnsAMissIntoATask() throws {
