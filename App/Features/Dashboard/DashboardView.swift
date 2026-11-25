@@ -9,7 +9,8 @@ struct DashboardView: View {
     @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
-    @Query(sort: \TaskItem.createdAt, order: .reverse) private var tasks: [TaskItem]
+    /// Open tasks plus what was finished since yesterday; a year of completed work is never loaded.
+    @Query(TaskQueries.home()) private var tasks: [TaskItem]
     @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
     @State private var showMoreTools = false
     @State private var pendingTool: Route?

@@ -451,27 +451,39 @@ final class PersistenceTests: XCTestCase {
 
     /// A year of heavy use: Home, Matrix and Tasks read every task and build the day's agenda on each
     /// redraw. This keeps that under half a second for 5,000 tasks on a CI simulator (debug build).
-    func testHomeAgendaStaysQuickWithFiveThousandTasks() throws {
-        let start = Date().addingTimeInterval(-365 * 86_400)
+    func testHomeAgendaStaysQuickWithAYearOfFinishedWork() throws {
+        // A year of shifts: about 5,000 tasks, nearly all finished, 200 still open, one finished today.
+        // The history ends four days ago, so nothing but the one task counts as finished recently.
+        let start = Date().addingTimeInterval(-369 * 86_400)
         for i in 0..<5_000 {
             let task = TaskItem(title: "Task \(i)")
             task.dueDate = start.addingTimeInterval(Double(i) * 6_300)
-            if i % 5 != 0 {
+            if i % 25 != 0 {
                 task.status = .completed
                 task.completedAt = task.dueDate
             }
             context.insert(task)
         }
+        let doneToday = TaskItem(title: "Finished this morning")
+        doneToday.status = .completed
+        doneToday.completedAt = Date()
+        context.insert(doneToday)
         try context.save()
-        let tasks = try context.fetch(FetchDescriptor<TaskItem>())
-        XCTAssertEqual(tasks.count, 5_000)
+
         let clock = ContinuousClock()
-        let elapsed = clock.measure {
-            let agenda = DayAgenda.build(tasks: tasks.map(\.snapshot), day: Date(), now: Date(), calendar: .current)
-            XCTAssertFalse(agenda.overdue.isEmpty)
+        var agenda: DayAgenda?
+        var loaded = 0
+        let elapsed = try clock.measure {
+            // Exactly what Home does: its query, the snapshots, the agenda.
+            let tasks = try context.fetch(TaskQueries.home())
+            loaded = tasks.count
+            agenda = DayAgenda.build(tasks: tasks.map(\.snapshot), day: Date(), now: Date(), calendar: .current)
         }
+        XCTAssertEqual(loaded, 201, "Home loads the 200 open tasks and today's finished one, not the year")
+        XCTAssertFalse(agenda?.overdue.isEmpty ?? true)
+        XCTAssertEqual(agenda?.completedToday.map(\.title), ["Finished this morning"])
         let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
-        XCTAssertLessThan(seconds, 0.5, "Building Home's agenda from 5,000 tasks took \(seconds) s")
+        XCTAssertLessThan(seconds, 0.5, "Loading Home with a year of finished work took \(seconds) s")
     }
 
     // MARK: Notifications plan from real models

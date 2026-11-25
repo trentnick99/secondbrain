@@ -4,7 +4,7 @@
 
 - **Builds 1–12:** capture, the Eisenhower Matrix, follow-ups, End My Shift, recurring tasks, notifications, widgets, Siri and Shortcuts, the Season Planner, Store Terms, Standards, Floor walk, Huddle, Shift timeline, the Live Activity, the Apple Watch app, the Off duty Focus filter and the rename to Coach Spark.
 - **Build 13 (audit stages 1–4):** complete backups (lists, schedule, role and settings) and a delete that removes them too; one sheet at a time, so deep links always open; one save path that shows a message when a save fails; a Home clock that stays current; the AI briefing removed; Settings holds settings only; End My Shift with Carry all at the top and swipe actions; cosmetic fixes for large text and edge fades; SwiftLint in CI; the shipped database schema frozen with tests.
-- **Build 14 (audit stage 5):** Standards check-offs with readings and a task for a miss; sharing lists as text; your store's own season events with prep steps; Sort all for the Inbox; a move-to-next-shift button on widgets; check-offs and season events in backups; the first database upgrade (V1 → V2), covered by tests.
+- **Build 14 (audit stage 5):** Standards check-offs with readings and a task for a miss; sharing lists as text; your store's own season events with prep steps; Sort all for the Inbox; a move-to-next-shift button on widgets; check-offs and season events in backups; Home loads only open and recently finished tasks, so a year of history doesn't slow it; the first database upgrade (V1 → V2), covered by tests.
 
 ## Next
 
