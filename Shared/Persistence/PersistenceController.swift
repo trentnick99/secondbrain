@@ -3,8 +3,10 @@ import SwiftData
 
 // MARK: - Versioned schema & migrations
 
-/// Version 1 of the on-device database. When the model changes, add `SchemaV2` (with the old
-/// model types nested in `SchemaV1`) and a `MigrationStage` below — see Docs/ARCHITECTURE.md.
+/// Version 1 of the on-device database, frozen: the model classes are nested in `SchemaV1` (see
+/// Shared/Models) and `SchemaTests` checks their hashes against what builds 1–12 shipped. To change a
+/// model, copy it into a new `SchemaV2` namespace, point the typealias at the copy, and add a migration
+/// stage below. Never edit a frozen version — see Docs/ARCHITECTURE.md.
 enum SchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
 
