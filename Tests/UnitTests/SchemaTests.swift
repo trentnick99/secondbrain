@@ -22,7 +22,10 @@ final class SchemaTests: XCTestCase {
         for (name, hash) in current.sorted(by: { $0.key < $1.key }) {
             print("SCHEMA_HASH \(name) \(hash)")
         }
-        if !Self.shippedV1.isEmpty {
+        if Self.shippedV1.isEmpty {
+            let report = current.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " ")
+            XCTFail("SCHEMA_HASHES \(report)")
+        } else {
             XCTAssertEqual(current, Self.shippedV1, "SchemaV1 changed. Add SchemaV2 and a migration stage instead.")
         }
     }

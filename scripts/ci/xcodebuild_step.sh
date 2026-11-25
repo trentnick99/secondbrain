@@ -8,7 +8,7 @@ mkdir -p build/logs
 log="build/logs/${name}.log"
 
 # Keep the full log in a file, and stream test progress and errors live to the job log.
-"$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)"
+"$@" 2>&1 | tee "$log" | grep --line-buffered -E "Test Case .*(passed|failed)|error:|\*\* .* \*\*|Testing started|Test Suite .* (passed|failed)|SCHEMA_HASH"
 status=${PIPESTATUS[0]}
 
 grep -E "^\*\* .* (SUCCEEDED|FAILED) \*\*" "$log" | tail -2 || true
