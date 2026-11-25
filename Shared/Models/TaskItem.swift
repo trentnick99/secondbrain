@@ -165,3 +165,6 @@ final class TaskItem {
         )
     }
 }
+
+/// Stated explicitly (SwiftData already implies it) so every file sees it, whatever order the compiler checks them in.
+extension TaskItem: Identifiable {}

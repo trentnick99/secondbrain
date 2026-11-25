@@ -78,3 +78,6 @@ final class Note {
         return (checklist ?? []).contains { $0.text.lowercased().contains(q) }
     }
 }
+
+/// Stated explicitly (SwiftData already implies it) so every file sees it, whatever order the compiler checks them in.
+extension Note: Identifiable {}
