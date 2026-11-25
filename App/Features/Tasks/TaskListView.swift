@@ -44,6 +44,7 @@ struct TaskListView: View {
     @State private var filter: TaskFilter = .today
     @State private var search = ""
     @State private var showRecurring = false
+    @State private var showTriage = false
 
     var body: some View {
         NavigationStack {
@@ -55,8 +56,15 @@ struct TaskListView: View {
                 }
                 if filter == .inbox && !visible.isEmpty {
                     Section {
-                        Text("Captured quickly, not yet sorted. Tap Sort to apply the suggested date, person and quadrant — you'll see it first.")
-                            .font(.footnote).foregroundStyle(.secondary)
+                        Button {
+                            showTriage = true
+                        } label: {
+                            Label("Sort all \(visible.count) in one pass", systemImage: "tray.and.arrow.down.fill")
+                                .font(.headline)
+                        }
+                        .accessibilityIdentifier("sortInboxButton")
+                    } footer: {
+                        Text("Captured quickly, not yet sorted. Sorting shows the suggested date, person and quadrant first; nothing changes until you tap Apply.")
                     }
                 }
                 ForEach(groups, id: \.title) { group in
@@ -96,6 +104,10 @@ struct TaskListView: View {
                 }
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
+            .sheet(isPresented: $showTriage) {
+                InboxTriageSheet(tasks: tasks.filter { $0.status == .inbox }.sorted { $0.createdAt < $1.createdAt },
+                                 knownAssociates: associates.map(\.name))
+            }
             .onAppear(perform: applyFilterRequest)
             .onChange(of: router.taskFilterRequest) { _, _ in applyFilterRequest() }
         }
@@ -294,5 +306,109 @@ struct InboxSortSheet: View {
             .sheet(isPresented: $showAdjust) { CaptureAdjustSheet(draft: $draft, associates: associates) }
         }
         .presentationDetents([.medium, .large])
+    }
+}
+
+/// Sort the Inbox in one pass: each item shows its suggested date, person and quadrant, and you
+/// apply, skip or delete it. Nothing changes until you choose.
+struct InboxTriageSheet: View {
+    let tasks: [TaskItem]
+    let knownAssociates: [String]
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
+    @Query(sort: \Associate.name) private var associates: [Associate]
+    @State private var index = 0
+    @State private var draft = CaptureDraft()
+    @State private var sorted = 0
+    @State private var showAdjust = false
+    @State private var confirmDelete = false
+
+    private var current: TaskItem? { index < tasks.count ? tasks[index] : nil }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if let task = current {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("\(index + 1) of \(tasks.count)")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Text(task.captureText.isEmpty ? task.displayTitle : task.captureText)
+                                .font(.headline)
+                            InterpretationCard(draft: draft, onAdjust: { showAdjust = true })
+                            if draft.needsReview {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    ForEach(draft.ambiguities) { Text("• " + $0.message).font(.subheadline) }
+                                }
+                                .card()
+                            }
+                        }
+                        .padding()
+                    }
+                    .safeAreaInset(edge: .bottom) { actions }
+                } else {
+                    ContentUnavailableView("Inbox sorted", systemImage: "tray",
+                                           description: Text("\(sorted) sorted. Anything you skipped is still in the Inbox."))
+                }
+            }
+            .background(Theme.background)
+            .navigationTitle("Sort Inbox")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { finish() } }
+            }
+            .sheet(isPresented: $showAdjust) { CaptureAdjustSheet(draft: $draft, associates: associates) }
+            .confirmationDialog("Delete this Inbox item?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                Button("Delete", role: .destructive) {
+                    if let task = current { TaskActions.delete(task, in: context) }
+                    next()
+                }
+            }
+            .onAppear(perform: load)
+        }
+    }
+
+    private var actions: some View {
+        HStack(spacing: 12) {
+            Button(role: .destructive) { confirmDelete = true } label: {
+                Image(systemName: "trash").frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("Delete")
+            Button { next() } label: {
+                Text("Skip").frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            Button {
+                if let task = current {
+                    CaptureSaver.apply(draft, to: task, in: context)
+                    sorted += 1
+                }
+                next()
+            } label: {
+                Text(draft.needsReview ? "Confirm & apply" : "Apply").font(.headline).frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("triageApply")
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(.bar)
+    }
+
+    private func load() {
+        guard let task = current else { return }
+        draft = CaptureSaver.suggestion(for: task, knownAssociates: knownAssociates)
+    }
+
+    private func next() {
+        index += 1
+        load()
+    }
+
+    private func finish() {
+        if sorted > 0 { router.showToast("Sorted \(sorted) Inbox item\(sorted == 1 ? "" : "s")") }
+        dismiss()
     }
 }

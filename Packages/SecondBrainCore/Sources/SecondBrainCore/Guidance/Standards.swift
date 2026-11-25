@@ -192,6 +192,37 @@ public enum Standards {
         return lists + guides.filter { $0.isValid && !kept.contains($0.id) }.map(StandardList.init(migrating:))
     }
 
+    // MARK: Sharing
+
+    /// Plain text to send a team lead: the title, each line, and where it comes from.
+    public static func shareText(_ list: StandardList) -> String {
+        var lines = [list.title]
+        for (index, item) in list.items.enumerated() {
+            if list.kind.hasValues {
+                lines.append(item.value.isEmpty ? "• \(item.name)" : "• \(item.name): \(item.value)")
+            } else {
+                lines.append("\(index + 1). \(item.name)")
+            }
+        }
+        if !list.note.isEmpty { lines.append(list.note) }
+        return lines.joined(separator: "\n")
+    }
+
+    public static func shareText(_ reference: ReferenceList) -> String {
+        var lines = [reference.title]
+        lines += reference.entries.map { "• \($0.name): \($0.value)" }
+        if !reference.sources.isEmpty { lines.append("Sources: " + reference.sources.map(\.title).joined(separator: "; ")) }
+        lines.append(disclaimer)
+        return lines.joined(separator: "\n")
+    }
+
+    public static func shareText(_ guide: CoachGuide) -> String {
+        var lines = [guide.title]
+        lines += guide.steps.enumerated().map { "\($0.offset + 1). \($0.element)" }
+        if let check = guide.checkWith { lines.append("Check with: \(check)") }
+        return lines.joined(separator: "\n")
+    }
+
     // MARK: Filter
 
     /// True when every word typed appears at the start of a word in the text ("temp" finds

@@ -32,6 +32,12 @@ final class SchemaTests: XCTestCase {
                        "SchemaV1 changed (now \(report)). Add a new schema version and a migration stage instead.")
     }
 
+    func testSchemaV2OnlyAddsTheCheckTable() {
+        var v2 = Self.hashes(for: SchemaV2.models)
+        XCTAssertNotNil(v2.removeValue(forKey: "StandardCheck"), "Version 2 adds StandardCheck")
+        XCTAssertEqual(v2, Self.shippedV1, "Version 2 leaves the shipped tables exactly as they were")
+    }
+
     /// A store written with SchemaV1 (what's on phones today) opens with the app's current schema and
     /// migration plan, and keeps its data.
     func testAStoreWrittenByEarlierBuildsOpensAndKeepsItsData() throws {
@@ -57,5 +63,10 @@ final class SchemaTests: XCTestCase {
         let context = ModelContext(container)
         XCTAssertEqual(try context.fetch(FetchDescriptor<TaskItem>()).map(\.title), ["Written by build 12"])
         XCTAssertEqual(try context.fetch(FetchDescriptor<Note>()).map(\.title), ["Weekly huddle"])
+        // The new table works in the migrated store.
+        context.insert(StandardCheck(listID: UUID(), itemID: UUID(), listTitle: "Cooler temps", itemName: "Ice cream",
+                                     standard: "-10°F or colder", reading: "-12°F", isWithinStandard: true))
+        try context.save()
+        XCTAssertEqual(try context.fetch(FetchDescriptor<StandardCheck>()).count, 1)
     }
 }

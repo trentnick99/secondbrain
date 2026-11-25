@@ -4,16 +4,16 @@
 
 | Step | What you do | What happens |
 |---|---|---|
-| 1. Open the app | Tap the icon at the start of your shift | **Home** shows today's top 3 (or suggestions), overdue items, Do First, follow-ups, due today, upcoming reminders and a short briefing |
-| 2. Capture a task | Tap **+** (bottom-right on every tab) and say or type "Make sure dairy is cleaned up before Friday" | The preview shows *Task · Dairy · Due Thu · Q2 Schedule (“before Friday” → due Thu)*. Tap **Save**. |
+| 1. Open the app | Tap the icon at the start of your shift | **Home** shows a greeting, today's counts and progress, four big tools, today's top 3 (or suggestions), your notes, overdue items, Do First, follow-ups, due today and upcoming reminders |
+| 2. Capture a task | Tap **Capture** on Home (or **+** on Tasks and Notes) and say or type "Make sure dairy is cleaned up before Friday" | The preview shows *Task · Dairy · Due Thu · Q2 Schedule (“before Friday” → due Thu)*. Tap **Save**. |
 | 3. Assign a quadrant | Open **Matrix** and drag the task onto Q1, or long-press › Move to Quadrant | The quadrant is saved as a manual choice and recorded in the task's history |
-| 4. Record an associate request | **+** then "Sarah needs help understanding her schedule. Talk to her tomorrow." | Becomes a **Follow-up** for Sarah, due tomorrow, with the request recorded. Because Sarah is new, the preview asks you to confirm before adding her. |
+| 4. Record an associate request | **Capture** then "Sarah needs help understanding her schedule. Talk to her tomorrow." | Becomes a **Follow-up** for Sarah, due tomorrow, with the request recorded. Because Sarah is new, the preview asks you to confirm before adding her. |
 | 5. Schedule a reminder | "Call the electrician tomorrow at 2:30pm", or set it in the task's **Reminder** field | A local notification is scheduled for 2:30 PM |
 | 6. Receive a notification | — | The banner arrives even if the app is closed. Long-press for **Mark Complete / Snooze 15 Minutes / Snooze 1 Hour / Tomorrow Morning / Open Task**. |
 | 7. Complete a responsibility | Tap the circle on any row, swipe right, or use the widget checkbox | It's marked complete and logged. For a follow-up, the associate's history shows it resolved. |
 | 8. Review the weekly planner | Home › calendar icon › **Week** | Seven days (your week start, Saturday by default) with quadrant counts per day. Drag tasks between days. |
 | 9. Use End My Shift | Home › **End My Shift** | Shows completed, unfinished, overdue, open commitments, unconfirmed hand-offs, upcoming deadlines, Q2 work and suggested priorities for tomorrow |
-| 10. Carry unfinished tasks into your next shift | **Carry all to next shift**, or per item **Next shift / Pick date / Done** | They move to your next scheduled shift, skipping days off. Each item keeps its time of day and reminder offset, and postponements are counted. Starred suggestions become that shift's top 3. Nothing is discarded. |
+| 10. Carry unfinished tasks into your next shift | **Carry all to next shift** (at the top), or per item swipe right for **Done**, left for **Next shift**, or tap ⋯ for **Pick a date** | They move to your next scheduled shift, skipping days off. Each item keeps its time of day and reminder offset, and postponements are counted. Starred suggestions become that shift's top 3. Nothing is discarded. |
 
 ## Your store and your schedule
 
@@ -49,15 +49,16 @@ A handed-off task shows as **Waiting** until you confirm the person took it on, 
 
 Teams and groups (Stock 1–3, CAP 1–3, "the overnight team", "my TLs", "the stocking TLs") can be handed work, but they never become contacts.
 
-**Store Terms reference.** Tap the book icon on Home (or Settings › Store terms) to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Coach Spark". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
+**Store Terms reference.** Open **More tools › Store terms** on Home to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Coach Spark". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
 
-**Season Planner.** Open it from Settings › Season planner, or tap **Coming up** on Home, which shows the next three weeks along with the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
+**Season Planner.** Open it from **More tools › Season planner**, or tap **Coming up** on Home, which shows the next three weeks along with the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
 - **Holidays**, worked out by the calendar: Valentine's Day, Easter, Mother's Day, Memorial Day, Father's Day, July 4th, Labor Day, Halloween, Thanksgiving, Black Friday, Cyber Monday, Christmas Eve, Christmas, New Year's Eve and New Year's Day.
 - **Announced sales events:** Walmart Deals (June 22–28, 2026), Early Black Friday Deals (Nov 12–15), Black Friday Deals (Nov 23–29; in stores from Nov 27 at 6 AM) and Cyber Monday Deals (Nov 30–Dec 2). Events for later years are added once Walmart announces them. Dates are never guessed.
 - **Typical seasonal timing**, labeled "confirm locally": Lawn & Garden, back-to-school, the Halloween set just after Labor Day, the holiday conversion after Halloween, and post-holiday clearance.
 - **Operations and safety:** the new fiscal year (Saturday of the week containing Feb 1), the two clock changes (overnight shifts run an hour shorter or longer), holiday staffing, summer heat, hurricane season and winter weather.
+- **Your store's events:** add your own, such as a remodel, an inventory count or a market visit, with a date, an optional end date, a note and your own prep steps, each set a number of days before. They're marked "Added by you", appear on the Home "Coming up" card, and are included in backups. Coach Spark never adds or guesses one for you.
 
-Each item has prep steps, such as "Black Friday safety walk: aisles clear, PLE parked, crowd plan". Tap **Add** to make one a task, or **Add all** and confirm. Due dates move back to your last scheduled workday before the event, and reminders follow your shift start. Swipe an item to hide it if it doesn't apply to your store. You can turn the Home card off in Settings.
+Each item has prep steps, such as "Black Friday safety walk: aisles clear, PLE parked, crowd plan". Tap **Add** to make one a task, or **Add all** and confirm. Due dates move back to your last scheduled workday before the event, and reminders follow your shift start. Swipe an item to hide it if it doesn't apply to your store. You can turn the Home card off in Settings › Home and Lock Screen.
 
 Quick Capture also understands holidays after "by", "before", "on", "until" or "ahead of": "by Black Friday" or "before Thanksgiving". A bare name like "the Halloween set" or "Christmas trees" is never treated as a date.
 
@@ -93,7 +94,7 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 
 **Scan, photo and walk notes.** Import also takes a **Scan** of a printed or handwritten page (on an iPhone with a camera) or a **Photo** of notes or a whiteboard. The text is read on your iPhone, and photos aren't saved. **Speak walk notes** (also **Walk notes** on Home) lets you talk as you walk the floor, like "Aisle 12 has holes. Dairy cooler door is leaking." Each sentence becomes an item, and walk notes keep every area you mention.
 
-**Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **More tools › Import notes** on Home, the Import button in Notes, or Settings › Import notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Coach Spark"). Coach Spark:
+**Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **More tools › Import notes** on Home, or the Import button in Notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Coach Spark"). Coach Spark:
 - **Finds action items:** it reads bullet points and action sentences, skips greetings, sign-offs and the quoted earlier email, and uses the subject line.
 - **Routes each item:** using area headings ("Food", "Fresh:"), inline labels ("Front End - …") and the departments mentioned, it sorts items into **For you**, **Total store** and **No area mentioned**. Items for other areas are hidden, with a count shown. "Dairy" or "Frozen" count as Food, "Produce" or "Bakery" as Fresh, and so on.
 - **Uses only stated dates:** an item gets a due date only if the notes give one ("by Wednesday"). Nothing is invented.
@@ -105,19 +106,23 @@ Copy and paste only content you're allowed to keep on a personal device. If your
 
 Home is laid out calm and roomy, in the order a shift runs:
 
-- **Header:** a greeting, the date, your shift and fiscal week, how many items are due today, overdue and waiting as follow-ups, a progress bar, and **End My Shift**.
+- **Header:** a greeting ("Good morning"), the date, your shift and fiscal week, how many items are due today, overdue and waiting as follow-ups, a progress bar, and **End My Shift**. Home keeps its clock current: it refreshes every minute, when you come back to the app, and at midnight.
+- **Toolbar:** the planner on the left and Settings on the right.
 - **Four big tools:** **Capture**, **Floor walk**, **Huddle** and **More tools**. More tools holds everything else: Task, Follow-up, Note, Reminder, Standards, Shift timeline, Walk notes, Import notes, Team lead lists, Planner, Season planner, Weekly review and Store terms.
 - **Today's top 3**, then **Notes:** your pinned notes first, then your most recent, up to four. Tap one to open it, **New note** to write one, or **See all** for the Notes tab.
 - Then overdue items, Do First, follow-ups, due today, reminders and what's coming up.
+- At large text sizes, the tools stack in one column.
 
 ## Standards
 
-Open **More tools › Standards** (or Settings › Standards). Standards is a reference library of lists. It doesn't answer questions or write steps of its own, so nothing in it is a guess about your situation. Type in the search bar to filter the lists; "egg" finds egg temperatures and "freezer door" finds the freezer door process.
+Open **More tools › Standards**. Standards is a reference library of lists. It doesn't answer questions or write steps of its own, so nothing in it is a guess about your situation. Type in the search bar to filter the lists; "egg" finds egg temperatures and "freezer door" finds the freezer door process.
 
 - **Temperatures:** **Food safety temperatures** from public sources: refrigerated food at 41°F or colder and hot food at 135°F or hotter (FDA Food Code), the 41–135°F danger zone, cooling cooked food (135°F to 70°F within 2 hours, then to 41°F within 4 more), shell eggs at 45°F or colder (21 CFR 115.50), and frozen food at 0°F or colder (USDA FSIS). Each value lists its source.
 - **Quality standards:** general **Product quality checks** for freight and zoning: rotation, dates, damaged packages, frozen product, eggs and cold product.
 - **Processes:** step lists for the floor and for safety: a freezer or cooler door that won't open on its own, breaking down a frozen and dairy truck, a case running warm, broken equipment, freight that's behind, getting ready for a market walk, spills, blocked exits, injuries, severe weather, big crowds, recalls, and equipment. Each process has a spot for **your store's steps**, and **+** next to a step adds it to your tasks after you confirm.
-- **Your own lists:** under **Add your own**, make a **temperature list** (for example "Ice cream · -10°F"), a **quality standard** or a **process**, with the values and steps your store trained you on. Lists stay on your phone and show up in search. Guides you wrote in an earlier version moved here as processes. Don't include passwords, codes or anyone's personal details.
+- **Your own lists:** under **Add your own**, make a **temperature list** (for example "Ice cream · -10°F or colder"), a **quality standard** or a **process**, with the values and steps your store trained you on. Lists stay on your phone, show up in search and are included in backups. Guides you wrote in an earlier version moved here as processes. Don't include passwords, codes or anyone's personal details.
+- **Check-offs:** on your temperature and quality lists, tap the thermometer (or check mark) next to a line to record a reading. Coach Spark reads the limit from the standard's words when it can ("-10°F or colder", "33–38°F", "135°F or hotter") and shows whether the reading is within it; otherwise you choose yes or no. A reading outside the standard can become a task after you confirm. Today's checks are listed under the list, and all checks are kept and backed up.
+- **Share:** send any list or process as plain text to a team lead from the share button.
 
 Your store's posted standards, logs and your store manager always come first.
 
@@ -141,7 +146,7 @@ Tap **Timeline** on Home to see your shift hour by hour: your plan blocks plus a
 
 ## Team lead lists
 
-In **Associates**, tap the clipboard icon (top left), or go to **Settings › Team lead lists**. Each team lead (anyone whose role contains "lead") shows how many handed-off tasks are open.
+In **Associates**, tap the clipboard icon (top left), or open **More tools › Team lead lists** on Home. Each team lead (anyone whose role contains "lead") shows how many handed-off tasks are open.
 - **Hand off tasks:** pick tasks and confirm. They show as waiting until the person confirms.
 - **Send list:** texts them just the task titles and due times.
 - **Take back:** swipe a task to return it to you.
@@ -223,6 +228,8 @@ Fields: title, description, type, status (Inbox, Not Started, In Progress, Waiti
 
 Filters: Today, Upcoming, Inbox, Overdue, Waiting, No Date, Completed, Archived. Search covers titles, details, people, departments, requests and commitments.
 
+**Sort the Inbox in one pass:** in the Inbox filter, tap **Sort all**. Each item shows its suggested date, person and quadrant; tap **Apply**, **Skip** or delete it. Nothing changes until you choose.
+
 Row actions: swipe right to complete. Swipe left for **Tomorrow** or **Reschedule**. Long-press for Complete, Snooze, Reschedule, Move to Quadrant, Top 3, Delegate, Open, Duplicate, Archive and Delete (with an "Archive instead" option).
 
 **Unfinished tasks never disappear when a new day begins.** They become overdue and stay at the top.
@@ -246,15 +253,16 @@ Daily, weekdays, specific weekdays, every N days/weeks/months, and monthly on a 
 
 - Types: **Reminders**, **deadline alerts** (at a timed due date), **still-open alerts** (an hour after a missed deadline, or at shift end for date-only items) and a **daily briefing** at shift start.
 - Actions: **Mark Complete · Snooze 15 Minutes · Snooze 1 Hour · Tomorrow Morning · Open Task**. In the app you can also snooze 30 minutes or pick any date and time.
-- **Offline and reliable:** everything is scheduled with iOS ahead of time. The full schedule is recomputed whenever data changes, the app opens, an action runs, or iOS grants a background refresh. iOS keeps at most 64 pending alerts, so the app keeps the soonest 60.
+- **Offline and reliable:** everything is scheduled with iOS ahead of time. The full schedule is recomputed whenever data changes, the app opens, an action runs, or iOS grants a background refresh. iOS keeps at most 64 pending alerts, so task reminders take the soonest 60, or fewer when shift timeline nudges are scheduled, and the total stays within 64.
 - **Privacy:** "Hide task details in notifications" replaces titles with a generic message.
 - **Permission:** explained in onboarding and requested only once. If you decline, Settings shows a link to iOS Settings.
 
 ## Widgets
 
 - **Small:** today's most important task and the open and due counts.
-- **Medium:** top 3 priorities with **tap-to-complete checkboxes**, the next reminder, counts and a Capture link.
-- **Large:** up to 5 tasks with checkboxes, Eisenhower counts and follow-ups.
+- **Medium:** top 3 priorities with **tap-to-complete checkboxes** and a **move to next shift** arrow, the next reminder, counts and a Capture link.
+- **Large:** up to 5 tasks with checkboxes and next-shift arrows, Eisenhower counts and follow-ups.
+- Completing or moving a task from a widget clears its pending reminders right away; the app reschedules the rest the next time it opens.
 - **Lock Screen:** circular (priority count), rectangular (next reminder or today's primary task) and inline.
 - **Control Center / Action button:** Quick Capture.
 
@@ -266,9 +274,9 @@ Widgets read the same database through the App Group. They refresh after every c
 
 **Control Center:** add **Quick Capture**, **Floor Walk** and **Walk Notes** buttons from the Control Center editor. You can also put them on the Lock Screen or the Action button. Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
 
-## Intelligence (optional, on-device)
+## Suggestions (built-in rules, no AI)
 
-Smart capture, Eisenhower suggestions, follow-up detection, the daily briefing, the weekly review (repeatedly postponed tasks, stale inbox items, long waits, items that may no longer be needed) and Top 3 suggestions all run with built-in rules. You don't need an account, a subscription or an internet connection. On iOS 26 devices with Apple Intelligence, **Apple Intelligence briefing** can rephrase the briefing more naturally. Nothing changes without your confirmation.
+Smart capture, Eisenhower suggestions, follow-up detection, the daily briefing, the weekly review (repeatedly postponed tasks, stale inbox items, long waits, items that may no longer be needed) and Top 3 suggestions all run with built-in rules. You don't need an account, a subscription or an internet connection, and nothing is generated by AI. Nothing changes without your confirmation.
 
 ## Calendar (optional)
 
@@ -276,4 +284,8 @@ Turn it on in Settings › Calendar. Events then appear in the daily planner and
 
 ## Privacy & security
 
-There's an optional Face ID or passcode lock, plus a privacy blur in the app switcher when the lock is on. You can hide notification previews. Data is stored with iOS data protection, and you can export or restore it. There are no accounts, no analytics, no employer systems and no credentials.
+There's an optional Face ID or passcode lock, plus a privacy blur in the app switcher when the lock is on. App Lock covers the app itself; widgets, the Watch, the Lock Screen shift card and automatic backups in the Files app aren't locked. You can hide notification previews. Data is stored with iOS data protection, and you can export or restore it. There are no accounts, no analytics, no employer systems and no credentials.
+
+**Settings** holds only settings: your schedule, notifications, privacy, suggestions, calendar, your store (role, severe weather alerts, recurring tasks), Home and Lock Screen, data, and about. Tools are in **More tools** on Home.
+
+**Backups and deleting.** Backups include your tasks, notes, associates, Standards lists and check-offs, Season planner events, schedule, role and settings. Restoring adds what's missing, updates records that are newer in the backup, and never deletes anything. Lists, season events and settings already on the phone are kept as they are. **Delete all data** removes all of that plus every automatic backup on the iPhone; notification and appearance settings stay.

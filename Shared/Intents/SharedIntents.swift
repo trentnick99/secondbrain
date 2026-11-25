@@ -39,6 +39,39 @@ struct CompleteTaskIntent: AppIntent {
     }
 }
 
+/// Moves a task to your next shift. Used by the widget's arrow button (runs in the widget process).
+struct MoveToNextShiftIntent: AppIntent {
+    static var title: LocalizedStringResource = "Move Task to Next Shift"
+    static var description = IntentDescription("Moves a Coach Spark task to your next scheduled shift.")
+    static var isDiscoverable: Bool = false
+
+    @Parameter(title: "Task Identifier")
+    var taskID: String
+
+    init() {
+        self.taskID = ""
+    }
+
+    init(taskID: UUID) {
+        self.taskID = taskID.uuidString
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        guard let id = UUID(uuidString: taskID) else { return .result() }
+        let context = PersistenceController.shared.mainContext
+        if let task = TaskActions.task(with: id, in: context) {
+            TaskActions.carryForward([task], to: AppSettings.nextShiftDay(), in: context)
+        }
+        AppSettings.markExternalChange()
+        // Its reminders were for the old time; the app schedules new ones the next time it opens.
+        let kinds: [PlannedNotification.Kind] = [.reminder, .deadline, .overdue]
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: kinds.map { PlannedNotification.identifier(kind: $0, taskID: id) })
+        return .result()
+    }
+}
+
 /// Opens the Quick Capture sheet. Backs the Control Center / Action button control and Siri.
 struct OpenQuickCaptureIntent: AppIntent {
     static var title: LocalizedStringResource = "Quick Capture"

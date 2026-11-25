@@ -1,5 +1,6 @@
 import BackgroundTasks
 import Foundation
+import OSLog
 import SwiftData
 import WidgetKit
 
@@ -13,6 +14,8 @@ enum AppMaintenance {
     }
 
     private static var widgetReload: Task<Void, Never>?
+    /// Marks upkeep in Instruments (Points of Interest), so slow launches can be measured on a device.
+    private static let signposter = OSSignposter(subsystem: AppGroup.loggingSubsystem, category: "upkeep")
 
     static func configure() {
         DataChange.handlers = [
@@ -27,6 +30,8 @@ enum AppMaintenance {
 
     /// Launch / foreground: create recurring occurrences, reschedule notifications, refresh widgets.
     static func runForegroundUpkeep() async {
+        let interval = signposter.beginInterval("Foreground upkeep")
+        defer { signposter.endInterval("Foreground upkeep", interval) }
         let context = PersistenceController.shared.mainContext
         RecurrenceService.materialize(in: context)
         await NotificationService.shared.resyncNow()

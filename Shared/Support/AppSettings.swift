@@ -235,6 +235,12 @@ enum AskStepsStorage {
     }
 }
 
+/// The person's own Season planner events, kept as JSON in settings.
+enum StoreEventStorage {
+    static func decode(_ json: String) -> [StoreEvent] { JSONStorage.decode([StoreEvent].self, from: json) ?? [] }
+    static func encode(_ events: [StoreEvent]) -> String { JSONStorage.encode(events) }
+}
+
 enum ScheduleStorage {
     static func decode(_ json: String) -> ShiftSchedule {
         guard let data = json.data(using: .utf8), !json.isEmpty,

@@ -84,4 +84,19 @@ final class StandardsTests: XCTestCase {
         let data = try JSONEncoder().encode([list])
         XCTAssertEqual(try JSONDecoder().decode([StandardList].self, from: data), [list])
     }
+
+    func testShareTextIsPlainAndComplete() {
+        let temps = StandardList(title: "Cooler temps", kind: .temperatures,
+                                 items: [StandardItem(name: "Ice cream", value: "-10°F or colder"), StandardItem(name: "Milk")],
+                                 note: "Posted on the cooler door")
+        XCTAssertEqual(Standards.shareText(temps), "Cooler temps\n• Ice cream: -10°F or colder\n• Milk\nPosted on the cooler door")
+        let process = StandardList(title: "Baler", kind: .process, items: [StandardItem(name: "Check the e-stop"), StandardItem(name: "Call facilities")])
+        XCTAssertEqual(Standards.shareText(process), "Baler\n1. Check the e-stop\n2. Call facilities")
+        let food = Standards.shareText(Standards.foodTemperatures)
+        XCTAssertTrue(food.contains("Shell eggs: Stored and displayed at 45°F or colder"))
+        XCTAssertTrue(food.contains("FDA Food Code"))
+        XCTAssertTrue(food.hasSuffix(Standards.disclaimer))
+        let door = Standards.shareText(CoachGuides.guide(id: "freezer-door")!)
+        XCTAssertTrue(door.hasPrefix("Freezer or cooler door won't open on its own\n1. "))
+    }
 }

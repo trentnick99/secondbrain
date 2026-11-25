@@ -198,6 +198,14 @@ private struct WidgetTaskRow: View {
                     }
                 }
             }
+            Spacer(minLength: 4)
+            Button(intent: MoveToNextShiftIntent(taskID: item.id)) {
+                Image(systemName: "arrow.uturn.forward")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Move \(item.title) to next shift")
         }
     }
 }

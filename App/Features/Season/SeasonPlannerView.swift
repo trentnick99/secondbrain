@@ -13,6 +13,7 @@ struct SeasonPlannerView: View {
     @State private var confirmAll: RetailMoment?
     @AppStorage(SettingsKey.seasonMyAreasOnly, store: AppGroup.defaults) private var myAreasOnly = SettingsDefault.seasonMyAreasOnly
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
+    @AppStorage(SettingsKey.customSeasonEvents, store: AppGroup.defaults) private var eventsJSON = ""
     @State private var now = Date()
 
     private var calendar: Calendar { .current }
@@ -20,7 +21,8 @@ struct SeasonPlannerView: View {
     var body: some View {
         let added = SeasonPlanStore.keys(addedRaw)
         let hidden = SeasonPlanStore.keys(hiddenRaw)
-        let all = RetailCalendar.upcoming(from: now, days: 365, calendar: calendar)
+        let storeEvents = StoreEventStorage.decode(eventsJSON)
+        let all = RetailCalendar.upcoming(from: now, days: 365, calendar: calendar, including: storeEvents)
         let role = RoleStorage.decode(roleJSON)
         let filtering = myAreasOnly && SeasonFilter.canFilter(role)
         let visible = all.filter { (showHidden || !hidden.contains($0.key)) && (!filtering || SeasonFilter.isRelevant($0, to: role)) }
@@ -37,6 +39,25 @@ struct SeasonPlannerView: View {
                     }
                 } footer: {
                     Text("Tap **Add** on a step to make it a task. Due dates move to your last workday before the event. Swipe an item to hide it if it doesn't apply to your store.")
+                }
+
+                Section {
+                    ForEach(storeEvents.sorted { $0.start < $1.start }) { event in
+                        NavigationLink { StoreEventEditor(existing: event) } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(event.title).font(.subheadline.weight(.semibold))
+                                Text(eventDates(event)).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    NavigationLink { StoreEventEditor(existing: nil) } label: {
+                        Label("Add an event", systemImage: "plus.circle")
+                    }
+                    .accessibilityIdentifier("addStoreEvent")
+                } header: {
+                    Text("Your store's events")
+                } footer: {
+                    Text("Add a remodel, an inventory count, a local festival or next year's deal dates, with the prep steps your store uses. They show up below like any other event.")
                 }
 
                 ForEach(months(visible), id: \.start) { month in
@@ -85,6 +106,12 @@ struct SeasonPlannerView: View {
             }
             .onAppear { now = Date() }
         }
+    }
+
+    private func eventDates(_ event: StoreEvent) -> String {
+        let start = event.start.formatted(date: .abbreviated, time: .omitted)
+        guard let end = event.end else { return start }
+        return start + " – " + end.formatted(date: .abbreviated, time: .omitted)
     }
 
     private func remaining(_ moment: RetailMoment, added: Set<String>) -> [PrepStep] {
@@ -222,6 +249,7 @@ struct SeasonComingUpCard: View {
     @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.seasonAdded, store: AppGroup.defaults) private var addedRaw = ""
     @AppStorage(SettingsKey.seasonHidden, store: AppGroup.defaults) private var hiddenRaw = ""
+    @AppStorage(SettingsKey.customSeasonEvents, store: AppGroup.defaults) private var eventsJSON = ""
     let now: Date
 
     var body: some View {
@@ -234,9 +262,10 @@ struct SeasonComingUpCard: View {
             !hidden.contains(m.key) && (!AppGroup.defaults.bool(forKey: SettingsKey.seasonMyAreasOnly, default: SettingsDefault.seasonMyAreasOnly)
                                         || SeasonFilter.isRelevant(m, to: role))
         }
-        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar).filter(mine)
+        let storeEvents = StoreEventStorage.decode(eventsJSON)
+        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar, including: storeEvents).filter(mine)
         let moments = soon.isEmpty
-            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar).filter(mine).prefix(1))
+            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar, including: storeEvents).filter(mine).prefix(1))
             : Array(soon.prefix(3))
         if !moments.isEmpty {
             Button { router.open(.seasonPlanner) } label: {
@@ -281,5 +310,101 @@ struct SeasonComingUpCard: View {
         case 1: return "\(when) · 1 prep step to add"
         default: return "\(when) · \(toAdd) prep steps to add"
         }
+    }
+}
+
+/// Add or edit one of your store's events and its prep steps.
+struct StoreEventEditor: View {
+    let existing: StoreEvent?
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage(SettingsKey.customSeasonEvents, store: AppGroup.defaults) private var eventsJSON = ""
+    @State private var draft = StoreEvent()
+    @State private var multiDay = false
+    @State private var loaded = false
+    @State private var confirmDelete = false
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("Event, e.g. Remodel walk", text: $draft.title)
+                    .accessibilityIdentifier("storeEventTitle")
+                DatePicker("Date", selection: $draft.start, displayedComponents: .date)
+                Toggle("Runs more than one day", isOn: $multiDay)
+                if multiDay {
+                    DatePicker("Ends", selection: Binding(get: { draft.end ?? draft.start }, set: { draft.end = $0 }),
+                               in: draft.start..., displayedComponents: .date)
+                }
+                TextField("Note (optional)", text: $draft.note, axis: .vertical)
+            }
+            Section {
+                ForEach($draft.steps) { $step in
+                    VStack(alignment: .leading, spacing: 6) {
+                        TextField("Prep step", text: $step.title, axis: .vertical)
+                        Stepper(value: $step.daysBefore, in: -14...90) {
+                            Text(daysText(step.daysBefore)).font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .onDelete { draft.steps.remove(atOffsets: $0) }
+                Button {
+                    draft.steps.append(StoreEvent.Step())
+                } label: {
+                    Label("Add a prep step", systemImage: "plus")
+                }
+            } header: {
+                Text("Prep steps")
+            } footer: {
+                Text("Each step can become a task from the planner. Swipe a step to delete it.")
+            }
+            if existing != nil {
+                Section {
+                    Button("Delete event", role: .destructive) { confirmDelete = true }
+                }
+            }
+        }
+        .navigationTitle(existing == nil ? "New event" : "Edit event")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") { save() }
+                    .disabled(!draft.isValid)
+                    .accessibilityIdentifier("storeEventSave")
+            }
+        }
+        .confirmationDialog("Delete this event?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                eventsJSON = StoreEventStorage.encode(StoreEventStorage.decode(eventsJSON).filter { $0.id != draft.id })
+                dismiss()
+            }
+        } message: {
+            Text("Tasks you already added from it are kept.")
+        }
+        .onAppear {
+            guard !loaded else { return }
+            draft = existing ?? StoreEvent(start: Calendar.current.startOfDay(for: Date()),
+                                           steps: [StoreEvent.Step(title: "", daysBefore: 7)])
+            multiDay = draft.end != nil
+            loaded = true
+        }
+    }
+
+    private func daysText(_ days: Int) -> String {
+        switch days {
+        case 0: return "On the day"
+        case 1: return "1 day before"
+        case -1: return "1 day after"
+        case ..<0: return "\(-days) days after"
+        default: return "\(days) days before"
+        }
+    }
+
+    private func save() {
+        var event = draft
+        if !multiDay { event.end = nil }
+        event = event.cleaned(calendar: .current)
+        var all = StoreEventStorage.decode(eventsJSON)
+        if let index = all.firstIndex(where: { $0.id == event.id }) { all[index] = event } else { all.append(event) }
+        eventsJSON = StoreEventStorage.encode(all)
+        dismiss()
     }
 }

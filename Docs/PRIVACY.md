@@ -1,6 +1,6 @@
 # Coach Spark: Privacy Policy
 
-_Last updated: November 24, 2026_
+_Last updated: November 25, 2026_
 
 Coach Spark (formerly Second Brain for Coaches) is a personal organizer for retail store leaders. It is an independent app. It is **not affiliated with, endorsed by or connected to Walmart** or any other retailer, and it does not connect to any employer's systems.
 
@@ -12,7 +12,9 @@ Coach Spark (formerly Second Brain for Coaches) is a personal organizer for reta
 
 ## What the app stores
 
-Tasks, notes, follow-ups, your schedule, your role, your guides, and similar information you enter are stored on your device in the app's private storage. If you turn on **iCloud sync** in Settings, that data syncs through your own private iCloud account, which Apple runs; the developer has no access to it. Backups you export are files you control.
+Tasks, notes, follow-ups, your schedule, your role, your Standards lists and the readings you record against them, your store's season events, and similar information you enter are stored on your device in the app's private storage. iCloud sync isn't turned on in current builds; if a future build offers it, data would sync only through your own private iCloud account, which Apple runs, and the developer would have no access to it.
+
+**Backups.** The app keeps up to 14 daily backups in its folder in the Files app (On My iPhone › Coach Spark), and you can export one any time. A backup includes your records, lists, readings, season events, schedule, role and app settings. Backup files are files you control; the optional App Lock doesn't cover them, or widgets, the Watch app or the Lock Screen shift card.
 
 The app reminds you not to store medical information, disciplinary records, passwords or other confidential personnel information.
 
@@ -24,7 +26,7 @@ The app reminds you not to store medical information, disciplinary records, pass
 | **Voice capture and walk notes** | Speech is recognized by Apple's speech recognition, on your iPhone when the device supports it. Otherwise Apple may process the audio under its own privacy policy. Audio isn't saved by the app. |
 | **Scan and Photo import** | Text is read from images on your iPhone with Apple's Vision framework. Images aren't saved or sent anywhere. |
 | **Standards** | Lists work offline, and what you search for or write stays on the phone. Source links open in your browser only when you tap them. |
-| **Daily briefing** (optional) | On iPhones that support Apple Intelligence, the briefing can be written by Apple's on-device model. Nothing leaves the phone. |
+| **Daily briefing** | Written on the phone by the app's own rules. No AI model is used and nothing leaves the phone. |
 | **Calendar** (optional) | If you allow it, the app reads your calendar on the device to show events next to your tasks. Nothing is uploaded. |
 | **Notifications, widgets, Live Activities and Siri** | These are handled by iOS on your device. |
 | **Sharing** (handoffs, huddles, lists, recaps) | Text is sent only when you choose a recipient in the iOS share sheet. |
@@ -35,7 +37,9 @@ The app isn't directed to children under 13 and doesn't knowingly collect inform
 
 ## Deleting your data
 
-Deleting the app removes its data from your iPhone. If you used iCloud sync, you can also remove the app's data in **Settings › [your name] › iCloud › Manage Account Storage**.
+**Settings › Data › Delete all data** (with two confirmations) removes every record, your lists and readings, season events, schedule, role, shift plan, floor walk, store location and every automatic backup on the iPhone. Notification and appearance settings stay. Backups you exported elsewhere aren't touched.
+
+Deleting the app removes all of its data from your iPhone.
 
 ## Changes and contact
 

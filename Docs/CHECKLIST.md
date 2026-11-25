@@ -18,7 +18,7 @@
 | 9 | Recurring tasks (daily, weekdays, weekdays list, monthly, intervals; no duplicates; pause / discontinue) | ✅ |
 | 10 | Widgets (small, medium, large, 3 Lock Screen families, Control Center control, interactive complete) | ✅ |
 | 10 | App Intents and Siri phrases (add, remind, priorities, overdue, follow-ups, end shift, quick capture) | ✅ |
-| 11 | Optional Apple Calendar (events, conflicts, add on request) and optional Apple Intelligence briefing | ✅ |
+| 11 | Optional Apple Calendar (events, conflicts, add on request); briefing from built-in rules (AI briefing removed in build 13) | ✅ |
 | 11 | End My Shift and Weekly Review | ✅ |
 | 11 | Face ID lock, privacy previews, backup / restore, daily automatic backup, fictional sample data | ✅ |
 | 12 | Engine tests: 73/73 passing; syntax check of all files; project validation | ✅ |

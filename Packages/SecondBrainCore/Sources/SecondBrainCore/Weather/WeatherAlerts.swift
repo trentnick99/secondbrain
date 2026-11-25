@@ -47,7 +47,7 @@ public struct WeatherAlert: Identifiable, Equatable, Codable, Sendable {
 }
 
 public enum WeatherAlerts {
-    public static let userAgent = "SecondBrainForCoaches/1.0 (github.com/trentnick99/secondbrain)"
+    public static let userAgent = "CoachSpark/1.0 (github.com/trentnick99/secondbrain)"
     public static let moreInfoURL = URL(string: "https://www.weather.gov")!
 
     /// Active alerts for a point. Coordinates are rounded to about 100 m; nothing else is sent.

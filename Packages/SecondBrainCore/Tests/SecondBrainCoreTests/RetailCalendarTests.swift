@@ -122,3 +122,44 @@ final class HolidayCaptureTests: XCTestCase {
         XCTAssertEqual(StoreRole.infer(from: "Emerging Store Manager"), .storeManager)
     }
 }
+
+final class StoreEventTests: XCTestCase {
+    let cal = Fixtures.calendar
+
+    func testYourEventsAppearWithTheirPrepSteps() {
+        let remodel = StoreEvent(title: "Remodel walk", start: Fixtures.date(2027, 1, 20), note: "Regional team visiting",
+                                 steps: [StoreEvent.Step(title: "Features full and signed", daysBefore: 5),
+                                         StoreEvent.Step(title: "  ", daysBefore: 1)])
+        let upcoming = RetailCalendar.upcoming(from: Fixtures.now, days: 90, calendar: cal, including: [remodel])
+        let moment = upcoming.first { $0.key == remodel.key }
+        XCTAssertNotNil(moment, "Your event is in the planner")
+        XCTAssertEqual(moment?.kind, .store)
+        XCTAssertEqual(moment?.certainty, .yours)
+        XCTAssertEqual(moment?.prep.map(\.title), ["Features full and signed"], "Empty steps are skipped")
+        XCTAssertTrue(moment?.areas.isEmpty == true, "Store-wide, so area filters keep it")
+        XCTAssertFalse(RetailCalendar.upcoming(from: Fixtures.now, days: 30, calendar: cal, including: [remodel])
+            .contains { $0.key == remodel.key }, "Outside the window it isn't shown")
+    }
+
+    func testStepKeysSurviveEditing() {
+        let step = StoreEvent.Step(title: "Order extra carts", daysBefore: 10)
+        var event = StoreEvent(title: "Local festival", start: Fixtures.date(2026, 12, 12), steps: [step])
+        let before = event.moment(calendar: cal).prep.first?.key
+        event.steps.insert(StoreEvent.Step(title: "Staffing plan", daysBefore: 14), at: 0)
+        event.title = "Downtown festival"
+        XCTAssertEqual(event.moment(calendar: cal).prep.last?.key, before, "An added step doesn't change the others' keys")
+    }
+
+    func testCleanedEventsAreTidy() {
+        let event = StoreEvent(title: "  Inventory  ", start: Fixtures.date(2026, 12, 3, 15), end: Fixtures.date(2026, 12, 1),
+                               steps: [StoreEvent.Step(title: " Count the backroom ", daysBefore: 2), StoreEvent.Step(title: "")])
+            .cleaned(calendar: cal)
+        XCTAssertEqual(event.title, "Inventory")
+        XCTAssertEqual(event.start, Fixtures.date(2026, 12, 3))
+        XCTAssertNil(event.end, "An end before the start collapses to a one-day event")
+        XCTAssertEqual(event.steps.map(\.title), ["Count the backroom"])
+        XCTAssertFalse(StoreEvent(title: "  ").isValid)
+        let decoded = try? JSONDecoder().decode([StoreEvent].self, from: JSONEncoder().encode([event]))
+        XCTAssertEqual(decoded, [event])
+    }
+}

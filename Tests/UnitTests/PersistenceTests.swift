@@ -360,6 +360,46 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(try BackupService.restore(data, into: other, defaults: target).settings, 0)
     }
 
+    func testSeasonEventsAreAddedByIDAndTheOnesOnThePhoneWin() throws {
+        let remodel = StoreEvent(title: "Remodel walk", start: Date(), steps: [.init(title: "Clear the back room", daysBefore: 3)])
+        var renamed = remodel
+        renamed.title = "Remodel walk (moved)"
+        let inventory = StoreEvent(title: "Inventory count", start: Date())
+
+        let source = try XCTUnwrap(UserDefaults(suiteName: "events-source-\(UUID())"))
+        source.set(StoreEventStorage.encode([remodel, inventory]), forKey: SettingsKey.customSeasonEvents)
+        let data = try BackupService.makeBackup(from: context, defaults: source)
+
+        let target = try XCTUnwrap(UserDefaults(suiteName: "events-target-\(UUID())"))
+        target.set(StoreEventStorage.encode([renamed]), forKey: SettingsKey.customSeasonEvents)
+        _ = try BackupService.restore(data, into: ModelContext(PersistenceController.makeInMemory()), defaults: target)
+
+        let events = StoreEventStorage.decode(target.string(forKey: SettingsKey.customSeasonEvents) ?? "")
+        XCTAssertEqual(events.map(\.title), ["Remodel walk (moved)", "Inventory count"],
+                       "A missing event is added; the phone's own copy is kept")
+    }
+
+    func testChecksAreBackedUpRestoredOnceAndDeleted() throws {
+        let check = StandardCheck(listID: UUID(), itemID: UUID(), listTitle: "Freezer temps", itemName: "Ice cream",
+                                  standard: "-10°F or colder", reading: "5°F", isWithinStandard: false, note: "Door left open")
+        context.insert(check)
+        try context.save()
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "checks-\(UUID())"))
+        let data = try BackupService.makeBackup(from: context, defaults: defaults)
+        XCTAssertEqual(try BackupService.decode(data).checks?.count, 1)
+
+        let other = ModelContext(PersistenceController.makeInMemory())
+        _ = try BackupService.restore(data, into: other, defaults: defaults)
+        _ = try BackupService.restore(data, into: other, defaults: defaults)
+        let restored = try other.fetch(FetchDescriptor<StandardCheck>())
+        XCTAssertEqual(restored.count, 1, "Restoring twice doesn't duplicate")
+        XCTAssertEqual(restored.first?.reading, "5°F")
+        XCTAssertEqual(restored.first?.isWithinStandard, false)
+
+        BackupService.deleteEverything(in: other, defaults: defaults, backupsFolder: nil)
+        XCTAssertTrue(try other.fetch(FetchDescriptor<StandardCheck>()).isEmpty)
+    }
+
     func testVersionOneBackupStillRestores() throws {
         let json = """
         {"formatVersion":1,"exportedAt":"2026-11-20T10:00:00Z","appVersion":"1.0","tasks":[],"associates":[],
@@ -405,6 +445,33 @@ final class PersistenceTests: XCTestCase {
         }
         XCTAssertEqual(BackupService.automaticBackups(in: folder).map(\.lastPathComponent),
                        ["CoachSpark-2026-11-25.json", "SecondBrain-2026-11-24.json", "SecondBrain-2026-11-23.json"])
+    }
+
+    // MARK: Performance
+
+    /// A year of heavy use: Home, Matrix and Tasks read every task and build the day's agenda on each
+    /// redraw. This keeps that under half a second for 5,000 tasks on a CI simulator (debug build).
+    func testHomeAgendaStaysQuickWithFiveThousandTasks() throws {
+        let start = Date().addingTimeInterval(-365 * 86_400)
+        for i in 0..<5_000 {
+            let task = TaskItem(title: "Task \(i)")
+            task.dueDate = start.addingTimeInterval(Double(i) * 6_300)
+            if i % 5 != 0 {
+                task.status = .completed
+                task.completedAt = task.dueDate
+            }
+            context.insert(task)
+        }
+        try context.save()
+        let tasks = try context.fetch(FetchDescriptor<TaskItem>())
+        XCTAssertEqual(tasks.count, 5_000)
+        let clock = ContinuousClock()
+        let elapsed = clock.measure {
+            let agenda = DayAgenda.build(tasks: tasks.map(\.snapshot), day: Date(), now: Date(), calendar: .current)
+            XCTAssertFalse(agenda.overdue.isEmpty)
+        }
+        let seconds = Double(elapsed.components.seconds) + Double(elapsed.components.attoseconds) / 1e18
+        XCTAssertLessThan(seconds, 0.5, "Building Home's agenda from 5,000 tasks took \(seconds) s")
     }
 
     // MARK: Notifications plan from real models

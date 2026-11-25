@@ -146,25 +146,50 @@ final class SecondBrainUITests: XCTestCase {
 
     func testYourOwnTemperatureListIsSearchable() throws {
         openMoreTool("Standards")
-        let new = app.descendants(matching: .any).matching(identifier: "newStandard-temperatures").firstMatch
-        XCTAssertTrue(scrollTo(new), "New temperature list is offered")
-        new.tap()
-        let title = app.descendants(matching: .any).matching(identifier: "standardTitle").firstMatch
-        XCTAssertTrue(title.waitForExistence(timeout: 5))
-        title.tap()
-        title.typeText("Frozen and dairy temps")
-        let name = app.descendants(matching: .any).matching(identifier: "standardItemName-0").firstMatch
-        name.tap()
-        name.typeText("Ice cream")
-        let value = app.descendants(matching: .any).matching(identifier: "standardItemValue-0").firstMatch
-        value.tap()
-        value.typeText("-10 F or colder")
-        app.buttons["standardSave"].firstMatch.tap()
+        createTemperatureList(title: "Frozen and dairy temps", item: "Ice cream", value: "-10 F or colder")
         let search = app.searchFields.firstMatch
         XCTAssertTrue(scrollTo(search, up: true), "Back on Standards")
         search.tap()
         search.typeText("ice cream")
         XCTAssertTrue(element(containing: "Frozen and dairy temps").waitForExistence(timeout: 5), "Your list is found")
+    }
+
+    func testAReadingOutsideTheStandardCanBecomeATask() throws {
+        openMoreTool("Standards")
+        createTemperatureList(title: "Freezer temps", item: "Ice cream", value: "-10 F or colder")
+        let list = app.buttons["standardList-Freezer temps"].firstMatch
+        XCTAssertTrue(scrollTo(list, up: true), "Your list is on Standards")
+        list.tap()
+        let check = app.buttons["check-Ice cream"].firstMatch
+        XCTAssertTrue(check.waitForExistence(timeout: 5), "Each line can be checked")
+        check.tap()
+        let reading = app.descendants(matching: .any).matching(identifier: "checkReading").firstMatch
+        XCTAssertTrue(reading.waitForExistence(timeout: 5))
+        reading.typeText("5")
+        XCTAssertTrue(element(containing: "Outside the standard").waitForExistence(timeout: 5), "The limit is read from the words")
+        app.buttons["checkSave"].firstMatch.tap()
+        let add = app.buttons["Add task"].firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 5), "A task is only added after you confirm")
+        add.tap()
+        XCTAssertTrue(element(containing: "Added to Tasks").waitForExistence(timeout: 5))
+    }
+
+    /// From Standards: makes a temperature list with one line.
+    private func createTemperatureList(title: String, item: String, value: String) {
+        let new = app.descendants(matching: .any).matching(identifier: "newStandard-temperatures").firstMatch
+        XCTAssertTrue(scrollTo(new), "New temperature list is offered")
+        new.tap()
+        let titleField = app.descendants(matching: .any).matching(identifier: "standardTitle").firstMatch
+        XCTAssertTrue(titleField.waitForExistence(timeout: 5))
+        titleField.tap()
+        titleField.typeText(title)
+        let name = app.descendants(matching: .any).matching(identifier: "standardItemName-0").firstMatch
+        name.tap()
+        name.typeText(item)
+        let valueField = app.descendants(matching: .any).matching(identifier: "standardItemValue-0").firstMatch
+        valueField.tap()
+        valueField.typeText(value)
+        app.buttons["standardSave"].firstMatch.tap()
     }
 
     func testHomeShowsNotesUnderTopThree() throws {
@@ -183,6 +208,19 @@ final class SecondBrainUITests: XCTestCase {
         app.open(try XCTUnwrap(URL(string: "secondbrain://standards?q=egg")))
         XCTAssertTrue(app.buttons["reference-food-temps"].firstMatch.waitForExistence(timeout: 10),
                       "A link replaces the open sheet instead of doing nothing")
+    }
+
+    func testYourOwnSeasonEventShowsUpWithItsPrep() throws {
+        openMoreTool("Season planner")
+        let add = app.descendants(matching: .any).matching(identifier: "addStoreEvent").firstMatch
+        XCTAssertTrue(scrollTo(add), "You can add your own event")
+        add.tap()
+        let title = app.descendants(matching: .any).matching(identifier: "storeEventTitle").firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        title.tap()
+        title.typeText("Remodel walk")
+        app.buttons["storeEventSave"].firstMatch.tap()
+        XCTAssertTrue(element(containing: "Remodel walk").waitForExistence(timeout: 5), "It's listed with your events")
     }
 
     /// Taps one of the four big tools on Home.

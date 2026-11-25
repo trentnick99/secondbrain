@@ -4,10 +4,11 @@ import Foundation
 /// seasonal set, or a safety/operations change such as the clocks moving.
 public struct RetailMoment: Identifiable, Hashable, Sendable {
     public enum Kind: String, Sendable {
-        case holiday, salesEvent, seasonal, operations, safety, fiscal
+        case holiday, salesEvent, seasonal, operations, safety, fiscal, store
 
         public var title: String {
             switch self {
+            case .store: return "Your event"
             case .holiday: return "Holiday"
             case .salesEvent: return "Sales event"
             case .seasonal: return "Seasonal set"
@@ -19,6 +20,7 @@ public struct RetailMoment: Identifiable, Hashable, Sendable {
 
         public var systemImage: String {
             switch self {
+            case .store: return "storefront"
             case .holiday: return "gift"
             case .salesEvent: return "tag"
             case .seasonal: return "leaf.arrow.triangle.circlepath"
@@ -37,9 +39,12 @@ public struct RetailMoment: Identifiable, Hashable, Sendable {
         case announced
         /// Usual timing only — confirm with your store's modular, feature or company calendar.
         case typical
+        /// An event the person added for their store.
+        case yours
 
         public var label: String {
             switch self {
+            case .yours: return "Added by you"
             case .calendar: return "Calendar date"
             case .announced: return "Announced"
             case .typical: return "Typical timing — confirm locally"
@@ -200,14 +205,16 @@ public enum RetailCalendar {
 
     // MARK: Moments
 
-    /// Everything from the start of `now`'s day through `days` ahead, earliest first.
-    public static func upcoming(from now: Date, days: Int, calendar: Calendar) -> [RetailMoment] {
+    /// Everything from the start of `now`'s day through `days` ahead, earliest first, including the
+    /// person's own store events.
+    public static func upcoming(from now: Date, days: Int, calendar: Calendar,
+                                including storeEvents: [StoreEvent] = []) -> [RetailMoment] {
         let math = DateMath(calendar: calendar)
         let today = math.startOfDay(now)
         let horizon = math.addingDays(days, to: today)
         let year = calendar.component(.year, from: today)
-        return ((year - 1)...(year + 1))
-            .flatMap { moments(inYear: $0, calendar: calendar) }
+        return (((year - 1)...(year + 1)).flatMap { moments(inYear: $0, calendar: calendar) }
+                + storeEvents.filter(\.isValid).map { $0.moment(calendar: calendar) })
             .filter { ($0.end ?? $0.start) >= today && $0.start <= horizon }
             .sorted { $0.start != $1.start ? $0.start < $1.start : $0.title < $1.title }
     }
@@ -431,5 +438,73 @@ public enum RetailCalendar {
         let month = (h + l - 7 * m + 114) / 31
         let dayOfMonth = (h + l - 7 * m + 114) % 31 + 1
         return day(year, month, dayOfMonth, calendar)
+    }
+}
+
+// MARK: - Your store events
+
+/// An event the person adds for their store: a remodel, an inventory count, a local festival, or
+/// next year's deal dates once they're announced. Kept on the phone and included in backups.
+public struct StoreEvent: Codable, Hashable, Identifiable, Sendable {
+    /// A prep step, due a number of days before the event (negative = after it).
+    public struct Step: Codable, Hashable, Identifiable, Sendable {
+        public var id: UUID
+        public var title: String
+        public var daysBefore: Int
+
+        public init(id: UUID = UUID(), title: String = "", daysBefore: Int = 7) {
+            self.id = id
+            self.title = title
+            self.daysBefore = daysBefore
+        }
+    }
+
+    public var id: UUID
+    public var title: String
+    public var start: Date
+    public var end: Date?
+    public var note: String
+    public var steps: [Step]
+
+    public init(id: UUID = UUID(), title: String = "", start: Date = Date(), end: Date? = nil,
+                note: String = "", steps: [Step] = []) {
+        self.id = id
+        self.title = title
+        self.start = start
+        self.end = end
+        self.note = note
+        self.steps = steps
+    }
+
+    public var isValid: Bool { !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+
+    /// The key used for hiding the event; each step's key adds its own id, so editing one step never
+    /// changes which steps are already added as tasks.
+    public var key: String { "store-" + id.uuidString }
+
+    /// Trimmed title, note and steps, with empty steps dropped and the end never before the start.
+    public func cleaned(calendar: Calendar) -> StoreEvent {
+        let math = DateMath(calendar: calendar)
+        var event = self
+        event.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        event.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        event.start = math.startOfDay(start)
+        if let end { event.end = max(math.startOfDay(end), event.start) }
+        if event.end == event.start { event.end = nil }
+        event.steps = steps.compactMap { step in
+            let title = step.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            return title.isEmpty ? nil : Step(id: step.id, title: title, daysBefore: step.daysBefore)
+        }
+        return event
+    }
+
+    public func moment(calendar: Calendar) -> RetailMoment {
+        let math = DateMath(calendar: calendar)
+        let prep = steps.filter { !$0.title.trimmingCharacters(in: .whitespaces).isEmpty }.map { step in
+            PrepStep(key: "\(key)#\(step.id.uuidString)", title: step.title, daysBefore: step.daysBefore,
+                     category: .operations, department: nil)
+        }
+        return RetailMoment(key: key, title: title, start: math.startOfDay(start), end: end.map(math.startOfDay),
+                            kind: .store, certainty: .yours, areas: [], note: note, prep: prep)
     }
 }

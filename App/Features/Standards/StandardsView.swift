@@ -220,6 +220,12 @@ struct ReferenceDetailView: View {
         }
         .navigationTitle(reference.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                ShareLink(item: Standards.shareText(reference)) { Image(systemName: "square.and.arrow.up") }
+                    .accessibilityLabel("Share this list")
+            }
+        }
     }
 }
 
@@ -231,6 +237,19 @@ struct StandardListDetailView: View {
     @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.standardLists, store: AppGroup.defaults) private var listsJSON = ""
     @State private var pendingStep: String?
+    @State private var checking: StandardItem?
+    @Query private var checks: [StandardCheck]
+
+    init(listID: UUID) {
+        self.listID = listID
+        _checks = Query(filter: #Predicate<StandardCheck> { $0.listID == listID }, sort: \.checkedAt, order: .reverse)
+    }
+
+    /// Checks from today, newest first.
+    private var todaysChecks: [StandardCheck] {
+        let start = Calendar.current.startOfDay(for: Date())
+        return checks.filter { $0.checkedAt >= start }
+    }
 
     private var list: StandardList? { StandardListStorage.decode(listsJSON).first { $0.id == listID } }
 
@@ -246,6 +265,14 @@ struct StandardListDetailView: View {
                                 Text(item.value)
                                     .font(.body.weight(.semibold))
                                     .multilineTextAlignment(.trailing)
+                                Button { checking = item } label: {
+                                    Image(systemName: list.kind == .temperatures ? "thermometer.medium" : "checkmark.circle")
+                                        .imageScale(.large)
+                                        .frame(minWidth: 36)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel("Check \(item.name)")
+                                .accessibilityIdentifier("check-\(item.name)")
                             }
                             .textSelection(.enabled)
                         } else {
@@ -268,6 +295,22 @@ struct StandardListDetailView: View {
                 } footer: {
                     if !list.kind.hasValues { Text("Tap + to add a step to your tasks. You'll confirm first.") }
                 }
+                if list.kind.hasValues {
+                    Section {
+                        if todaysChecks.isEmpty {
+                            Text(list.kind == .temperatures ? "No readings yet today. Tap the thermometer to record one."
+                                                            : "No checks yet today. Tap the check mark to record one.")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        ForEach(todaysChecks) { check in CheckRow(check: check) }
+                    } header: {
+                        Text("Today's checks")
+                    } footer: {
+                        if checks.count > todaysChecks.count {
+                            Text("\(checks.count - todaysChecks.count) earlier check\(checks.count - todaysChecks.count == 1 ? "" : "s") are kept and included in backups.")
+                        }
+                    }
+                }
                 if !list.note.isEmpty {
                     Section("Note") { Text(list.note) }
                 }
@@ -277,10 +320,16 @@ struct StandardListDetailView: View {
         }
         .navigationTitle(list?.title ?? "List")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $checking) { item in
+            if let list { StandardCheckSheet(list: list, item: item) }
+        }
         .toolbar {
             if let list {
                 ToolbarItem(placement: .primaryAction) {
                     NavigationLink("Edit", value: StandardEditorRef(id: list.id, kind: list.kind))
+                }
+                ToolbarItem(placement: .secondaryAction) {
+                    ShareLink(item: Standards.shareText(list)) { Label("Share", systemImage: "square.and.arrow.up") }
                 }
             }
         }
@@ -474,6 +523,12 @@ struct GuideDetailView: View {
         }
         .navigationTitle(guide.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                ShareLink(item: Standards.shareText(guide)) { Image(systemName: "square.and.arrow.up") }
+                    .accessibilityLabel("Share these steps")
+            }
+        }
         .onAppear {
             guard !loaded else { return }
             ownSteps = AskStepsStorage.decode(storeStepsJSON)[guide.id] ?? ""
@@ -519,5 +574,161 @@ enum StepTask {
         if CaptureSaver.save(draft, in: context) != nil {
             router.showToast("Added to Tasks")
         }
+    }
+}
+
+// MARK: - Check-offs
+
+private struct CheckRow: View {
+    let check: StandardCheck
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Image(systemName: check.isWithinStandard ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                .foregroundStyle(check.isWithinStandard ? Theme.success : Theme.danger)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(check.reading.isEmpty ? check.itemName : "\(check.itemName) · \(check.reading)")
+                    .font(.subheadline.weight(.semibold))
+                Text(check.isWithinStandard ? "Within \(check.standard)" : "Outside \(check.standard)")
+                    .font(.caption)
+                    .foregroundStyle(check.isWithinStandard ? Color.secondary : Theme.danger)
+                if !check.note.isEmpty {
+                    Text(check.note).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Text(check.checkedAt.formatted(date: .omitted, time: .shortened))
+                .font(.caption).foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Record one reading or check against a line of your list. For temperatures, Coach Spark reads the
+/// limit from the standard's words when it can ("-10°F or colder"); otherwise you say whether it meets
+/// the standard. A reading outside the standard can become a task, after you confirm.
+struct StandardCheckSheet: View {
+    let list: StandardList
+    let item: StandardItem
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
+    @State private var readingText = ""
+    @State private var meets: Bool?
+    @State private var note = ""
+    @State private var offerTask = false
+    @State private var saved = 0
+    @FocusState private var focused: Bool
+
+    private var isTemperature: Bool { list.kind == .temperatures }
+    private var rule: TemperatureRule? { isTemperature ? TemperatureRule.parse(item.value) : nil }
+    private var reading: Double? { TemperatureRule.reading(from: readingText) }
+    /// Known from the reading and the rule, when both are clear.
+    private var computed: Bool? {
+        guard let rule, let reading else { return nil }
+        return rule.allows(reading)
+    }
+    private var within: Bool? { computed ?? meets }
+    private var canSave: Bool { within != nil && (!isTemperature || reading != nil) }
+
+    private var readingLabel: String {
+        guard let reading else { return "" }
+        let number = reading.rounded() == reading ? String(Int(reading)) : String(reading)
+        return number + "°F"
+    }
+
+    private var taskTitle: String {
+        isTemperature
+            ? "Fix \(item.name): \(readingLabel), standard \(item.value)"
+            : "Fix \(item.name): doesn't meet \(item.value.isEmpty ? "the standard" : item.value)"
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    LabeledContent("Standard", value: item.value.isEmpty ? "Not written down" : item.value)
+                } header: {
+                    Text(item.name)
+                }
+                if isTemperature {
+                    Section {
+                        TextField("Temperature you read, e.g. -12", text: $readingText)
+                            .keyboardType(.numbersAndPunctuation)
+                            .focused($focused)
+                            .accessibilityIdentifier("checkReading")
+                        if let computed {
+                            Label(computed ? "Within the standard" : "Outside the standard",
+                                  systemImage: computed ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                                .foregroundStyle(computed ? Theme.success : Theme.danger)
+                                .accessibilityIdentifier("checkStatus")
+                        }
+                    } header: {
+                        Text("Reading (°F)")
+                    }
+                }
+                if computed == nil {
+                    Section {
+                        Picker("Meets the standard?", selection: $meets) {
+                            Text("Yes").tag(Optional(true))
+                            Text("No").tag(Optional(false))
+                        }
+                        .pickerStyle(.segmented)
+                    } header: {
+                        Text("Meets the standard?")
+                    } footer: {
+                        if isTemperature && rule == nil {
+                            Text("Coach Spark couldn't read a limit from \"\(item.value)\", so you decide.")
+                        }
+                    }
+                }
+                Section {
+                    TextField("Note (optional), e.g. door was left open", text: $note, axis: .vertical)
+                }
+            }
+            .navigationTitle(isTemperature ? "Record a reading" : "Record a check")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { save() }
+                        .disabled(!canSave)
+                        .accessibilityIdentifier("checkSave")
+                }
+            }
+            .confirmationDialog("Outside the standard. Add a task to fix it?", isPresented: $offerTask, titleVisibility: .visible) {
+                Button("Add task") {
+                    addTask()
+                    dismiss()
+                }
+                Button("Not now", role: .cancel) { dismiss() }
+            } message: {
+                Text(taskTitle)
+            }
+            .sensoryFeedback(.success, trigger: saved)
+            .onAppear { focused = isTemperature }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func save() {
+        guard let within else { return }
+        let check = StandardCheck(listID: list.id, itemID: item.id, listTitle: list.title, itemName: item.name,
+                                  standard: item.value, reading: isTemperature ? readingLabel : "",
+                                  isWithinStandard: within, note: note.trimmingCharacters(in: .whitespacesAndNewlines))
+        context.insert(check)
+        TaskActions.save(context)
+        saved += 1
+        if within {
+            router.showToast("Check saved")
+            dismiss()
+        } else {
+            offerTask = true
+        }
+    }
+
+    private func addTask() {
+        StepTask.add(taskTitle, from: list.title, safety: isTemperature, in: context, router: router)
     }
 }

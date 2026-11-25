@@ -6,7 +6,8 @@ import UniformTypeIdentifiers
 // MARK: - Backup file format (JSON, versioned, human-readable)
 
 struct BackupFile: Codable {
-    /// 2 added `settings`: Standards lists, schedule, role, shift plan and preferences. Version 1 files still restore.
+    /// 2 added `settings` (Standards lists, schedule, role, shift plan, preferences) and `checks`
+    /// (Standards check-offs). Version 1 files still restore.
     static let currentVersion = 2
 
     var formatVersion: Int = BackupFile.currentVersion
@@ -21,6 +22,13 @@ struct BackupFile: Codable {
     var shiftLogs: [ShiftLogDTO] = []
     /// Content and preferences kept in settings (see `UserContent`). Missing in version 1 files.
     var settings: [String: BackupSetting]? = nil
+    /// Temperature and quality check-offs. Missing in version 1 files.
+    var checks: [CheckDTO]? = nil
+
+    struct CheckDTO: Codable {
+        var id: UUID; var listID: UUID; var itemID: UUID; var listTitle: String; var itemName: String
+        var standard: String; var reading: String; var isWithinStandard: Bool; var note: String; var checkedAt: Date
+    }
 
     struct TaskDTO: Codable {
         var id: UUID; var title: String; var details: String; var kindRaw: String; var statusRaw: String
@@ -138,6 +146,12 @@ enum BackupService {
             BackupFile.ShiftLogDTO(id: l.id, day: l.day, endedAt: l.endedAt, completedCount: l.completedCount,
                                    carriedForwardCount: l.carriedForwardCount, openCommitments: l.openCommitments,
                                    reflection: l.reflection)
+        }
+
+        file.checks = try context.fetch(FetchDescriptor<StandardCheck>()).map { c in
+            BackupFile.CheckDTO(id: c.id, listID: c.listID, itemID: c.itemID, listTitle: c.listTitle, itemName: c.itemName,
+                                standard: c.standard, reading: c.reading, isWithinStandard: c.isWithinStandard,
+                                note: c.note, checkedAt: c.checkedAt)
         }
 
         let encoder = JSONEncoder()
@@ -271,6 +285,17 @@ enum BackupService {
             logIDs.insert(dto.id)
         }
 
+        let existingChecks = Set(try context.fetch(FetchDescriptor<StandardCheck>()).map(\.id))
+        for dto in file.checks ?? [] {
+            guard !existingChecks.contains(dto.id) else { summary.skipped += 1; continue }
+            let check = StandardCheck(listID: dto.listID, itemID: dto.itemID, listTitle: dto.listTitle, itemName: dto.itemName,
+                                      standard: dto.standard, reading: dto.reading, isWithinStandard: dto.isWithinStandard,
+                                      note: dto.note, checkedAt: dto.checkedAt)
+            check.id = dto.id
+            context.insert(check)
+            summary.inserted += 1
+        }
+
         TaskActions.save(context)
         return summary
     }
@@ -347,6 +372,7 @@ enum BackupService {
         try? context.delete(model: RecurrenceSeries.self)
         try? context.delete(model: Associate.self)
         try? context.delete(model: ShiftLog.self)
+        try? context.delete(model: StandardCheck.self)
         TaskActions.save(context)
         UserContent.deletePersonal(from: defaults)
         if let folder {

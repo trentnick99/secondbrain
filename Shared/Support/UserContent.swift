@@ -63,6 +63,8 @@ enum UserContent {
         case processSteps
         /// Newline-separated sets (season items added or hidden, routines added): combined.
         case lineSet
+        /// Your store's season events: added by id; events already on the phone win.
+        case storeEvents
     }
 
     /// Keys a backup carries, with how each is restored.
@@ -71,7 +73,7 @@ enum UserContent {
         SettingsKey.standardLists: .standardLists,
         SettingsKey.askStoreSteps: .processSteps,
         SettingsKey.customGuides: .fillIfMissing,
-        SettingsKey.customSeasonEvents: .fillIfMissing,
+        SettingsKey.customSeasonEvents: .storeEvents,
         SettingsKey.userRole: .fillIfMissing,
         SettingsKey.shiftSchedule: .fillIfMissing,
         SettingsKey.shiftPlanBlocks: .fillIfMissing,
@@ -153,11 +155,13 @@ enum UserContent {
                 guard case .string(let json) = value else { continue }
                 var mine = AskStepsStorage.decode(defaults.string(forKey: key) ?? "")
                 let theirs = AskStepsStorage.decode(json)
-                let before = mine.count
-                for (id, text) in theirs where (mine[id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                var filled = false
+                for (id, text) in theirs where (mine[id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     mine[id] = text
+                    filled = true
                 }
-                guard mine.count != before else { continue }
+                guard filled else { continue }
                 defaults.set(JSONStorage.encode(mine), forKey: key)
                 changed += 1
             case .lineSet:
@@ -166,6 +170,14 @@ enum UserContent {
                 let union = mine.union(SeasonPlanStore.keys(raw))
                 guard union != mine else { continue }
                 defaults.set(SeasonPlanStore.joined(union), forKey: key)
+                changed += 1
+            case .storeEvents:
+                guard case .string(let json) = value else { continue }
+                let mine = StoreEventStorage.decode(defaults.string(forKey: key) ?? "")
+                let kept = Set(mine.map(\.id))
+                let added = StoreEventStorage.decode(json).filter { !kept.contains($0.id) && $0.isValid }
+                guard !added.isEmpty else { continue }
+                defaults.set(StoreEventStorage.encode(mine + added), forKey: key)
                 changed += 1
             }
         }

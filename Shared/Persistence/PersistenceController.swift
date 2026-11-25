@@ -5,8 +5,8 @@ import SwiftData
 
 /// Version 1 of the on-device database, frozen: the model classes are nested in `SchemaV1` (see
 /// Shared/Models) and `SchemaTests` checks their hashes against what builds 1–12 shipped. To change a
-/// model, copy it into a new `SchemaV2` namespace, point the typealias at the copy, and add a migration
-/// stage below. Never edit a frozen version — see Docs/ARCHITECTURE.md.
+/// model, copy it into the next version's namespace (`SchemaV3`), point the typealias at the copy, and
+/// add a migration stage below. Never edit a frozen version — see Docs/ARCHITECTURE.md.
 enum SchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
 
@@ -16,9 +16,21 @@ enum SchemaV1: VersionedSchema {
     }
 }
 
+/// Version 2 adds `StandardCheck` (temperature and quality check-offs in Standards). The seven V1
+/// models are unchanged, so moving from V1 is a lightweight migration that only adds a table.
+enum SchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    static var models: [any PersistentModel.Type] {
+        SchemaV1.models + [StandardCheck.self]
+    }
+}
+
 enum SecondBrainMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [SchemaV1.self] }
-    static var stages: [MigrationStage] { [] }
+    static var schemas: [any VersionedSchema.Type] { [SchemaV1.self, SchemaV2.self] }
+    static var stages: [MigrationStage] {
+        [.lightweight(fromVersion: SchemaV1.self, toVersion: SchemaV2.self)]
+    }
 }
 
 // MARK: - Container
@@ -52,7 +64,8 @@ enum PersistenceController {
         return makeAppContainer()
     }()
 
-    static var schema: Schema { Schema(versionedSchema: SchemaV1.self) }
+    /// The current schema. Change this only together with a new version and migration stage.
+    static var schema: Schema { Schema(versionedSchema: SchemaV2.self) }
 
     private static var groupContainer: ModelConfiguration.GroupContainer {
         AppGroup.isAvailable ? .identifier(AppGroup.identifier) : .none
