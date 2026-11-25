@@ -165,6 +165,7 @@ final class SecondBrainUITests: XCTestCase {
         check.tap()
         let reading = app.descendants(matching: .any).matching(identifier: "checkReading").firstMatch
         XCTAssertTrue(reading.waitForExistence(timeout: 5))
+        reading.tap()   // the field asks for focus on its own, but a slow simulator may not have given it yet
         reading.typeText("5")
         XCTAssertTrue(element(containing: "Outside the standard").waitForExistence(timeout: 5), "The limit is read from the words")
         app.buttons["checkSave"].firstMatch.tap()

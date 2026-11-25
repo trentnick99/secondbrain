@@ -1,5 +1,19 @@
 # Test results
 
+## Cloud Mac (GitHub Actions) — 2026-11-25 (builds 13 and 14)
+
+Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5**. SwiftLint (`--strict`) passes on both.
+
+| Suite | Build 13 (audit stages 1–4) | Build 14 (stage 5) |
+|---|---|---|
+| **Compile:** app, widget, Watch app, unit and UI test targets | ✅ run 45699962001 | ✅ run 45712885487 |
+| **SecondBrainCoreTests** (engine) | ✅ 177 / 177 | ✅ 184 / 184 (adds season events, temperature limits, list sharing) |
+| **SecondBrainTests** (SwiftData integration) | ✅ 30 / 30, including the schema frozen against the entity hashes of builds 1–12 and a store written by the old schema reopening with its data | ✅ 34 / 34, adding the V1 → V2 upgrade, check-offs and season events in backups, and Home loading a year of history (5,000 tasks) in under 0.5 s |
+| **SecondBrainUITests** (end-to-end) | ✅ 17 / 17 (run 45711795502). The first run failed only the Huddle test, which checked for the share row without scrolling to it; the test now scrolls. | ✅ 19 / 19 (run 45712885487), adding your own season event and a reading outside the standard becoming a task. Two passed on the automatic retry: a simulator launch timeout, and a text field that hadn't taken focus yet (the test now taps it first). |
+| **Screenshots** | ✅ 24 screens (run 45711800286), on the `screenshots` branch | See the TestFlight row |
+| **Signed release + TestFlight upload** | ✅ **Build 13 uploaded** (run 45711804343) | Uploaded after this table was written; see the run list |
+| **On-device checks** | ⏳ See the manual checklist below, plus: Home's greeting after midnight, Delete all data removing the Files backups, a widget checkbox clearing its reminder | ⏳ Plus: the database upgrade on a phone that has real data, a check-off saved and restored, the widget's next-shift arrow |
+
 ## Cloud Mac (GitHub Actions) — 2026-11-25 (Coach Spark, build 12)
 
 Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5**. Workflow: `.github/workflows/build.yml`.
