@@ -227,8 +227,9 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(element(containing: "Today's top three").exists || element(containing: "TODAY'S TOP THREE").exists)
         let shout = app.descendants(matching: .any).matching(identifier: "huddleShoutOuts").firstMatch
         XCTAssertTrue(scrollTo(shout), "Shout-outs can be typed")
-        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "huddleShareButton").firstMatch.exists
-                      || element(containing: "Share with your team leads").exists)
+        // The share row sits at the end of a list, so it's only built once it's scrolled to.
+        let share = app.descendants(matching: .any).matching(identifier: "huddleShareButton").firstMatch
+        XCTAssertTrue(scrollTo(share), "The huddle can be shared")
     }
 
     func testFloorWalkTurnsAMissIntoATask() throws {
