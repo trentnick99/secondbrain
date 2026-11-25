@@ -25,6 +25,11 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 |---|---|
 | **Your store** | Knows coach and team lead roles, the store manager, and areas like AP, ACC and OPD. "Have Jordan work the truck" hands a task to a team lead, and it stays Waiting until they confirm. A weekly 7–5 / 10–8 / 12–10 schedule drives "end of shift", briefings and End My Shift. |
 | **Ask** | "What do I do if…": 28 offline guides (safety, leading people, the floor, customers, ethics) from general practice and public sources. On Apple Intelligence iPhones, written answers come from Apple's on-device model, and your question stays on the phone. Emergencies show "call 911" first. One tap searches Reddit (r/walmart) or the web in your browser. |
+| **Floor walk** | A safety-first checklist of your areas. Misses become tasks after you review them, and a summary can be saved to Notes. |
+| **Scan, photo & walk notes** | Import reads text from a scanned page or a photo, on the phone. Speak walk notes turns each spoken sentence into an item. |
+| **Shift handoff** | End My Shift → Share handoff texts what's open, what's coming up and what got done to the next coach. Associate follow-ups are left out by default. |
+| **Severe weather** | Opt-in NWS warnings for your store's location: a Home banner and a notification around your shift. |
+| **Shift on Lock Screen** | A Live Activity with time left, progress and your top three, also in the Dynamic Island. |
 | **Quick Note** | Set the Action button to **Quick Note** to save a note from anywhere without opening the app. |
 | **Your role & imports** | Choose your role and area (for example Food coach). Home, Tasks and the Season Planner focus on your areas plus store-wide items, and suggested routines fit your role. Paste a market email or notes, and the action items are sorted into yours, total store and no area. Other areas are hidden, only stated dates are used, and nothing saves until you review it. |
 | **Season Planner** | Shows the next 12 months: holidays, Walmart's announced deal events, typical seasonal sets, clock changes and weather safety. Each item has prep steps you add as tasks with a tap. Home shows what's coming up and the fiscal week. |

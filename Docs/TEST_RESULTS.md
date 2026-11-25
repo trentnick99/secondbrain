@@ -7,9 +7,9 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 | Suite | Result |
 |---|---|
 | **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
-| **SecondBrainCoreTests**: 151 engine tests, including holidays, the fiscal week, Season Planner prep dates, store terms, team hand-offs, privacy notes, roles, suggested routines, importing notes, and Ask guides, search, emergency detection and prompts | ✅ **151 / 151 passed** |
-| **SecondBrainTests**: 23 SwiftData integration tests (in-memory store), including saving imported items with their area and only stated dates, and Quick Note saving text exactly as given | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`, run 45493462134) |
-| **SecondBrainUITests**: 11 end-to-end tests (in-memory store, fictional data) | ⚠️ **10 / 11 passed** (run 45501364872), including the new test: Ask finds the short-staffed guide, offers Reddit search, and adds a step as a task after confirming. The ambiguous-capture test missed its 3-second wait on a cold simulator. It passed in run 45347308837, and the engine still flags that capture for confirmation. Its waits are now 10 seconds. Run 45493462134's UI step failed before testing began, because the simulator's accessibility timed out. Earlier: 10 / 10 in run 45347308837. |
+| **SecondBrainCoreTests**: 164 engine tests, including holidays, the fiscal week, Season Planner prep dates, store terms, team hand-offs, privacy notes, roles, suggested routines, importing notes, Ask, scanned-text ordering, walk notes, floor walks, shift handoffs and weather alerts | ✅ **164 / 164 passed** |
+| **SecondBrainTests**: 24 SwiftData integration tests (in-memory store), including saving imported items with their area and only stated dates, Quick Note saving text exactly as given, and the Lock Screen's top three open priorities | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`, run 45512953456) |
+| **SecondBrainUITests**: 12 end-to-end tests (in-memory store, fictional data) | ✅ **12 / 12 passed** (run 45512953456). The tests cover: Quick Capture, ambiguous captures, the privacy note, the Matrix, End My Shift, the weekly planner, Store Terms, the Season Planner, Import notes, editing the schedule, Ask (guide, Reddit link, step to task), and the floor walk (a miss becomes a task after review). Scan, photo text, walk-note speech, weather location and the Live Activity need a real iPhone's camera, microphone, location or Lock Screen, so they're covered by engine tests and compile checks only. |
 | **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
 | **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
@@ -17,7 +17,7 @@ Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5
 
 | Check | Result |
 |---|---|
-| Engine tests (Swift 5.10.1, Linux) | ✅ 151 / 151 |
+| Engine tests (Swift 5.10.1, Linux) | ✅ 164 / 164 |
 | `swiftc -parse` on all app, widget and test files | ✅ |
 | Project validation (`scripts/validate_project.py`) | ✅ |
 

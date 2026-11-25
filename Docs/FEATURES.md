@@ -91,6 +91,8 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 - **Season Planner:** a toggle shows only your areas plus store-wide items. It's on by default and also applies to the Home "Coming up" card.
 - **Suggested routines:** a starter list of common routines for your role and area, such as a Saturday numbers review for coaches or a truck plan for Stocking. Add one, or **Add all** after confirming. They become ordinary recurring tasks you can edit, pause or stop. They're suggestions only, so follow your store's actual schedule.
 
+**Scan, photo and walk notes.** Import also takes a **Scan** of a printed or handwritten page (on an iPhone with a camera) or a **Photo** of notes or a whiteboard. The text is read on your iPhone, and photos aren't saved. **Speak walk notes** (also **Walk notes** on Home) lets you talk as you walk the floor, like "Aisle 12 has holes. Dairy cooler door is leaking." Each sentence becomes an item, and walk notes keep every area you mention.
+
 **Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **Import** on Home, the Import button in Notes, or Settings › Import notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Second Brain"). Second Brain:
 - **Finds action items:** it reads bullet points and action sentences, skips greetings, sign-offs and the quoted earlier email, and uses the subject line.
 - **Routes each item:** using area headings ("Food", "Fresh:"), inline labels ("Front End - …") and the departments mentioned, it sorts items into **For you**, **Total store** and **No area mentioned**. Items for other areas are hidden, with a count shown. "Dairy" or "Frozen" count as Food, "Produce" or "Bakery" as Fresh, and so on.
@@ -108,7 +110,32 @@ Tap **Ask: what do I do if…** on Home (or Settings › Ask) and type a questio
 - **Emergencies:** if a question sounds like an emergency (someone hurt, a weapon, smoke), Ask shows "call 911 now, then get the manager on duty" first.
 - **Search online:** **Search Reddit (r/walmart)** and **Search the web** open in your browser. Reddit posts are other people's opinions, not company policy, and the app doesn't read Reddit itself.
 - **Your store's steps:** each guide has a place to write the steps your store trained you on. They're kept on your phone and used in written answers.
-- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks.
+- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks. For a written answer, **Add steps as tasks** lets you pick the steps to add.
+
+## Floor walk
+
+Tap **Floor walk** on Home. You get a checklist for each of your areas (from Your role):
+- **Safety first:** exits and fire equipment, spills, equipment put away, pallets off the main aisles.
+- **Then the floor:** holes, features and endcaps, signs, mods, zoning and cleanliness.
+- **Area checks:** for example out-of-date product for Food and Fresh, top stock and the backroom for Stocking, and entrances and registers for Front End.
+
+Tap ✓ if a check is fine or ! if it needs work, and add a note if you like. Your progress is kept for the day if you leave. **Finish walk** lists what needs work, safety first. Untick anything you don't want, then add the rest as tasks. Safety items go to Do First, and no dates are added. You can also save a walk summary to Notes.
+
+## Shift handoff
+
+At the bottom of **End My Shift**, **Share handoff** sends a short summary by text, email or any app. It lists what's still open (safety and Do First first), what's coming up, and what got done, plus your "Notes for tomorrow". Associate follow-ups stay out unless you turn on **Include associate follow-ups**.
+
+## Severe weather alerts
+
+In **Settings › Severe weather alerts**, turn alerts on and set your store's location: tap **Use my current location** at the store, or enter its ZIP code.
+- **Home banner:** warnings and severe alerts from the National Weather Service (weather.gov) show as a banner. Tap it for what NWS says to do, with links to the severe weather guide and weather.gov.
+- **Notifications:** you're notified from an hour before your shift until it ends, once per new alert.
+- **Privacy:** only the store's approximate location (rounded to about 100 m) is sent to weather.gov.
+- **Limits:** iOS decides when background checks run, so this doesn't replace Wireless Emergency Alerts or your store's emergency plan.
+
+## Shift on the Lock Screen
+
+When you open the app from 30 minutes before your shift until it ends, your shift appears on the Lock Screen and in the Dynamic Island. It shows time left, how many of today's tasks are done, any overdue items, and your top three priorities, and it updates as you complete tasks. Turn it off in Settings › **Shift on Lock Screen**. iOS ends Live Activities after about 8 hours, so on a 10-hour shift it may disappear before the shift ends; open the app to start it again.
 
 ## Quick Note (Action button)
 
