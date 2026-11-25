@@ -43,6 +43,7 @@ struct QuickNoteIntent: AppIntent {
 }
 
 /// Saves a quick note verbatim. Shared by the intent and tests.
+@MainActor
 enum QuickNoteSaver {
     static let tag = "quick note"
 
@@ -56,8 +57,7 @@ enum QuickNoteSaver {
         let note = Note(title: title, body: trimmed, type: .general)
         note.tagsRaw = tag
         context.insert(note)
-        try? context.save()
-        AppMaintenance.requestWidgetReload()
+        TaskActions.save(context)
         var reply = "Saved to Notes."
         if let notice = SensitiveContent.check(trimmed) {
             reply += " Heads up: " + notice.message

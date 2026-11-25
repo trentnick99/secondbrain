@@ -15,48 +15,26 @@ struct RootView: View {
 
         TabView(selection: $router.selectedTab) {
             Tab(AppTab.home.title, systemImage: AppTab.home.systemImage, value: AppTab.home) {
-                DashboardView().withCaptureButton()
+                DashboardView()
             }
             Tab(AppTab.tasks.title, systemImage: AppTab.tasks.systemImage, value: AppTab.tasks) {
                 TaskListView().withCaptureButton()
             }
             Tab(AppTab.matrix.title, systemImage: AppTab.matrix.systemImage, value: AppTab.matrix) {
-                MatrixView().withCaptureButton()
+                MatrixView()
             }
             Tab(AppTab.associates.title, systemImage: AppTab.associates.systemImage, value: AppTab.associates) {
-                AssociatesView().withCaptureButton()
+                AssociatesView()
             }
             Tab(AppTab.notes.title, systemImage: AppTab.notes.systemImage, value: AppTab.notes) {
-                NotesListView().withCaptureButton()
+                NotesListView().withCaptureButton(kind: .note)
             }
         }
         .tint(Theme.accent)
         .preferredColorScheme(colorScheme)
-        .sheet(isPresented: $router.showCapture) {
-            QuickCaptureView(initialKind: router.captureKind, initialText: router.captureText)
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.visible)
+        .sheet(item: $router.sheet) { sheet in
+            sheetContent(sheet)
         }
-        .sheet(item: $router.presentedTask) { ref in
-            TaskSheet(taskID: ref.id)
-        }
-        .sheet(isPresented: $router.showEndShift) { EndShiftView() }
-        .sheet(isPresented: $router.showPlanner) { PlannerContainerView() }
-        .sheet(isPresented: $router.showWeeklyReview) { WeeklyReviewView() }
-        .sheet(isPresented: $router.showSettings) { SettingsView() }
-        .sheet(isPresented: $router.showStoreTerms) { StoreTermsView(initialQuery: router.storeTermsQuery) }
-        .sheet(isPresented: $router.showSeasonPlanner) { SeasonPlannerView() }
-        .sheet(isPresented: $router.showRole) { RoleSheet() }
-        .sheet(isPresented: $router.showRoutines) {
-            NavigationStack {
-                RoutinesView().toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { router.showRoutines = false } } }
-            }
-        }
-        .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText, mode: router.importMode) }
-        .sheet(isPresented: $router.showStandards) { StandardsView(initialQuery: router.standardsQuery) }
-        .sheet(isPresented: $router.showFloorWalk) { FloorWalkView() }
-        .sheet(isPresented: $router.showHuddle) { HuddleView() }
-        .sheet(isPresented: $router.showTimeline) { ShiftTimelineView() }
         .fullScreenCover(isPresented: Binding(get: { !hasCompletedOnboarding }, set: { hasCompletedOnboarding = !$0 })) {
             OnboardingView()
         }
@@ -68,6 +46,33 @@ struct RootView: View {
             } else if appLockEnabled && scenePhase != .active {
                 PrivacyShield()
             }
+        }
+    }
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: ActiveSheet) -> some View {
+        switch sheet {
+        case .capture:
+            QuickCaptureView(initialKind: router.captureKind, initialText: router.captureText)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+        case .task(let id): TaskSheet(taskID: id)
+        case .endShift: EndShiftView()
+        case .planner: PlannerContainerView()
+        case .weeklyReview: WeeklyReviewView()
+        case .settings: SettingsView()
+        case .storeTerms: StoreTermsView(initialQuery: router.storeTermsQuery)
+        case .seasonPlanner: SeasonPlannerView()
+        case .role: RoleSheet()
+        case .routines:
+            NavigationStack {
+                RoutinesView().toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { router.dismissSheet() } } }
+            }
+        case .importNotes: ImportNotesView(initialText: router.importText, mode: router.importMode)
+        case .standards: StandardsView(initialQuery: router.standardsQuery)
+        case .floorWalk: FloorWalkView()
+        case .huddle: HuddleView()
+        case .timeline: ShiftTimelineView()
         }
     }
 
@@ -106,13 +111,18 @@ struct TaskSheet: View {
 
 // MARK: - Quick Capture button (on every main screen)
 
+/// The + button on Tasks and Notes. Home has its own Capture tile, so it isn't repeated there.
+/// Lists get bottom room so their last row can scroll clear of the button.
 struct CaptureButtonModifier: ViewModifier {
+    var kind: CaptureKind?
     @Environment(AppRouter.self) private var router
 
     func body(content: Content) -> some View {
-        content.overlay(alignment: .bottomTrailing) {
+        content
+            .contentMargins(.bottom, 84, for: .scrollContent)
+            .overlay(alignment: .bottomTrailing) {
             Button {
-                router.open(.capture(nil))
+                router.open(.capture(kind))
             } label: {
                 Image(systemName: "plus")
                     .font(.title2.weight(.semibold))
@@ -126,13 +136,13 @@ struct CaptureButtonModifier: ViewModifier {
             .accessibilityLabel("Quick Capture")
             .accessibilityHint("Capture a task, follow-up, note or reminder")
             .accessibilityIdentifier("quickCaptureButton")
-            .sensoryFeedback(.impact(weight: .medium), trigger: router.showCapture)
+            .sensoryFeedback(.impact(weight: .medium), trigger: router.sheet == .capture)
         }
     }
 }
 
 extension View {
-    func withCaptureButton() -> some View { modifier(CaptureButtonModifier()) }
+    func withCaptureButton(kind: CaptureKind? = nil) -> some View { modifier(CaptureButtonModifier(kind: kind)) }
 }
 
 // MARK: - Overlays

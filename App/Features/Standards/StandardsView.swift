@@ -419,7 +419,7 @@ struct GuideDetailView: View {
             Section {
                 Text(guide.summary).font(.headline)
                 if guide.isSafety {
-                    Label(AskAssistant.emergencyMessage, systemImage: "phone.fill")
+                    Label(SafetyNotice.emergencyMessage, systemImage: "phone.fill")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(Theme.danger)
                 }

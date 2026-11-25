@@ -119,17 +119,14 @@ final class TeamListAndRecapTests: XCTestCase {
 }
 
 final class CustomGuideTests: XCTestCase {
-    func testYourOwnGuideIsFoundAndWinsTies() {
+    func testOldGuidesKeepTheirShapeForTheMove() throws {
         let own = CustomGuide(title: "Baler won't start", category: .operations,
                               steps: ["Check the e-stop is pulled out", "Call the facilities number on the baler sign", ""],
                               checkWith: "Facilities", extraKeywords: "cardboard, bale")
         XCTAssertTrue(own.isValid)
-        XCTAssertEqual(own.guide.steps.count, 2, "Blank steps are dropped")
-        let results = CoachGuides.search("the baler won't start", including: [own.guide])
-        XCTAssertEqual(results.first?.id, own.guideID)
-        XCTAssertTrue(results.first?.isCustom == true)
-        XCTAssertEqual(CoachGuides.search("too much cardboard to bale", including: [own.guide]).first?.id, own.guideID)
-        XCTAssertEqual(CoachGuides.guide(id: own.guideID, including: [own.guide])?.title, "Baler won't start")
+        let decoded = try JSONDecoder().decode(CustomGuide.self, from: JSONEncoder().encode(own))
+        XCTAssertEqual(decoded, own, "Guides saved by earlier versions still decode")
+        XCTAssertEqual(StandardList(migrating: own).items.count, 2, "Blank steps are dropped when it moves")
         XCTAssertFalse(CustomGuide(title: " ", steps: ["x"]).isValid)
     }
 }

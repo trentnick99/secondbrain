@@ -81,4 +81,19 @@ final class NotificationPlannerTests: XCTestCase {
                                             overdueAlertsEnabled: false, dailyBriefingEnabled: false)
         XCTAssertTrue(NotificationPlanner.plan(tasks: [t], preferences: prefs, now: now, calendar: cal).isEmpty)
     }
+
+    func testTaskRemindersShareTheSixtyFourLimit() {
+        XCTAssertEqual(NotificationPlanner.taskBudget(reserved: 0), 60, "Nothing else pending: the usual 60")
+        XCTAssertEqual(NotificationPlanner.taskBudget(reserved: 12), 52, "Twelve timeline nudges leave 52")
+        XCTAssertEqual(NotificationPlanner.taskBudget(reserved: 70), 1, "Never zero")
+        XCTAssertEqual(NotificationPlanner.taskBudget(reserved: -3), 60)
+        var preferences = NotificationPreferences(dailyBriefingEnabled: false)
+        preferences.maxPending = NotificationPlanner.taskBudget(reserved: 60)
+        let tasks = (0..<10).map { i in
+            Fixtures.task("Task \(i)", due: Fixtures.date(2026, 11, 24 + i, 9), hasTime: true,
+                          reminder: Fixtures.date(2026, 11, 24 + i, 8))
+        }
+        XCTAssertLessThanOrEqual(NotificationPlanner.plan(tasks: tasks, preferences: preferences, now: Fixtures.now,
+                                                          calendar: Fixtures.calendar).count, 4)
+    }
 }

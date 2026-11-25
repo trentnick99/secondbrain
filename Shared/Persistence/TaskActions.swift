@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SwiftData
 import SecondBrainCore
 
@@ -7,6 +8,9 @@ import SecondBrainCore
 @MainActor
 enum DataChange {
     static var handlers: [() -> Void] = []
+    /// Called when a save fails, so the app can tell the person instead of failing silently.
+    static var saveFailed: ((Error) -> Void)?
+    static let log = Logger(subsystem: AppGroup.loggingSubsystem, category: "data")
 
     static func notify() {
         for handler in handlers { handler() }
@@ -78,11 +82,14 @@ enum TaskActions {
 
     // MARK: Saving
 
+    /// The one way the app saves. Reminders, widgets, the Watch and the Live Activity hear about every
+    /// change, and a failed save is logged and shown instead of being lost quietly.
     static func save(_ context: ModelContext) {
         do {
             try context.save()
         } catch {
-            print("Coach Spark save failed: \(error)")
+            DataChange.log.error("Save failed: \(error.localizedDescription, privacy: .public)")
+            DataChange.saveFailed?(error)
         }
         DataChange.notify()
     }

@@ -96,11 +96,14 @@ final class NotificationService {
 
         let context = PersistenceController.shared.mainContext
         let snapshots = TaskActions.openTasks(in: context).map(\.snapshot)
-        let plan = NotificationPlanner.plan(tasks: snapshots, preferences: AppSettings.notificationPreferences,
-                                            now: now, calendar: .current)
+        let pending = await center.pendingNotificationRequests()
+        // Share iOS's 64-notification limit with the shift timeline's nudges.
+        let reserved = pending.filter { request in !NotificationIDs.managedPrefixes.contains { request.identifier.hasPrefix($0) } }.count
+        var preferences = AppSettings.notificationPreferences
+        preferences.maxPending = NotificationPlanner.taskBudget(reserved: reserved, cap: preferences.maxPending)
+        let plan = NotificationPlanner.plan(tasks: snapshots, preferences: preferences, now: now, calendar: .current)
         let desired = Set(plan.map(\.id))
 
-        let pending = await center.pendingNotificationRequests()
         let stale = pending.map(\.identifier).filter { id in
             NotificationIDs.managedPrefixes.contains { id.hasPrefix($0) } && !desired.contains(id)
         }

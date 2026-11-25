@@ -21,6 +21,7 @@ enum AppMaintenance {
             { ShiftActivityController.requestRefresh() },
             { WatchSyncService.shared.requestPush() }
         ]
+        DataChange.saveFailed = { _ in AppRouter.shared.showToast("Couldn't save that. Try again.") }
         WatchSyncService.shared.activate()
     }
 

@@ -1,4 +1,5 @@
 import AppIntents
+import UserNotifications
 import Foundation
 import SwiftData
 import SecondBrainCore
@@ -29,6 +30,11 @@ struct CompleteTaskIntent: AppIntent {
             TaskActions.complete(task, in: context)
         }
         AppSettings.markExternalChange()
+        // A widget runs outside the app, where reminders aren't resynced, so clear this task's
+        // pending reminders here. The app reschedules everything the next time it opens.
+        let kinds: [PlannedNotification.Kind] = [.reminder, .deadline, .overdue]
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: kinds.map { PlannedNotification.identifier(kind: $0, taskID: id) })
         return .result()
     }
 }

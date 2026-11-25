@@ -66,7 +66,7 @@ final class SecondBrainUITests: XCTestCase {
             let confirm = app.buttons["Carry forward"].firstMatch
             if confirm.waitForExistence(timeout: 2) { confirm.tap() }
         }
-        app.buttons["Finish"].firstMatch.tap()
+        app.buttons["Finish shift"].firstMatch.tap()
         XCTAssertTrue(app.tabBars.buttons["Home"].waitForExistence(timeout: 3))
     }
 
@@ -175,6 +175,16 @@ final class SecondBrainUITests: XCTestCase {
         XCTAssertTrue(scrollTo(newNote))
         newNote.tap()
         XCTAssertTrue(captureField.waitForExistence(timeout: 5), "New note opens Capture")
+    }
+
+    func testDeepLinkOpensEvenWhenASheetIsOpen() throws {
+        let settings = app.buttons["settingsButton"].firstMatch
+        XCTAssertTrue(settings.waitForExistence(timeout: 5))
+        settings.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        app.open(try XCTUnwrap(URL(string: "secondbrain://standards?q=egg")))
+        XCTAssertTrue(app.buttons["reference-food-temps"].firstMatch.waitForExistence(timeout: 10),
+                      "A link replaces the open sheet instead of doing nothing")
     }
 
     /// Taps one of the four big tools on Home.

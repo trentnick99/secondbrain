@@ -75,7 +75,7 @@ private struct TeamListDetailView: View {
                             task.waitingOn = ""
                             if task.status == .waiting { task.status = .notStarted }
                             task.updatedAt = Date()
-                            try? context.save()
+                            TaskActions.save(context)
                         }
                         .tint(Theme.warning)
                     }

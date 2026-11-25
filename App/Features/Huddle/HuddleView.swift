@@ -61,7 +61,7 @@ struct HuddleView: View {
                                         body: script.text, type: .operational)
                         note.tagsRaw = "huddle"
                         context.insert(note)
-                        try? context.save()
+                        TaskActions.save(context)
                         router.showToast("Huddle saved to Notes")
                     } label: {
                         Label("Save to Notes", systemImage: "square.and.arrow.down")

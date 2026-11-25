@@ -32,6 +32,9 @@ enum AppGroup {
     static var isRunningInExtension: Bool {
         Bundle.main.bundlePath.hasSuffix(".appex")
     }
+
+    /// Subsystem for `os.Logger`, so the app's logs can be filtered in Console.
+    static var loggingSubsystem: String { Bundle.main.bundleIdentifier ?? "com.example.secondbrain" }
 }
 
 /// URLs used by widgets, notifications and Siri to open specific screens.

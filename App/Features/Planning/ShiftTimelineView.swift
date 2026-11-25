@@ -93,7 +93,7 @@ private struct TimelineRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     if entry.isTask {
-                        Image(systemName: entry.isSafety ? "shield.lefthalf.filled" : "checkmark.circle")
+                        Image(systemName: entry.isSafety ? "shield.lefthalf.filled" : "circle")
                             .foregroundStyle(entry.isSafety ? Theme.danger : Theme.accent)
                     }
                     Text(entry.title)
@@ -197,6 +197,8 @@ enum ShiftPlanNotifier {
     static let prefix = "timeline."
 
     static func reschedule(now: Date = Date()) async {
+        // Task reminders share iOS's 64-notification limit with these nudges, so let them re-plan after.
+        defer { Task { @MainActor in NotificationService.shared.requestResync() } }
         let center = UNUserNotificationCenter.current()
         let pending = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(prefix) }
         center.removePendingNotificationRequests(withIdentifiers: pending)

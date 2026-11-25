@@ -343,7 +343,7 @@ struct ImportNotesView: View {
         if saveOriginal {
             let note = Note(title: source, body: text, type: .general)
             context.insert(note)
-            try? context.save()
+            TaskActions.save(context)
         }
         let count = items.count
         router.showToast(count == 0 ? "Saved the notes" : "Added \(count) task\(count == 1 ? "" : "s")")

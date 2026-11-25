@@ -93,6 +93,12 @@ public struct PlannedNotification: Hashable, Identifiable, Sendable {
 /// time with calendar triggers and recomputes this plan whenever data changes, the app becomes
 /// active, a notification action runs, or an opportunistic background refresh happens.
 public enum NotificationPlanner {
+    /// iOS keeps at most 64 pending notifications per app and silently drops the rest. Task reminders
+    /// get what's left after other features' notifications (timeline nudges), up to `cap`.
+    public static func taskBudget(reserved: Int, cap: Int = 60) -> Int {
+        max(1, min(cap, 64 - max(0, reserved)))
+    }
+
     public static func plan(tasks: [TaskSnapshot], preferences: NotificationPreferences,
                             now: Date, calendar: Calendar) -> [PlannedNotification] {
         let math = DateMath(calendar: calendar)

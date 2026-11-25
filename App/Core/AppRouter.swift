@@ -47,38 +47,31 @@ enum Route: Equatable {
     case timeline
 }
 
-/// Wraps an id so it can drive `.sheet(item:)`.
-struct TaskRef: Identifiable, Hashable {
-    let id: UUID
+/// The one sheet on screen. Exactly one can be open, so a new route replaces whatever was showing
+/// instead of two sheets fighting over the screen.
+enum ActiveSheet: Identifiable, Equatable {
+    case capture, task(UUID), endShift, planner, weeklyReview, settings, storeTerms, seasonPlanner, role, routines,
+         importNotes, standards, floorWalk, huddle, timeline
+
+    var id: String {
+        if case .task(let id) = self { return "task-" + id.uuidString }
+        return String(describing: self)
+    }
 }
 
-/// App-wide navigation state: selected tab, sheets, and a transient confirmation toast.
+/// App-wide navigation state: selected tab, the open sheet, and a transient confirmation toast.
 @MainActor
 @Observable
 final class AppRouter {
     static let shared = AppRouter()
 
     var selectedTab: AppTab = .home
-    var showCapture = false
+    var sheet: ActiveSheet?
     var captureKind: CaptureKind?
     /// Text to pre-fill in Quick Capture (from a `secondbrain://capture?text=` link). Never saved automatically.
     var captureText: String?
-    var presentedTask: TaskRef?
-    var showEndShift = false
-    var showPlanner = false
-    var showWeeklyReview = false
-    var showSettings = false
-    var showStoreTerms = false
-    var showSeasonPlanner = false
-    var showRole = false
-    var showRoutines = false
-    var showImport = false
     var importText: String?
     var importMode: ImportMode = .paste
-    var showStandards = false
-    var showFloorWalk = false
-    var showHuddle = false
-    var showTimeline = false
     var standardsQuery: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
@@ -88,63 +81,48 @@ final class AppRouter {
     func open(_ route: Route) {
         switch route {
         case .tab(let tab):
-            dismissSheets()
+            sheet = nil
             selectedTab = tab
         case .capture(let kind):
-            presentedTask = nil
             captureKind = kind
             captureText = nil
-            showCapture = true
+            sheet = .capture
         case .task(let id):
-            showCapture = false
-            presentedTask = TaskRef(id: id)
+            sheet = .task(id)
         case .shift:
-            dismissSheets()
-            showEndShift = true
+            sheet = .endShift
         case .planner:
-            dismissSheets()
-            showPlanner = true
+            sheet = .planner
         case .weeklyReview:
-            dismissSheets()
-            showWeeklyReview = true
+            sheet = .weeklyReview
         case .settings:
-            dismissSheets()
-            showSettings = true
+            sheet = .settings
         case .overdue:
-            dismissSheets()
+            sheet = nil
             selectedTab = .tasks
             taskFilterRequest = .overdue
         case .storeTerms(let query):
-            dismissSheets()
             storeTermsQuery = query
-            showStoreTerms = true
+            sheet = .storeTerms
         case .seasonPlanner:
-            dismissSheets()
-            showSeasonPlanner = true
+            sheet = .seasonPlanner
         case .role:
-            dismissSheets()
-            showRole = true
+            sheet = .role
         case .routines:
-            dismissSheets()
-            showRoutines = true
+            sheet = .routines
         case .importNotes(let text, let mode):
-            dismissSheets()
             importText = text
             importMode = mode
-            showImport = true
+            sheet = .importNotes
         case .standards(let query):
-            dismissSheets()
             standardsQuery = query
-            showStandards = true
+            sheet = .standards
         case .floorWalk:
-            dismissSheets()
-            showFloorWalk = true
+            sheet = .floorWalk
         case .huddle:
-            dismissSheets()
-            showHuddle = true
+            sheet = .huddle
         case .timeline:
-            dismissSheets()
-            showTimeline = true
+            sheet = .timeline
         }
     }
 
@@ -194,23 +172,7 @@ final class AppRouter {
         }
     }
 
-    private func dismissSheets() {
-        showCapture = false
-        presentedTask = nil
-        showEndShift = false
-        showPlanner = false
-        showWeeklyReview = false
-        showSettings = false
-        showStoreTerms = false
-        showSeasonPlanner = false
-        showRole = false
-        showRoutines = false
-        showImport = false
-        showStandards = false
-        showFloorWalk = false
-        showHuddle = false
-        showTimeline = false
-    }
+    func dismissSheet() { sheet = nil }
 
     func showToast(_ message: String) {
         toastTask?.cancel()

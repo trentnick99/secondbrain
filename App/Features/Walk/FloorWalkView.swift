@@ -242,7 +242,7 @@ private struct WalkReviewView: View {
             let note = Note(title: "Floor walk · \(stamp)", body: FloorWalkChecklist.summary(state, sections), type: .operational)
             note.tagsRaw = "floor walk"
             context.insert(note)
-            try? context.save()
+            TaskActions.save(context)
         }
         router.showToast(added == 0 ? "Walk saved" : "Added \(added) task\(added == 1 ? "" : "s")")
         onFinish()
