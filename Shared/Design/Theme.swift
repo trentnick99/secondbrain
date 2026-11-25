@@ -28,7 +28,7 @@ enum Theme {
     static let success = dynamic(light: rgb(36, 145, 84), dark: rgb(84, 214, 138))
     static let purple = dynamic(light: rgb(83, 74, 183), dark: rgb(175, 169, 236))
     static let pink = dynamic(light: rgb(193, 64, 110), dark: rgb(237, 147, 177))
-    static let teal = dynamic(light: rgb(15, 118, 128), dark: rgb(94, 200, 210))
+    static let brown = dynamic(light: rgb(140, 94, 60), dark: rgb(214, 170, 130))
 
     // Header ("hero") card: deep teal with mint text, the same in light and dark.
     static let heroFill = Color(uiColor: rgb(15, 110, 86))
@@ -57,7 +57,7 @@ enum Theme {
         case .operations: return color(for: .schedule)
         case .safety: return warning
         case .fiscal: return accent
-        case .store: return teal
+        case .store: return brown
         }
     }
 
