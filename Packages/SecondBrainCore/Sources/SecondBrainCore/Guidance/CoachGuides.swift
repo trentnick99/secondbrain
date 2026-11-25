@@ -566,7 +566,7 @@ public enum CoachGuides {
                 let k = normalize(keyword)
                 if k.contains(" ") || k.contains("-") {
                     if q.contains(k) { score += 6 }
-                } else if let word = (words.contains(k) ? k : words.first(where: { $0.count > 3 && (k.hasPrefix($0) || $0.hasPrefix(k)) })),
+                } else if let word = (words.contains(k) ? k : words.first(where: { isWordForm($0, of: k) })),
                           used.insert(word).inserted {
                     score += 4
                 }
@@ -598,6 +598,15 @@ public enum CoachGuides {
         if role?.role == .storeManager { ids = ["conflicting-priorities", "follow-through", "crowd"] + ids }
         var seen = Set<String>()
         return ids.compactMap { id in seen.insert(id).inserted ? guide(id: id) : nil }.prefix(6).map { $0 }
+    }
+
+    /// "spills"/"spill", "recalled"/"recall", "manually"/"manual": the same word with a short ending.
+    /// "door" doesn't match "doorbuster".
+    static func isWordForm(_ word: String, of keyword: String) -> Bool {
+        guard word.count > 3, keyword.count > 3 else { return false }
+        if word.hasPrefix(keyword) { return word.count - keyword.count <= 3 }
+        if keyword.hasPrefix(word) { return keyword.count - word.count <= 2 }
+        return false
     }
 
     static func normalize(_ text: String) -> String {

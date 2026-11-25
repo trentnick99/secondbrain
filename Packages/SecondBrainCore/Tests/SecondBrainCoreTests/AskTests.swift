@@ -45,7 +45,10 @@ final class CoachGuideTests: XCTestCase {
         let freezer = "the frozen and dairy truck needs to be broke down-meaning sorted and separated - but the freezer door will not open it will only open manually, what should I do"
         let freezerGuides = CoachGuides.search(freezer, limit: 3).map(\.id)
         XCTAssertEqual(Set(freezerGuides.prefix(2)), ["freezer-door", "frozen-truck"], "\(freezerGuides)")
-        XCTAssertFalse(freezerGuides.contains("crowd"), "A door question isn't about crowds")
+        XCTAssertFalse(CoachGuides.search(freezer, limit: 10).map(\.id).contains("crowd"), "A door question isn't about crowds")
+        XCTAssertTrue(CoachGuides.isWordForm("spills", of: "spill"))
+        XCTAssertTrue(CoachGuides.isWordForm("recalled", of: "recall"))
+        XCTAssertFalse(CoachGuides.isWordForm("door", of: "doorbuster"))
         XCTAssertNil(AskAssistant.emergency(in: freezer))
         XCTAssertEqual(CoachGuides.search("the baler is jammed").first?.id, "broken-equipment")
         XCTAssertEqual(CoachGuides.search("dairy cooler is running warm").first?.id, "warm-case")
