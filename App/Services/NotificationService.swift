@@ -44,7 +44,7 @@ final class NotificationService {
         let taskCategory = UNNotificationCategory(identifier: NotificationIDs.taskCategory,
                                                   actions: [complete, snooze15, snooze60, tomorrow, open],
                                                   intentIdentifiers: [],
-                                                  hiddenPreviewsBodyPlaceholder: "Second Brain reminder",
+                                                  hiddenPreviewsBodyPlaceholder: "Coach Spark reminder",
                                                   options: [])
         let briefingCategory = UNNotificationCategory(identifier: NotificationIDs.briefingCategory, actions: [],
                                                       intentIdentifiers: [],
@@ -145,7 +145,7 @@ final class NotificationService {
     /// Sends a test notification in 5 seconds so the person can confirm alerts work.
     func sendTest() async {
         let content = UNMutableNotificationContent()
-        content.title = "Second Brain"
+        content.title = "Coach Spark"
         content.body = "Notifications are working. Reminders will arrive like this."
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)

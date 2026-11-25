@@ -1,8 +1,8 @@
-# Second Brain for Coaches: Privacy Policy
+# Coach Spark: Privacy Policy
 
 _Last updated: November 24, 2026_
 
-Second Brain for Coaches is a personal organizer for retail store leaders. It is an independent app. It is **not affiliated with, endorsed by or connected to Walmart** or any other retailer, and it does not connect to any employer's systems.
+Coach Spark (formerly Second Brain for Coaches) is a personal organizer for retail store leaders. It is an independent app. It is **not affiliated with, endorsed by or connected to Walmart** or any other retailer, and it does not connect to any employer's systems.
 
 ## The short version
 
@@ -23,7 +23,7 @@ The app reminds you not to store medical information, disciplinary records, pass
 | **Severe weather alerts** (off by default) | Your store's approximate location (rounded to about 100 m), set from a ZIP code or your current location, is sent to the U.S. National Weather Service (api.weather.gov) to check for active alerts. A ZIP code is converted to a location by Apple's geocoding service. Your location isn't tracked; the app uses it only when you tap "Use my current location". |
 | **Voice capture and walk notes** | Speech is recognized by Apple's speech recognition, on your iPhone when the device supports it. Otherwise Apple may process the audio under its own privacy policy. Audio isn't saved by the app. |
 | **Scan and Photo import** | Text is read from images on your iPhone with Apple's Vision framework. Images aren't saved or sent anywhere. |
-| **Ask** | Guides work offline, and your question stays on the phone. "Search Reddit" and "Search the web" open your browser with your question as the search. |
+| **Standards** | Lists work offline, and what you search for or write stays on the phone. Source links open in your browser only when you tap them. |
 | **Daily briefing** (optional) | On iPhones that support Apple Intelligence, the briefing can be written by Apple's on-device model. Nothing leaves the phone. |
 | **Calendar** (optional) | If you allow it, the app reads your calendar on the device to show events next to your tasks. Nothing is uploaded. |
 | **Notifications, widgets, Live Activities and Siri** | These are handled by iOS on your device. |

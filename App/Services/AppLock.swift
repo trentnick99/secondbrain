@@ -39,7 +39,7 @@ final class AppLock {
         let context = LAContext()
         context.localizedCancelTitle = "Cancel"
         do {
-            let ok = try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Unlock Second Brain")
+            let ok = try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Unlock Coach Spark")
             if ok {
                 isLocked = false
                 lastError = nil

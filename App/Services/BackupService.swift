@@ -73,7 +73,7 @@ struct RestoreSummary {
 }
 
 /// Export / import of everything in the store, plus a daily automatic backup in the app's
-/// Documents folder (visible in the Files app under On My iPhone › Second Brain).
+/// Documents folder (visible in the Files app under On My iPhone › Coach Spark).
 @MainActor
 enum BackupService {
     static func makeBackup(from context: ModelContext) throws -> Data {

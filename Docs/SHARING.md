@@ -1,10 +1,14 @@
-# Sharing Second Brain with other coaches (TestFlight public link)
+# Sharing Coach Spark with other coaches (TestFlight public link)
 
 TestFlight can give the app a public link that anyone can open on an iPhone, for up to 10,000 testers. Apple reviews the first build shared this way (Beta App Review), which usually takes about a day. Each tester's data stays on their own phone.
 
-## 1. Fill in Test Information (once)
+## 1. Rename the listing to Coach Spark (once)
 
-In **App Store Connect › Apps › Second Brain for Coaches › TestFlight › Test Information**:
+The app on your Home Screen is already called **Coach Spark** (build 12 and later). The name testers see in TestFlight comes from App Store Connect: open **App Store Connect › Apps ›** your app (still called "Second Brain for Coaches" until you change it) **› App Information**, change **Name** to `Coach Spark`, and tap **Save**. App Store names must be unique, so if Apple says it's taken, try something like `Coach Spark for Store Leaders`. The bundle ID stays the same, so your data and TestFlight installs carry over.
+
+## 2. Fill in Test Information (once)
+
+In **App Store Connect › Apps › Coach Spark › TestFlight › Test Information**:
 
 - **Beta App Description:** paste the text below.
 - **Feedback Email:** the address where you want testers' feedback.
@@ -13,13 +17,13 @@ In **App Store Connect › Apps › Second Brain for Coaches › TestFlight › 
 
 ### Beta App Description (paste)
 
-> Second Brain for Coaches is a personal organizer for retail store leaders. Capture tasks and follow-ups in plain language and see what matters in an Eisenhower Matrix. You can also run a floor walk, build a 5-minute huddle, plan your shift hour by hour, and hand off to the next coach with End My Shift. Ask suggests practical "what do I do if…" guides, and you can add your own store's steps. Everything stays on your iPhone, with no accounts and no tracking. This is an independent app, not affiliated with or endorsed by any retailer. Don't store medical, disciplinary or other confidential personnel information.
+> Coach Spark is a personal organizer for retail store leaders. Capture tasks and follow-ups in plain language and see what matters in an Eisenhower Matrix. You can also run a floor walk, build a 5-minute huddle, plan your shift hour by hour, and hand off to the next coach with End My Shift. Standards keeps reference lists at hand: food safety temperatures with their public sources, quality checks, store process steps, and your own lists. Everything stays on your iPhone, with no accounts and no tracking. This is an independent app, not affiliated with or endorsed by any retailer. Don't store medical, disciplinary or other confidential personnel information.
 
 ### What to Test (paste for each build)
 
-> Try capturing a few tasks, setting your role in Settings, a floor walk, the Huddle, and Ask. Tell us what's confusing or missing.
+> Try capturing a few tasks, setting your role in Settings, a floor walk, the Huddle, and More tools › Standards. Tell us what's confusing or missing.
 
-## 2. Create the public group
+## 3. Create the public group
 
 1. **TestFlight › External Testing › +** (next to "External Testing"), and name it "Coaches".
 2. In the group, open **Builds › +**, pick the latest build, and add the "What to Test" text.

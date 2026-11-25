@@ -14,7 +14,7 @@ public struct SensitivityNotice: Equatable, Sendable {
 public enum SensitiveContent {
     private static let rules: [(SensitivityNotice.Kind, [String], String)] = [
         (.credentials, ["password", "passwords", "passcode", "pin number", "login info", "username and password", "my win", "win number", "win #"],
-         "Looks like a password or ID. Don't keep credentials or associate ID numbers in Second Brain."),
+         "Looks like a password or ID. Don't keep credentials or associate ID numbers in Coach Spark."),
         (.disciplinary, ["write up", "write-up", "writeup", "written up", "disciplinary", "discipline", "1st written",
                          "2nd written", "3rd written", "first written", "second written", "third written",
                          "final written", "documented coaching", "coaching for", "termination", "terminate",
@@ -26,13 +26,13 @@ public enum SensitiveContent {
         (.medical, ["fmla", "ada accommodation", "accommodation request", "medical", "diagnosis", "diagnosed", "surgery",
                     "doctor's note", "doctors note", "pregnant", "pregnancy", "prescription", "medication", "therapy",
                     "mental health", "disability", "workers comp", "workers' comp", "loa", "leave of absence"],
-         "Looks like medical or leave detail. Keep health and leave information out of Second Brain — note only the task."),
+         "Looks like medical or leave detail. Keep health and leave information out of Coach Spark — note only the task."),
         (.assetProtection, ["internal theft", "orc case", "case file", "apprehension", "apprehended", "shoplifter",
                             "ethics complaint", "ethics case", "theft investigation", "ap investigation"],
          "Looks like an asset-protection or investigation detail. Those stay with AP and the approved systems."),
         (.personal, ["ssn", "social security", "date of birth", "dob", "home address", "pay rate", "salary",
                      "bank account", "driver's license", "drivers license"],
-         "Looks like personal information. Don't store protected personal details in Second Brain.")
+         "Looks like personal information. Don't store protected personal details in Coach Spark.")
     ]
 
     /// The first matching notice, or nil when the text looks fine.

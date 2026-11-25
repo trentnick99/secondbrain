@@ -1,6 +1,6 @@
 // swift-tools-version:5.9
 //
-// SecondBrainCore — the platform-independent "organizational engine" of Project Second Brain.
+// SecondBrainCore — the platform-independent "organizational engine" of Coach Spark.
 // Contains natural-language capture parsing, Eisenhower classification, recurrence rules,
 // notification planning, and the agenda / End My Shift / weekly review builders.
 //

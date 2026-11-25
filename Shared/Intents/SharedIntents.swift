@@ -7,7 +7,7 @@ import SecondBrainCore
 /// and available to the app.
 struct CompleteTaskIntent: AppIntent {
     static var title: LocalizedStringResource = "Complete Task"
-    static var description = IntentDescription("Marks a Second Brain task as complete.")
+    static var description = IntentDescription("Marks a Coach Spark task as complete.")
     static var isDiscoverable: Bool = false
 
     @Parameter(title: "Task Identifier")
@@ -36,7 +36,7 @@ struct CompleteTaskIntent: AppIntent {
 /// Opens the Quick Capture sheet. Backs the Control Center / Action button control and Siri.
 struct OpenQuickCaptureIntent: AppIntent {
     static var title: LocalizedStringResource = "Quick Capture"
-    static var description = IntentDescription("Opens Second Brain ready to capture a task, note or follow-up.")
+    static var description = IntentDescription("Opens Coach Spark ready to capture a task, note or follow-up.")
     static var openAppWhenRun: Bool = true
 
     init() {}
@@ -66,7 +66,7 @@ struct OpenFloorWalkIntent: AppIntent {
 /// Opens Import ready to speak walk notes. Backs the Control Center control.
 struct OpenWalkNotesIntent: AppIntent {
     static var title: LocalizedStringResource = "Walk Notes"
-    static var description = IntentDescription("Opens Second Brain listening for walk notes.")
+    static var description = IntentDescription("Opens Coach Spark listening for walk notes.")
     static var openAppWhenRun: Bool = true
 
     init() {}

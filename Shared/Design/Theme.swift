@@ -2,8 +2,9 @@ import SwiftUI
 import UIKit
 import SecondBrainCore
 
-/// Visual language: "bold color" — charcoal surfaces lit by a teal header, tinted stat tiles,
-/// colored section badges and quadrant stripes. Deliberately neutral — no retailer branding.
+/// Visual language: "calm and roomy" — soft surfaces, generous spacing and rounded cards under a deep
+/// teal header, with color kept for meaning (badges, quadrants, safety). Deliberately neutral — no
+/// retailer branding.
 enum Theme {
     static func dynamic(light: UIColor, dark: UIColor) -> Color {
         Color(uiColor: UIColor { traits in traits.userInterfaceStyle == .dark ? dark : light })
@@ -16,7 +17,7 @@ enum Theme {
     /// Calm teal accent.
     static let accent = dynamic(light: rgb(14, 140, 126), dark: rgb(56, 201, 180))
 
-    static let background = dynamic(light: rgb(242, 242, 245), dark: rgb(17, 18, 20))
+    static let background = dynamic(light: rgb(244, 245, 243), dark: rgb(17, 18, 20))
     static let surface = dynamic(light: .white, dark: rgb(28, 29, 32))
     static let surfaceRaised = dynamic(light: rgb(248, 248, 250), dark: rgb(38, 39, 43))
     static let stroke = dynamic(light: rgb(0, 0, 0, 0.06), dark: rgb(255, 255, 255, 0.07))
@@ -67,12 +68,12 @@ enum Theme {
         }
     }
 
-    static let cornerRadius: CGFloat = 16
+    static let cornerRadius: CGFloat = 20
 }
 
 /// Card container used across the dashboard and planners.
 struct CardBackground: ViewModifier {
-    var padding: CGFloat = 14
+    var padding: CGFloat = 16
     /// Optional color wash for cards that carry a meaning (Inbox, Coming up).
     var tint: Color? = nil
 
@@ -92,7 +93,7 @@ struct CardBackground: ViewModifier {
 }
 
 extension View {
-    func card(padding: CGFloat = 14, tint: Color? = nil) -> some View {
+    func card(padding: CGFloat = 16, tint: Color? = nil) -> some View {
         modifier(CardBackground(padding: padding, tint: tint))
     }
 }

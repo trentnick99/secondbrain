@@ -1,4 +1,4 @@
-# Installing Second Brain on your iPhone
+# Installing Coach Spark on your iPhone
 
 **No Mac?** Use [GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md) instead: GitHub's cloud Macs build the app and TestFlight installs it.
 
@@ -43,10 +43,10 @@ On first launch you'll see a short welcome. It asks for notification permission 
 
 ## 4. Add the widgets and the capture control
 
-- **Home Screen widget:** long-press the Home Screen, tap **Edit › Add Widget**, search for "Second Brain" and choose Small, Medium or Large.
-- **Lock Screen widget:** long-press the Lock Screen, tap **Customize › Lock Screen**, tap the widget area and choose a Second Brain widget.
+- **Home Screen widget:** long-press the Home Screen, tap **Edit › Add Widget**, search for "Coach Spark" and choose Small, Medium or Large.
+- **Lock Screen widget:** long-press the Lock Screen, tap **Customize › Lock Screen**, tap the widget area and choose a Coach Spark widget.
 - **Control Center / Action button:** open Control Center, tap **+ › Add a Control**, and choose "Quick Capture". On iPhone 15 Pro and later, go to **Settings › Action Button › Controls › Quick Capture** for one-press capture.
-- **Siri:** say "Add a task to Second Brain". All phrases appear in the Shortcuts app under Second Brain.
+- **Siri:** say "Add a task to Coach Spark". All phrases appear in the Shortcuts app under Coach Spark.
 
 ## 5. Run the tests
 

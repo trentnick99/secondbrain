@@ -22,9 +22,8 @@ struct SectionTitle: View {
                     .accessibilityHidden(true)
             }
             Text(title)
-                .font(.subheadline.weight(.semibold))
-                .textCase(.uppercase)
-                .foregroundStyle(tint == .secondary ? Color.secondary : tint)
+                .font(.headline)
+                .foregroundStyle(.primary)
             if let count {
                 Text("\(count)")
                     .font(.caption.weight(.bold))

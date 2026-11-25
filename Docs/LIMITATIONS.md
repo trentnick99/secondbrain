@@ -9,7 +9,7 @@
 ## Platform constraints (iOS rules)
 
 - **Background work isn't guaranteed.** iOS decides whether and when background refresh runs. Reminders don't depend on it, because they're scheduled ahead, but the "week ahead" of recurring occurrences is only extended when the app opens or iOS grants a refresh. If the app isn't opened for over a week, daily recurring reminders past that week won't be scheduled until you open it.
-- **Pending notification limit.** iOS keeps 64 pending local notifications per app. Second Brain keeps the soonest 60 and tops them up on every open or change. With a very large number of timed reminders far in the future, the later ones are scheduled as earlier ones fire, once the app is opened.
+- **Pending notification limit.** iOS keeps 64 pending local notifications per app. Coach Spark keeps the soonest 60 and tops them up on every open or change. With a very large number of timed reminders far in the future, the later ones are scheduled as earlier ones fire, once the app is opened.
 - **Briefing notification text** is computed when it's scheduled. If you change tasks on another device (with iCloud sync) without opening the app on this one, the morning briefing's counts can be out of date. Opening the app refreshes them.
 - **Widget refresh budget.** iOS limits how often widgets refresh. The app reloads them after every change, but timing is ultimately up to iOS.
 - **Widget checkbox vs. open app.** Completing a task from a widget writes to the shared database from the widget process. If the app is already open in the background, it may show the old state until it's reopened. Any reminder already scheduled for that task can still fire once, until the app next runs and resyncs.

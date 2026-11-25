@@ -53,7 +53,7 @@ struct RootView: View {
             }
         }
         .sheet(isPresented: $router.showImport) { ImportNotesView(initialText: router.importText, mode: router.importMode) }
-        .sheet(isPresented: $router.showAsk) { AskView(initialQuestion: router.askQuestion) }
+        .sheet(isPresented: $router.showStandards) { StandardsView(initialQuery: router.standardsQuery) }
         .sheet(isPresented: $router.showFloorWalk) { FloorWalkView() }
         .sheet(isPresented: $router.showHuddle) { HuddleView() }
         .sheet(isPresented: $router.showTimeline) { ShiftTimelineView() }
@@ -187,10 +187,10 @@ struct LockScreenView: View {
         ZStack {
             Theme.background.ignoresSafeArea()
             VStack(spacing: 20) {
-                Image(systemName: "brain.head.profile")
+                Image(systemName: "sparkles")
                     .font(.system(size: 56))
                     .foregroundStyle(Theme.accent)
-                Text("Second Brain is locked")
+                Text("Coach Spark is locked")
                     .font(.title2.weight(.semibold))
                 if let error = lock.lastError {
                     Text(error).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)

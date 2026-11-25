@@ -261,7 +261,7 @@ struct LockScreenWidgetView: View {
             if let date = entry.nextReminderDate, let title = entry.nextReminderTitle {
                 Label("\(date.formatted(date: .omitted, time: .shortened)) \(title)", systemImage: "bell.fill")
             } else {
-                Label("\(entry.priorityCount) priorities · \(entry.dueTodayCount) due", systemImage: "brain.head.profile")
+                Label("\(entry.priorityCount) priorities · \(entry.dueTodayCount) due", systemImage: "sparkles")
             }
         default:
             VStack(alignment: .leading, spacing: 2) {
@@ -274,7 +274,7 @@ struct LockScreenWidgetView: View {
                     Label("Today", systemImage: "star.fill").font(.caption.weight(.bold)).widgetAccentable()
                     Text(primary.title).font(.headline).lineLimit(2)
                 } else {
-                    Label("Second Brain", systemImage: "brain.head.profile").font(.caption.weight(.bold)).widgetAccentable()
+                    Label("Coach Spark", systemImage: "sparkles").font(.caption.weight(.bold)).widgetAccentable()
                     Text("All clear").font(.headline)
                 }
             }
@@ -294,7 +294,7 @@ struct QuickCaptureControl: ControlWidget {
             }
         }
         .displayName("Quick Capture")
-        .description("Open Second Brain ready to capture.")
+        .description("Open Coach Spark ready to capture.")
     }
 }
 

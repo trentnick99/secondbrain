@@ -49,7 +49,7 @@ A handed-off task shows as **Waiting** until you confirm the person took it on, 
 
 Teams and groups (Stock 1–3, CAP 1–3, "the overnight team", "my TLs", "the stocking TLs") can be handed work, but they never become contacts.
 
-**Store Terms reference.** Tap the book icon on Home (or Settings › Store terms) to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Second Brain". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
+**Store Terms reference.** Tap the book icon on Home (or Settings › Store terms) to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Coach Spark". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
 
 **Season Planner.** Open it from Settings › Season planner, or tap **Coming up** on Home, which shows the next three weeks along with the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
 - **Holidays**, worked out by the calendar: Valentine's Day, Easter, Mother's Day, Memorial Day, Father's Day, July 4th, Labor Day, Halloween, Thanksgiving, Black Friday, Cyber Monday, Christmas Eve, Christmas, New Year's Eve and New Year's Day.
@@ -76,7 +76,7 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 
 **People by role.** Associates groups people as Store Manager, Coaches, Team Leads and Associates (with job titles like Stocker or Cashier), each with their area. To add a whole team at once, use **Add Several People**: choose a role and area, then enter one name per line. A team lead's page also shows the tasks handed to them that are still waiting.
 
-**Your weekly schedule.** In Settings › Your schedule (also part of the welcome steps), set each day to **7–5, 10–8, 12–10**, a custom time, or **Off**. Second Brain then:
+**Your weekly schedule.** In Settings › Your schedule (also part of the welcome steps), set each day to **7–5, 10–8, 12–10**, a custom time, or **Off**. Coach Spark then:
 - **Matches phrases to your shifts:** "by end of shift" means 5 PM on a 7–5 day and 8 PM on a 10–8 day; "before I leave" works too. "First thing" means the start of your next shift, and "next shift" skips your days off.
 - **Times reminders to your shifts:** date-only items get a reminder at that day's shift start.
 - **Briefs you only on workdays:** the daily briefing arrives at the start of each scheduled shift.
@@ -93,7 +93,7 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 
 **Scan, photo and walk notes.** Import also takes a **Scan** of a printed or handwritten page (on an iPhone with a camera) or a **Photo** of notes or a whiteboard. The text is read on your iPhone, and photos aren't saved. **Speak walk notes** (also **Walk notes** on Home) lets you talk as you walk the floor, like "Aisle 12 has holes. Dairy cooler door is leaking." Each sentence becomes an item, and walk notes keep every area you mention.
 
-**Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **Import** on Home, the Import button in Notes, or Settings › Import notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Second Brain"). Second Brain:
+**Import notes.** Copy an email or notes (for example a market manager's follow-up in Outlook), then tap **More tools › Import notes** on Home, the Import button in Notes, or Settings › Import notes, and tap **Paste**. You can also use Siri or Shortcuts ("Import notes into Coach Spark"). Coach Spark:
 - **Finds action items:** it reads bullet points and action sentences, skips greetings, sign-offs and the quoted earlier email, and uses the subject line.
 - **Routes each item:** using area headings ("Food", "Fresh:"), inline labels ("Front End - …") and the departments mentioned, it sorts items into **For you**, **Total store** and **No area mentioned**. Items for other areas are hidden, with a count shown. "Dairy" or "Frozen" count as Food, "Produce" or "Bakery" as Fresh, and so on.
 - **Uses only stated dates:** an item gets a due date only if the notes give one ("by Wednesday"). Nothing is invented.
@@ -101,16 +101,25 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 
 Copy and paste only content you're allowed to keep on a personal device. If your company's Outlook blocks copying, that's company policy and the app doesn't try to work around it. The privacy note still appears if pasted text looks like personnel, medical or case details.
 
-## Ask
+## Home
 
-Tap **Ask: what do I do if…** on Home (or Settings › Ask) and type a question, like "The freezer door won't open, only manually" or "We're short-staffed tonight, what first?" Ask **suggests guides** that match. It doesn't write its own answers, so it can't make up steps that don't fit your store.
+Home is laid out calm and roomy, in the order a shift runs:
 
-- **Guides (offline):** short, vetted guides across Safety, Leading people, Running the floor, Customers, and Ethics & conduct, including equipment and freight problems such as a freezer door that won't open on its own, breaking down a frozen and dairy truck, broken equipment, and a cooler running warm. They're built from general leadership and safety practice and public sources: OSHA, FDA/USDA/CPSC recalls, the National Weather Service, and Walmart's public policies and Code of Conduct. Before you ask, Ask suggests guides for your role. Where a store procedure matters, a guide says to follow it and who to check with.
-- **Your own guides:** under **Your guides**, tap **Write a guide for your store** and add the steps your store trained you on (for example "Baler won't start"). Ask shows them first when they match. Don't include passwords, codes or anyone's personal details.
-- **Your store's steps:** each built-in guide also has a spot for your store's own steps, kept on your phone.
-- **Emergencies:** if a question sounds like an emergency (someone hurt, a weapon, smoke), Ask shows "call 911 now, then get the manager on duty" first.
-- **Search online:** **Search Reddit (r/walmart)** and **Search the web** open in your browser. Reddit posts are other people's opinions, not company policy, and the app doesn't read Reddit itself.
-- **Turn steps into tasks:** tap **+** next to a step and confirm to add it to your tasks.
+- **Header:** a greeting, the date, your shift and fiscal week, how many items are due today, overdue and waiting as follow-ups, a progress bar, and **End My Shift**.
+- **Four big tools:** **Capture**, **Floor walk**, **Huddle** and **More tools**. More tools holds everything else: Task, Follow-up, Note, Reminder, Standards, Shift timeline, Walk notes, Import notes, Team lead lists, Planner, Season planner, Weekly review and Store terms.
+- **Today's top 3**, then **Notes:** your pinned notes first, then your most recent, up to four. Tap one to open it, **New note** to write one, or **See all** for the Notes tab.
+- Then overdue items, Do First, follow-ups, due today, reminders and what's coming up.
+
+## Standards
+
+Open **More tools › Standards** (or Settings › Standards). Standards is a reference library of lists. It doesn't answer questions or write steps of its own, so nothing in it is a guess about your situation. Type in the search bar to filter the lists; "egg" finds egg temperatures and "freezer door" finds the freezer door process.
+
+- **Temperatures:** **Food safety temperatures** from public sources: refrigerated food at 41°F or colder and hot food at 135°F or hotter (FDA Food Code), the 41–135°F danger zone, cooling cooked food (135°F to 70°F within 2 hours, then to 41°F within 4 more), shell eggs at 45°F or colder (21 CFR 115.50), and frozen food at 0°F or colder (USDA FSIS). Each value lists its source.
+- **Quality standards:** general **Product quality checks** for freight and zoning: rotation, dates, damaged packages, frozen product, eggs and cold product.
+- **Processes:** step lists for the floor and for safety: a freezer or cooler door that won't open on its own, breaking down a frozen and dairy truck, a case running warm, broken equipment, freight that's behind, getting ready for a market walk, spills, blocked exits, injuries, severe weather, big crowds, recalls, and equipment. Each process has a spot for **your store's steps**, and **+** next to a step adds it to your tasks after you confirm.
+- **Your own lists:** under **Add your own**, make a **temperature list** (for example "Ice cream · -10°F"), a **quality standard** or a **process**, with the values and steps your store trained you on. Lists stay on your phone and show up in search. Guides you wrote in an earlier version moved here as processes. Don't include passwords, codes or anyone's personal details.
+
+Your store's posted standards, logs and your store manager always come first.
 
 ## Huddle
 
@@ -143,11 +152,11 @@ In **Weekly Review**, **Share recap with your store manager** sends a short summ
 
 ## Apple Watch
 
-The Second Brain watch app shows your shift's time left, how many tasks are done, and your top three. Tap one and confirm to mark it done on your iPhone. **Quick note** takes dictation, Scribble or the keyboard and saves exactly what you said to Notes on your iPhone. If the phone is out of range, the watch queues changes and sends them when it reconnects. The iPhone app does all the saving.
+The Coach Spark watch app shows your shift's time left, how many tasks are done, and your top three. Tap one and confirm to mark it done on your iPhone. **Quick note** takes dictation, Scribble or the keyboard and saves exactly what you said to Notes on your iPhone. If the phone is out of range, the watch queues changes and sends them when it reconnects. The iPhone app does all the saving.
 
 ## Off duty (Focus filter)
 
-In iOS **Settings › Focus**, choose a Focus such as Personal or Sleep, then **Focus Filters › Add Filter › Second Brain › Off duty**. While that Focus is on, widgets show "Off duty", Home says work can wait, and the shift Live Activity is removed. Nothing is deleted or rescheduled.
+In iOS **Settings › Focus**, choose a Focus such as Personal or Sleep, then **Focus Filters › Add Filter › Coach Spark › Off duty**. While that Focus is on, widgets show "Off duty", Home says work can wait, and the shift Live Activity is removed. Nothing is deleted or rescheduled.
 
 ## Floor walk
 
@@ -176,11 +185,11 @@ When you open the app from 30 minutes before your shift until it ends, your shif
 
 ## Quick Note (Action button)
 
-Set it up in your iPhone's **Settings › Action Button › Shortcut › Second Brain › Quick Note**. Press the button anywhere, type or dictate, and the note is saved to Notes exactly as you said it, without opening the app. It's tagged "quick note", and nothing is turned into a task or given a date. You can also say "Quick note in Second Brain". If the note looks like it holds personnel, medical or other sensitive details, Siri adds a short heads-up.
+Set it up in your iPhone's **Settings › Action Button › Shortcut › Coach Spark › Quick Note**. Press the button anywhere, type or dictate, and the note is saved to Notes exactly as you said it, without opening the app. It's tagged "quick note", and nothing is turned into a task or given a date. You can also say "Quick note in Coach Spark". If the note looks like it holds personnel, medical or other sensitive details, Siri adds a short heads-up.
 
 ## Quick Capture
 
-- **Where:** the **+** button on all five tabs, the Home quick actions (Capture, Task, Follow-up, Note, Reminder), the Control Center control or Action button, Siri ("Add a task to Second Brain"), and the widget's Capture link.
+- **Where:** the **+** button on all five tabs, Home's **Capture** tool and **More tools** (Task, Follow-up, Note, Reminder), the Control Center control or Action button, Siri ("Add a task to Coach Spark"), and the widget's Capture link.
 - **Input:** the keyboard, the keyboard's dictation key, or the in-app **mic** button. The mic uses Apple Speech and runs on-device when supported.
 - **Interpretation (on-device, no internet):** title, details, type (task, follow-up, reminder, issue, note, meeting note, idea), associate (matched against your list, or detected from phrases like "check with…" or "Sarah needs…"), roles ("the overnight coach"), department, due date and time, reminder, recurrence, category, priority and Eisenhower quadrant with reasons.
 - **Never invents things:** with no date there's no due date. A new person, a vague date ("next week"), a time without AM/PM, a time that already passed, or a reminder with no time all show a **Check before saving** box. The button changes to **Confirm & Save**. Return saves instantly only when nothing is ambiguous.
@@ -253,7 +262,7 @@ Widgets read the same database through the App Group. They refresh after every c
 
 ## Siri & Shortcuts
 
-"Add a task to Second Brain" · "Remind me in Second Brain" · "What are my priorities in Second Brain" · "Show my overdue tasks in Second Brain" · "Show my follow-ups in Second Brain" · "End my shift in Second Brain" · "Quick capture in Second Brain" · "Quick note in Second Brain" · "Import notes into Second Brain" · "Look up a store term in Second Brain" · "What's next in Second Brain".
+"Add a task to Coach Spark" · "Remind me in Coach Spark" · "What are my priorities in Coach Spark" · "Show my overdue tasks in Coach Spark" · "Show my follow-ups in Coach Spark" · "End my shift in Coach Spark" · "Quick capture in Coach Spark" · "Quick note in Coach Spark" · "Import notes into Coach Spark" · "Look up a store term in Coach Spark" · "What's next in Coach Spark".
 
 **Control Center:** add **Quick Capture**, **Floor Walk** and **Walk Notes** buttons from the Control Center editor. You can also put them on the Lock Screen or the Action button. Spoken captures are interpreted on-device. If anything is ambiguous, Siri saves it to your Inbox and tells you why.
 

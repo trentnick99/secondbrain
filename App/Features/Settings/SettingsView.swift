@@ -76,7 +76,7 @@ struct SettingsView: View {
                 }
                 .accessibilityIdentifier("roleSettingsRow")
                 Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
-                Button { router.open(.ask(nil)) } label: { Label("Ask", systemImage: "questionmark.bubble") }
+                Button { router.open(.standards(nil)) } label: { Label("Standards", systemImage: "list.clipboard") }
                 Button { router.open(.floorWalk) } label: { Label("Floor walk", systemImage: "figure.walk") }
                 Button { router.open(.huddle) } label: { Label("Huddle", systemImage: "megaphone") }
                 Button { router.open(.timeline) } label: { Label("Shift timeline", systemImage: "clock") }
@@ -133,12 +133,12 @@ struct SettingsView: View {
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.json]) { result in
                 importBackup(result)
             }
-            .alert("Second Brain", isPresented: alertBinding) {
+            .alert("Coach Spark", isPresented: alertBinding) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(alertMessage ?? "")
             }
-            .confirmationDialog("Delete all Second Brain data?", isPresented: $confirmDeleteAll, titleVisibility: .visible) {
+            .confirmationDialog("Delete all Coach Spark data?", isPresented: $confirmDeleteAll, titleVisibility: .visible) {
                 Button("Delete Everything", role: .destructive) { confirmDeleteAllAgain = true }
             } message: {
                 Text("Export a backup first if you might want this data later.")
@@ -171,7 +171,7 @@ struct SettingsView: View {
         } header: {
             Text("Your schedule")
         } footer: {
-            Text("Set each day to 7–5, 10–8, 12–10, a custom time, or Off. Second Brain uses it for “end of shift”, “first thing” and “next shift”, sends the daily briefing at shift start on workdays only, and End My Shift carries unfinished work to your next shift. The week starts Saturday by default, matching a Saturday–Friday business week.")
+            Text("Set each day to 7–5, 10–8, 12–10, a custom time, or Off. Coach Spark uses it for “end of shift”, “first thing” and “next shift”, sends the daily briefing at shift start on workdays only, and End My Shift carries unfinished work to your next shift. The week starts Saturday by default, matching a Saturday–Friday business week.")
         }
     }
 
@@ -213,7 +213,7 @@ struct SettingsView: View {
         } header: {
             Text("Notifications")
         } footer: {
-            Text("Reminders are scheduled on your iPhone ahead of time, so they arrive without an internet connection and even when the app is closed. iOS allows up to 64 pending alerts; Second Brain keeps the soonest 60 and tops them up each time you open the app.")
+            Text("Reminders are scheduled on your iPhone ahead of time, so they arrive without an internet connection and even when the app is closed. iOS allows up to 64 pending alerts; Coach Spark keeps the soonest 60 and tops them up each time you open the app.")
         }
     }
 
@@ -237,7 +237,7 @@ struct SettingsView: View {
         } header: {
             Text("Privacy & security")
         } footer: {
-            Text("Data is stored on this iPhone, protected by iOS data protection. Second Brain is a personal tool — it doesn't connect to any employer systems and never asks for work credentials.")
+            Text("Data is stored on this iPhone, protected by iOS data protection. Coach Spark is a personal tool — it doesn't connect to any employer systems and never asks for work credentials.")
         }
     }
 
@@ -265,7 +265,7 @@ struct SettingsView: View {
                             calendarEnabled = true
                         } else {
                             calendarEnabled = false
-                            alertMessage = "Calendar access wasn't granted. You can allow it in iOS Settings › Second Brain."
+                            alertMessage = "Calendar access wasn't granted. You can allow it in iOS Settings › Coach Spark."
                         }
                     }
                 } else {
@@ -300,7 +300,7 @@ struct SettingsView: View {
         } header: {
             Text("Data")
         } footer: {
-            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Second Brain › Backups. Restoring merges: newer records win, nothing is deleted. iCloud sync needs the iCloud capability added when building (see Docs/SIGNING.md) and takes effect after relaunch; without it, data stays on this iPhone.")
+            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Coach Spark › Backups. Restoring merges: newer records win, nothing is deleted. iCloud sync needs the iCloud capability added when building (see Docs/SIGNING.md) and takes effect after relaunch; without it, data stays on this iPhone.")
         }
     }
 
@@ -312,7 +312,7 @@ struct SettingsView: View {
         } header: {
             Text("About")
         } footer: {
-            Text("Project Second Brain is an independent personal productivity app. It is not affiliated with, endorsed by, or connected to any employer or retailer. Sample data is fictional.")
+            Text("Coach Spark is an independent personal productivity app. It is not affiliated with, endorsed by, or connected to any employer or retailer. Sample data is fictional.")
         }
     }
 

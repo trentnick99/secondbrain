@@ -38,8 +38,10 @@ enum SettingsKey {
     /// Season Planner and Coming up show only the person's areas plus store-wide items.
     static let seasonMyAreasOnly = "seasonMyAreasOnly"
     static let dismissedRolePrompt = "dismissedRolePrompt"
-    /// The person's own store steps for each Ask guide (JSON of [guide id: text]).
+    /// The person's own store steps for each process in Standards (JSON of [guide id: text]).
     static let askStoreSteps = "askStoreSteps"
+    /// The person's own Standards lists: temperatures, quality standards, processes (JSON of [StandardList]).
+    static let standardLists = "standardLists"
     /// A floor walk in progress (JSON of `FloorWalkState`).
     static let floorWalkState = "floorWalkState"
     /// Severe weather alerts from the National Weather Service for the store's location.
@@ -54,7 +56,7 @@ enum SettingsKey {
     /// The shift plan's blocks (JSON of [PlanBlock]) and whether to nudge when each starts.
     static let shiftPlanBlocks = "shiftPlanBlocks"
     static let shiftPlanNudges = "shiftPlanNudges"
-    /// The person's own Ask guides (JSON of [CustomGuide]).
+    /// Guides written in an earlier version (JSON of [CustomGuide]). Standards moves them into lists.
     static let customGuides = "customGuides"
     /// Set by the Focus filter: when off duty, widgets and Home stay quiet.
     static let offDuty = "offDuty"
@@ -217,7 +219,7 @@ enum JSONStorage {
     }
 }
 
-/// The person's own steps for each Ask guide, kept on the phone.
+/// The person's own steps for each store process in Standards, kept on the phone.
 enum AskStepsStorage {
     static func decode(_ json: String) -> [String: String] {
         guard !json.isEmpty, let data = json.data(using: .utf8) else { return [:] }

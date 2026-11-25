@@ -156,7 +156,7 @@ public enum CoachGuides {
                 "Get the manager on duty and the first aid kit or AED. Don't move someone with a possible head, neck or back injury unless they're in danger.",
                 "Keep the area safe and keep a crowd from forming.",
                 "Report it the same shift using your store's incident process.",
-                "Don't discuss fault, and don't record medical details in Second Brain."
+                "Don't discuss fault, and don't record medical details in Coach Spark."
             ],
             checkWith: "Follow your store's incident reporting process and involve the manager on duty.",
             keywords: ["hurt", "injured", "injury", "accident", "cut", "bleeding", "fell", "fall", "first aid", "aed", "customer fell", "associate hurt"],
@@ -277,7 +277,7 @@ public enum CoachGuides {
                 "Don't chase, block, touch or accuse anyone.",
                 "Get asset protection or the manager on duty involved.",
                 "If anyone is threatened or there's a weapon, get to safety and call 911.",
-                "Keep notes and descriptions with AP, not in Second Brain."
+                "Keep notes and descriptions with AP, not in Coach Spark."
             ],
             checkWith: "Your store's asset protection procedures. AP and the manager on duty handle it.",
             keywords: ["shoplifting", "shoplifter", "theft", "stealing", "steal", "concealing", "push out", "walk out"],
@@ -318,7 +318,7 @@ public enum CoachGuides {
                 "Recognize something specific they did well.",
                 "Talk about one goal or skill they want to grow.",
                 "Agree on one or two next steps with dates, and add your own follow-ups here.",
-                "Keep personal, medical or disciplinary details out of Second Brain."
+                "Keep personal, medical or disciplinary details out of Coach Spark."
             ],
             checkWith: nil,
             keywords: ["one on one", "one-on-one", "1:1", "1 on 1", "check in", "check-in", "development", "career"],
@@ -331,7 +331,7 @@ public enum CoachGuides {
                 "Use Situation, Behavior, Impact: when and where, what you saw, and why it matters.",
                 "Ask for their side, and listen.",
                 "Agree on what good looks like and when you'll check in.",
-                "Follow up. Formal coaching or discipline goes through your People Lead and the approved system, not Second Brain."
+                "Follow up. Formal coaching or discipline goes through your People Lead and the approved system, not Coach Spark."
             ],
             checkWith: "Your People Lead, for anything formal.",
             keywords: ["feedback", "coach", "coaching", "correct", "performance", "not performing", "slow", "lazy", "attitude", "conversation"],
@@ -381,7 +381,7 @@ public enum CoachGuides {
             steps: [
                 "Find a private, quiet spot and give them a moment.",
                 "Listen. Ask how you can help today, like a short break or a different task.",
-                "Don't press for personal or medical details, and don't record them in Second Brain.",
+                "Don't press for personal or medical details, and don't record them in Coach Spark.",
                 "Point them to the associate support resources your People Lead can share.",
                 "If they mention hurting themselves, stay with them and call or text 988 (Suicide & Crisis Lifeline). If they're in immediate danger, call 911."
             ],
@@ -530,7 +530,7 @@ public enum CoachGuides {
                 "You can go to your manager, a People Lead or Ethics & Compliance.",
                 "The Ethics Helpline is 1-800-WM-ETHIC (800-963-8442) in the U.S., open 24/7.",
                 "The Code prohibits retaliation against anyone who reports a concern.",
-                "Keep case details out of Second Brain."
+                "Keep case details out of Coach Spark."
             ],
             checkWith: "Ethics & Compliance, your People Lead or your manager.",
             keywords: ["ethics", "unethical", "wrong", "report", "concern", "fraud", "speak up", "retaliation", "code of conduct", "hotline", "helpline"],
@@ -543,7 +543,7 @@ public enum CoachGuides {
                 "Don't promise to keep it secret. Say you'll get it to the right people.",
                 "Report it to your People Lead or Ethics & Compliance, as the Code of Conduct says.",
                 "Don't investigate or confront anyone yourself.",
-                "Keep the details out of Second Brain. Note only the task, like \"talk with People Lead today\"."
+                "Keep the details out of Coach Spark. Note only the task, like \"talk with People Lead today\"."
             ],
             checkWith: "Your People Lead or Ethics & Compliance.",
             keywords: ["harassment", "harassing", "discrimination", "inappropriate", "comments", "hostile", "bullying", "bully", "uncomfortable"],

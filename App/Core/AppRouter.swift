@@ -41,7 +41,7 @@ enum Route: Equatable {
     case role
     case routines
     case importNotes(String?, mode: ImportMode = .paste)
-    case ask(String?)
+    case standards(String?)
     case floorWalk
     case huddle
     case timeline
@@ -75,11 +75,11 @@ final class AppRouter {
     var showImport = false
     var importText: String?
     var importMode: ImportMode = .paste
-    var showAsk = false
+    var showStandards = false
     var showFloorWalk = false
     var showHuddle = false
     var showTimeline = false
-    var askQuestion: String?
+    var standardsQuery: String?
     var storeTermsQuery: String?
     var taskFilterRequest: TaskFilter?
     var toast: String?
@@ -132,10 +132,10 @@ final class AppRouter {
             importText = text
             importMode = mode
             showImport = true
-        case .ask(let question):
+        case .standards(let query):
             dismissSheets()
-            askQuestion = question
-            showAsk = true
+            standardsQuery = query
+            showStandards = true
         case .floorWalk:
             dismissSheets()
             showFloorWalk = true
@@ -181,8 +181,8 @@ final class AppRouter {
             open(.huddle)
         case "timeline":
             open(.timeline)
-        case "ask":
-            open(.ask(URLComponents(url: url, resolvingAgainstBaseURL: false)?
+        case "standards", "ask":
+            open(.standards(URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "q" }?.value))
         case "terms":
             let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?
@@ -206,7 +206,7 @@ final class AppRouter {
         showRole = false
         showRoutines = false
         showImport = false
-        showAsk = false
+        showStandards = false
         showFloorWalk = false
         showHuddle = false
         showTimeline = false

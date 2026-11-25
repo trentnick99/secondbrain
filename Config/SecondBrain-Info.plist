@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Second Brain</string>
+	<string>Coach Spark</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -52,21 +52,21 @@
 		<string>fetch</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Second Brain uses the camera only when you tap Scan, to read the text on a page of notes. Scans aren't saved.</string>
+	<string>Coach Spark uses the camera only when you tap Scan, to read the text on a page of notes. Scans aren't saved.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Optional: Second Brain uses your location once, when you tap “Use my current location”, to set your store's location for severe weather alerts. It isn't tracked.</string>
+	<string>Optional: Coach Spark uses your location once, when you tap “Use my current location”, to set your store's location for severe weather alerts. It isn't tracked.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Second Brain uses the microphone only while you hold or tap the mic button, so you can capture tasks by voice.</string>
+	<string>Coach Spark uses the microphone only while you hold or tap the mic button, so you can capture tasks by voice.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Second Brain turns your spoken captures into text. When your iPhone supports it, recognition happens on the device.</string>
+	<string>Coach Spark turns your spoken captures into text. When your iPhone supports it, recognition happens on the device.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Second Brain can use Face ID to keep your notes and follow-ups private.</string>
+	<string>Coach Spark can use Face ID to keep your notes and follow-ups private.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Optional: Second Brain can show your calendar events in the planner, flag conflicts, and add a task to your calendar when you ask.</string>
+	<string>Optional: Coach Spark can show your calendar events in the planner, flag conflicts, and add a task to your calendar when you ask.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
-	<string>Optional: Second Brain adds a task to your calendar only when you tap “Add to Apple Calendar”.</string>
+	<string>Optional: Coach Spark adds a task to your calendar only when you tap “Add to Apple Calendar”.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

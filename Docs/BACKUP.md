@@ -6,7 +6,7 @@ Your data lives in a SwiftData (SQLite) database on your iPhone, inside the App 
 
 | Layer | What it covers | Where |
 |---|---|---|
-| **Daily automatic backup** | A full JSON snapshot each day you use the app, keeping the 14 most recent | Files app › On My iPhone › Second Brain › Backups |
+| **Daily automatic backup** | A full JSON snapshot each day you use the app, keeping the 14 most recent | Files app › On My iPhone › Coach Spark › Backups |
 | **Manual export** | A full JSON snapshot whenever you want one | Settings › Data › **Export backup…** (save to Files, iCloud Drive, AirDrop or email) |
 | **iPhone / iCloud device backup** | iOS backs up the app's container with your normal iPhone backup | Automatic, if iPhone backups are on |
 | **iCloud sync (optional)** | Keeps the database in your private iCloud and syncs between your devices | See [SIGNING.md](SIGNING.md) — paid membership required |

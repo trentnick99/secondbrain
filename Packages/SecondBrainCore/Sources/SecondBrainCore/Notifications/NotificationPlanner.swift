@@ -108,8 +108,8 @@ public enum NotificationPlanner {
                     kind: .reminder,
                     taskID: task.id,
                     fireDate: reminder,
-                    title: preferences.hidePreviews ? "Second Brain reminder" : reminderTitle(for: task, displayTitle: displayTitle),
-                    body: preferences.hidePreviews ? "Open Second Brain to see what's due." : reminderBody(for: task, now: now, calendar: calendar),
+                    title: preferences.hidePreviews ? "Coach Spark reminder" : reminderTitle(for: task, displayTitle: displayTitle),
+                    body: preferences.hidePreviews ? "Open Coach Spark to see what's due." : reminderBody(for: task, now: now, calendar: calendar),
                     threadID: task.kind == .followUp ? "followups" : "reminders",
                     hasTaskActions: true
                 ))
@@ -127,7 +127,7 @@ public enum NotificationPlanner {
                         taskID: task.id,
                         fireDate: due,
                         title: preferences.hidePreviews ? "Something is due" : "Due now",
-                        body: preferences.hidePreviews ? "Open Second Brain to see what's due." : displayTitle,
+                        body: preferences.hidePreviews ? "Open Coach Spark to see what's due." : displayTitle,
                         threadID: "deadlines",
                         hasTaskActions: true
                     ))
@@ -154,7 +154,7 @@ public enum NotificationPlanner {
                         taskID: task.id,
                         fireDate: fire,
                         title: preferences.hidePreviews ? "An item is still open" : "Still open: \(displayTitle)",
-                        body: preferences.hidePreviews ? "Open Second Brain to review." : whenText,
+                        body: preferences.hidePreviews ? "Open Coach Spark to review." : whenText,
                         threadID: "overdue",
                         hasTaskActions: true
                     ))

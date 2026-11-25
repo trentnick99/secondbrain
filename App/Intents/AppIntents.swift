@@ -3,11 +3,11 @@ import Foundation
 import SwiftData
 import SecondBrainCore
 
-/// "Add a task to Second Brain" — Siri asks what to add, interprets it on-device and saves it.
+/// "Add a task to Coach Spark" — Siri asks what to add, interprets it on-device and saves it.
 /// Anything ambiguous is saved to the Inbox exactly as spoken, so nothing is invented.
 struct AddTaskIntent: AppIntent {
-    static var title: LocalizedStringResource = "Add to Second Brain"
-    static var description = IntentDescription("Captures a task, follow-up or reminder in Second Brain.")
+    static var title: LocalizedStringResource = "Add to Coach Spark"
+    static var description = IntentDescription("Captures a task, follow-up or reminder in Coach Spark.")
 
     @Parameter(title: "What should I add?", requestValueDialog: IntentDialog("What should I add?"))
     var text: String
@@ -23,11 +23,11 @@ struct AddTaskIntent: AppIntent {
     }
 }
 
-/// "Quick note in Second Brain" — made for the Action button. Asks for a note (type or tap the mic) and
+/// "Quick note in Coach Spark" — made for the Action button. Asks for a note (type or tap the mic) and
 /// saves it exactly as given, without opening the app. Nothing is interpreted, so no dates or people are added.
 struct QuickNoteIntent: AppIntent {
     static var title: LocalizedStringResource = "Quick Note"
-    static var description = IntentDescription("Saves a note to Second Brain without opening the app. Great for the Action button.")
+    static var description = IntentDescription("Saves a note to Coach Spark without opening the app. Great for the Action button.")
 
     @Parameter(title: "Note", requestValueDialog: IntentDialog("What's the note?"))
     var text: String
@@ -66,10 +66,10 @@ enum QuickNoteSaver {
     }
 }
 
-/// "Remind me in Second Brain" — e.g. "check the backroom tomorrow".
+/// "Remind me in Coach Spark" — e.g. "check the backroom tomorrow".
 struct AddReminderIntent: AppIntent {
     static var title: LocalizedStringResource = "Remind Me"
-    static var description = IntentDescription("Creates a reminder in Second Brain, e.g. “check the backroom tomorrow”.")
+    static var description = IntentDescription("Creates a reminder in Coach Spark, e.g. “check the backroom tomorrow”.")
 
     @Parameter(title: "Remind you to…", requestValueDialog: IntentDialog("What should I remind you about, and when?"))
     var text: String
@@ -83,7 +83,7 @@ struct AddReminderIntent: AppIntent {
     }
 }
 
-/// "Look up a store term in Second Brain" — Siri asks which term and reads the meaning.
+/// "Look up a store term in Coach Spark" — Siri asks which term and reads the meaning.
 struct LookUpStoreTermIntent: AppIntent {
     static var title: LocalizedStringResource = "Look Up a Store Term"
     static var description = IntentDescription("Explains a store acronym or term, like FTPR, WOSH or remix. Works offline.")
@@ -100,10 +100,10 @@ struct LookUpStoreTermIntent: AppIntent {
     }
 }
 
-/// "Import notes into Second Brain" — opens the import screen with text from Shortcuts or the clipboard.
+/// "Import notes into Coach Spark" — opens the import screen with text from Shortcuts or the clipboard.
 struct ImportNotesIntent: AppIntent {
     static var title: LocalizedStringResource = "Import Notes"
-    static var description = IntentDescription("Opens Second Brain's import screen with notes to sort into tasks. Nothing is added until you review it.")
+    static var description = IntentDescription("Opens Coach Spark's import screen with notes to sort into tasks. Nothing is added until you review it.")
     static var openAppWhenRun: Bool = true
 
     @Parameter(title: "Notes", description: "The email or notes to import. Leave empty to paste in the app.")
@@ -200,7 +200,7 @@ struct TodayPrioritiesIntent: AppIntent {
     }
 }
 
-/// "What's next in Second Brain?" Answers without opening the app: the next timed item today,
+/// "What's next in Coach Spark?" Answers without opening the app: the next timed item today,
 /// the top priority, and anything overdue.
 struct WhatsNextIntent: AppIntent {
     static var title: LocalizedStringResource = "What's Next"
@@ -219,7 +219,7 @@ struct WhatsNextIntent: AppIntent {
 /// "Show my overdue tasks."
 struct OverdueTasksIntent: AppIntent {
     static var title: LocalizedStringResource = "Show Overdue Tasks"
-    static var description = IntentDescription("Lists overdue tasks and opens them in Second Brain.")
+    static var description = IntentDescription("Lists overdue tasks and opens them in Coach Spark.")
     static var openAppWhenRun: Bool = true
 
     init() {}
@@ -255,7 +255,7 @@ struct FollowUpsIntent: AppIntent {
     }
 }
 
-/// "End my shift in Second Brain."
+/// "End my shift in Coach Spark."
 struct EndShiftIntent: AppIntent {
     static var title: LocalizedStringResource = "End My Shift"
     static var description = IntentDescription("Opens the End My Shift review.")

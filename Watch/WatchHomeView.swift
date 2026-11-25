@@ -26,7 +26,7 @@ struct WatchHomeView: View {
 
                 Section("Top three") {
                     if store.items.isEmpty {
-                        Text(store.updated == nil ? "Open Second Brain on your iPhone to sync." : "Nothing open. Nice work.")
+                        Text(store.updated == nil ? "Open Coach Spark on your iPhone to sync." : "Nothing open. Nice work.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
@@ -54,7 +54,7 @@ struct WatchHomeView: View {
                     Text("Saved exactly as you say it.")
                 }
             }
-            .navigationTitle("Second Brain")
+            .navigationTitle("Coach Spark")
             .alert("Mark done?", isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } }),
                    presenting: confirming) { item in
                 Button("Done") { store.complete(item) }

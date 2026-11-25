@@ -2,13 +2,17 @@ import SwiftData
 import SwiftUI
 import SecondBrainCore
 
-/// Home: what needs attention right now, in the order a shift actually runs.
+/// Home: what needs attention right now, in the order a shift actually runs. Calm and roomy: a
+/// header with the day's progress, four big tools, today's top three and your notes, then tasks.
 struct DashboardView: View {
     @Environment(\.modelContext) private var context
     @Environment(AppRouter.self) private var router
     @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @Query(sort: \TaskItem.createdAt, order: .reverse) private var tasks: [TaskItem]
+    @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
+    @State private var showMoreTools = false
+    @State private var pendingTool: Route?
     @State private var briefing: String = ""
     @State private var showCompleted = false
     @State private var now = Date()
@@ -23,7 +27,7 @@ struct DashboardView: View {
 
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 20) {
                     header(agenda)
                     if offDuty {
                         Label("Off duty. Your Focus is on, so work can wait.", systemImage: "moon.stars.fill")
@@ -35,11 +39,11 @@ struct DashboardView: View {
                     }
                     WeatherAlertBanner(alerts: weather.current)
                     nowBlock
-                    quickActions
-                    askBar
+                    toolsGrid
                     if !agenda.inbox.isEmpty { inboxBanner(count: agenda.inbox.count) }
 
                     focusCard(agenda, items: items)
+                    notesCard
 
                     TaskCard(title: "Overdue", systemImage: "exclamationmark.circle.fill", tint: Theme.danger,
                              tasks: items(agenda.overdue))
@@ -63,10 +67,21 @@ struct DashboardView: View {
                     upcoming(agenda, items: items)
                     completed(agenda, items: items)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
+                .padding(.top, 4)
                 .padding(.bottom, 96)
             }
             .background(Theme.background)
+            .sheet(isPresented: $showMoreTools, onDismiss: {
+                // Open the chosen tool once this sheet is gone, so two sheets never overlap.
+                if let route = pendingTool { router.open(route) }
+                pendingTool = nil
+            }) {
+                MoreToolsSheet { route in
+                    pendingTool = route
+                    showMoreTools = false
+                }
+            }
             .navigationTitle("Today")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -103,51 +118,49 @@ struct DashboardView: View {
         let total = done + agenda.dueToday.count + agenda.overdue.count
         let progress = total == 0 ? 0 : Double(done) / Double(total)
         return VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(greeting)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Theme.heroText)
-                    .lineLimit(2)
-                Text(dateLine)
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.heroSecondary)
-                Capsule()
-                    .fill(Theme.heroTrack)
-                    .frame(height: 8)
-                    .overlay(alignment: .leading) {
-                        Capsule()
-                            .fill(Theme.heroProgress)
-                            .scaleEffect(x: max(progress, 0.03), y: 1, anchor: .leading)
-                    }
-                    .accessibilityHidden(true)
-                Text(total == 0 ? "Nothing due today" : "\(done) of \(total) done today")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(Theme.heroSecondary)
-                Button {
-                    router.open(.shift)
-                } label: {
-                    Label("End My Shift", systemImage: "moon.stars")
-                        .font(.headline)
-                        .foregroundStyle(Theme.heroFill)
-                        .frame(maxWidth: .infinity, minHeight: 46)
-                        .background(Theme.heroText, in: Capsule())
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 2)
-                .accessibilityIdentifier("endShiftButton")
-            }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Theme.heroFill, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-
+            Text(greeting)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(Theme.heroText)
+                .lineLimit(2)
+            Text(dateLine)
+                .font(.subheadline)
+                .foregroundStyle(Theme.heroSecondary)
             HStack(spacing: 8) {
-                StatPill(value: agenda.overdue.count, label: "Overdue", tint: Theme.danger, systemImage: "exclamationmark.circle")
-                StatPill(value: agenda.dueToday.count, label: "Today", tint: Theme.accent, systemImage: "calendar")
-                StatPill(value: agenda.followUpsDue.count, label: "Follow-ups", tint: Theme.color(for: .schedule), systemImage: "person")
-                StatPill(value: done, label: "Done", tint: Theme.success, systemImage: "checkmark")
+                HeroCount(value: agenda.dueToday.count, label: "due today")
+                HeroCount(value: agenda.overdue.count, label: "overdue", alert: agenda.overdue.count > 0)
+                if agenda.followUpsDue.count > 0 {
+                    HeroCount(value: agenda.followUpsDue.count, label: agenda.followUpsDue.count == 1 ? "follow-up" : "follow-ups")
+                }
             }
+            Capsule()
+                .fill(Theme.heroTrack)
+                .frame(height: 8)
+                .overlay(alignment: .leading) {
+                    Capsule()
+                        .fill(Theme.heroProgress)
+                        .scaleEffect(x: max(progress, 0.03), y: 1, anchor: .leading)
+                }
+                .accessibilityHidden(true)
+            Text(total == 0 ? "Nothing due today" : "\(done) of \(total) done today")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Theme.heroSecondary)
+            Button {
+                router.open(.shift)
+            } label: {
+                Label("End My Shift", systemImage: "moon.stars")
+                    .font(.headline)
+                    .foregroundStyle(Theme.heroFill)
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .background(Theme.heroText, in: Capsule())
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
+            .accessibilityIdentifier("endShiftButton")
         }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.heroFill, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     /// First line of the briefing ("Good evening. You have 6 tasks due today…"), or a plain greeting.
@@ -174,22 +187,22 @@ struct DashboardView: View {
         return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: Date(), calendar: cal)) \(label)"
     }
 
-    private var quickActions: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                QuickActionButton(title: "Capture", systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
-                QuickActionButton(title: "Task", systemImage: "checklist", tint: Theme.color(for: .schedule)) { router.open(.capture(.task)) }
-                QuickActionButton(title: "Follow-up", systemImage: "person.crop.circle.badge.clock", tint: Theme.purple) { router.open(.capture(.followUp)) }
-                QuickActionButton(title: "Huddle", systemImage: "megaphone.fill", tint: Theme.warning) { router.open(.huddle) }
-                QuickActionButton(title: "Floor walk", systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
-                QuickActionButton(title: "Timeline", systemImage: "clock.fill", tint: Theme.accent) { router.open(.timeline) }
-                QuickActionButton(title: "Walk notes", systemImage: "mic.fill", tint: Theme.pink) { router.open(.importNotes(nil, mode: .speak)) }
-                QuickActionButton(title: "Import", systemImage: "square.and.arrow.down", tint: Theme.purple) { router.open(.importNotes(nil)) }
-                QuickActionButton(title: "Note", systemImage: "note.text", tint: Theme.warning) { router.open(.capture(.note)) }
-                QuickActionButton(title: "Reminder", systemImage: "bell", tint: Theme.pink) { router.open(.capture(.reminder)) }
+    /// Four big tools. Everything else is one tap away in More tools.
+    private var toolsGrid: some View {
+        Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+            GridRow {
+                ToolTile(id: "capture", title: "Capture", subtitle: "Task, note or follow-up",
+                         systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
+                ToolTile(id: "floorwalk", title: "Floor walk", subtitle: "Check your areas",
+                         systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
+            }
+            GridRow {
+                ToolTile(id: "huddle", title: "Huddle", subtitle: "Built from today",
+                         systemImage: "megaphone.fill", tint: Theme.warning) { router.open(.huddle) }
+                ToolTile(id: "more", title: "More tools", subtitle: "Standards, timeline, import",
+                         systemImage: "square.grid.2x2.fill", tint: Theme.purple) { showMoreTools = true }
             }
         }
-        .accessibilityIdentifier("quickActions")
     }
 
     /// "Now: Work the freight · until 11:00 AM" from the shift plan, while on shift.
@@ -219,28 +232,39 @@ struct DashboardView: View {
         }
     }
 
-    /// Looks like a search field; opens Ask.
-    private var askBar: some View {
-        Button { router.open(.ask(nil)) } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "questionmark.bubble.fill")
-                    .foregroundStyle(Theme.pink)
-                Text("Ask: what do I do if…")
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+    /// Pinned notes first, then the most recent: the things worth keeping in front of you.
+    private var homeNotes: [Note] {
+        Array((notes.filter(\.isPinned) + notes.filter { !$0.isPinned }).prefix(4))
+    }
+
+    private var notesCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                SectionTitle(title: "Notes", systemImage: "note.text", tint: Theme.purple)
+                if !notes.isEmpty {
+                    Button("See all") { router.open(.tab(.notes)) }
+                        .font(.subheadline.weight(.semibold))
+                        .accessibilityIdentifier("homeNotesSeeAll")
+                }
             }
-            .font(.subheadline)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.tint(Theme.pink, 0.35)))
+            if homeNotes.isEmpty {
+                Text("Jot down what you notice on the floor. Pinned notes stay here.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(homeNotes) { note in
+                NavigationLink { NoteEditorView(note: note) } label: { HomeNoteRow(note: note) }
+                    .buttonStyle(.plain)
+                if note.id != homeNotes.last?.id { Divider() }
+            }
+            Button { router.open(.capture(.note)) } label: {
+                Label("New note", systemImage: "square.and.pencil")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .padding(.top, 2)
+            .accessibilityIdentifier("homeNewNote")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Ask a question")
-        .accessibilityIdentifier("homeAskBar")
+        .card()
     }
 
     private func inboxBanner(count: Int) -> some View {
@@ -378,27 +402,152 @@ struct StatPill: View {
     }
 }
 
-struct QuickActionButton: View {
+/// "4 due today" on the header.
+private struct HeroCount: View {
+    let value: Int
+    let label: String
+    var alert = false
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text("\(value)").font(.subheadline.weight(.bold).monospacedDigit())
+            Text(label).font(.subheadline)
+        }
+        .foregroundStyle(alert ? Theme.heroFill : Theme.heroText)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(alert ? Theme.heroText : Theme.heroTrack, in: Capsule())
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// A big, quiet tool button on Home.
+struct ToolTile: View {
+    let id: String
     let title: String
+    let subtitle: String
     let systemImage: String
     var tint: Color = Theme.accent
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 12) {
                 Image(systemName: systemImage)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(tint)
-                    .frame(width: 36, height: 36)
-                    .background(Theme.tint(tint, 0.18), in: Circle())
-                Text(title).font(.caption.weight(.medium))
+                    .frame(width: 40, height: 40)
+                    .background(Theme.tint(tint, 0.16), in: Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.headline)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
-            .frame(width: 84, height: 80)
-            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.stroke))
+            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+            .padding(16)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous).strokeBorder(Theme.stroke))
+            .contentShape(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("New \(title)")
+        .accessibilityLabel(title)
+        .accessibilityHint(subtitle)
+        .accessibilityIdentifier("tool-\(id)")
+    }
+}
+
+/// One note on Home: title, a line of the body and when it changed.
+private struct HomeNoteRow: View {
+    let note: Note
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: note.isPinned ? "pin.fill" : note.type.systemImage)
+                .font(.subheadline)
+                .foregroundStyle(note.isPinned ? Theme.warning : Theme.purple)
+                .frame(width: 20)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(note.displayTitle).font(.subheadline.weight(.semibold)).lineLimit(1)
+                if !note.snippet.isEmpty {
+                    Text(note.snippet).font(.footnote).foregroundStyle(.secondary).lineLimit(1)
+                }
+            }
+            Spacer(minLength: 8)
+            Text(RelativeDateText.dayLabel(for: note.updatedAt, now: Date(), calendar: .current))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Every other tool, grouped. Picking one closes this sheet, then Home opens the tool.
+struct MoreToolsSheet: View {
+    let choose: (Route) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Capture") {
+                    row("Task", "checklist", Theme.color(for: .schedule), .capture(.task))
+                    row("Follow-up", "person.crop.circle.badge.clock", Theme.purple, .capture(.followUp))
+                    row("Note", "note.text", Theme.warning, .capture(.note))
+                    row("Reminder", "bell", Theme.pink, .capture(.reminder))
+                }
+                Section("On the floor") {
+                    row("Standards", "list.clipboard", Theme.accent, .standards(nil))
+                    row("Shift timeline", "clock.fill", Theme.accent, .timeline)
+                    row("Walk notes", "mic.fill", Theme.pink, .importNotes(nil, mode: .speak))
+                    row("Import notes", "square.and.arrow.down", Theme.purple, .importNotes(nil))
+                    NavigationLink { TeamListsView() } label: {
+                        MoreToolLabel(title: "Team lead lists", systemImage: "list.bullet.clipboard", tint: Theme.success)
+                    }
+                    .accessibilityIdentifier("moreTool-Team lead lists")
+                }
+                Section("Plan and review") {
+                    row("Planner", "calendar", Theme.color(for: .schedule), .planner)
+                    row("Season planner", "leaf", Theme.success, .seasonPlanner)
+                    row("Weekly review", "chart.bar.doc.horizontal", Theme.accent, .weeklyReview)
+                    row("Store terms", "character.book.closed", Theme.warning, .storeTerms(nil))
+                }
+            }
+            .navigationTitle("More tools")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func row(_ title: String, _ systemImage: String, _ tint: Color, _ route: Route) -> some View {
+        Button { choose(route) } label: {
+            MoreToolLabel(title: title, systemImage: systemImage, tint: tint)
+        }
+        .foregroundStyle(.primary)
+        .accessibilityIdentifier("moreTool-\(title)")
+    }
+}
+
+private struct MoreToolLabel: View {
+    let title: String
+    let systemImage: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(tint)
+                .frame(width: 32, height: 32)
+                .background(Theme.tint(tint, 0.16), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            Text(title)
+        }
     }
 }

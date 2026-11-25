@@ -82,7 +82,7 @@ enum TaskActions {
         do {
             try context.save()
         } catch {
-            print("Second Brain save failed: \(error)")
+            print("Coach Spark save failed: \(error)")
         }
         DataChange.notify()
     }

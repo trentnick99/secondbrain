@@ -537,7 +537,7 @@ public enum StoreGlossary {
         Me@Walmart|Associate mobile app
         OneWalmart|Associate portal
         The Wire|Older name for the associate portal|l
-        WIN|Associate identification number — don't store it in Second Brain
+        WIN|Associate identification number — don't store it in Coach Spark
         BYOD|Bring Your Own Device
         GTA|Global Time and Attendance
         PTO|Paid Time Off

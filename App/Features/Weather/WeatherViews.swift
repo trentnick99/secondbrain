@@ -150,7 +150,7 @@ struct WeatherSettingsView: View {
         isLocating = true
         defer { isLocating = false }
         guard let coordinate = await fetcher.current() else {
-            message = "Couldn't get your location. Check Location Services for Second Brain in iOS Settings, or enter a ZIP code."
+            message = "Couldn't get your location. Check Location Services for Coach Spark in iOS Settings, or enter a ZIP code."
             return
         }
         WeatherAlertService.setLocation(coordinate, name: "Set from your location")

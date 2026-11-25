@@ -31,7 +31,7 @@ struct OnboardingView: View {
             Button {
                 if page < 5 { withAnimation { page += 1 } } else { finish() }
             } label: {
-                Text(page < 5 ? "Continue" : "Start using Second Brain")
+                Text(page < 5 ? "Continue" : "Start using Coach Spark")
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
@@ -61,7 +61,7 @@ struct OnboardingView: View {
     }
 
     private var welcome: some View {
-        pageLayout(icon: "brain.head.profile", title: "Your second brain for every shift") {
+        pageLayout(icon: "sparkles", title: "Welcome to Coach Spark") {
             Text("Capture what people ask, what you promise and what you notice — in seconds — then get back to the floor.")
                 .font(.title3).foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 10) {
@@ -77,7 +77,7 @@ struct OnboardingView: View {
     private var howItWorks: some View {
         pageLayout(icon: "sparkles", title: "How it works") {
             step("1", "Tap + anywhere and type or speak: “Check with John tomorrow about his schedule.”")
-            step("2", "Second Brain suggests the person, date, reminder and Eisenhower quadrant. If anything is unclear, it asks before saving — it never invents dates or people.")
+            step("2", "Coach Spark suggests the person, date, reminder and Eisenhower quadrant. If anything is unclear, it asks before saving — it never invents dates or people.")
             step("3", "Your dashboard, widgets and reminders keep it in front of you.")
             step("4", "At the end of the day, End My Shift shows what's done and carries the rest forward — nothing unfinished disappears.")
         }
@@ -118,7 +118,7 @@ struct OnboardingView: View {
 
     private var notifications: some View {
         pageLayout(icon: "bell.badge.fill", title: "Reminders that arrive") {
-            Text("Second Brain uses notifications on your iPhone for reminders, deadlines, still-open alerts and an optional daily briefing. They're scheduled on the device, so they work offline and when the app is closed.")
+            Text("Coach Spark uses notifications on your iPhone for reminders, deadlines, still-open alerts and an optional daily briefing. They're scheduled on the device, so they work offline and when the app is closed.")
                 .foregroundStyle(.secondary)
             Text("From a notification you can Mark Complete, Snooze or open the task.").foregroundStyle(.secondary)
             Button {

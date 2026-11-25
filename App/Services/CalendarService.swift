@@ -87,7 +87,7 @@ final class CalendarService {
         guard let calendar = store.defaultCalendarForNewEvents else { throw CalendarError.noCalendar }
         let event = EKEvent(eventStore: store)
         event.title = task.displayTitle
-        event.notes = task.details.isEmpty ? "From Second Brain" : task.details
+        event.notes = task.details.isEmpty ? "From Coach Spark" : task.details
         event.calendar = calendar
         if task.hasDueTime {
             event.startDate = due

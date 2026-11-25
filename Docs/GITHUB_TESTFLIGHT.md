@@ -29,8 +29,8 @@ Pick something unique, for example **`com.trentnick99.secondbrain`**. You'll use
 
 At **developer.apple.com/account**, open **Certificates, Identifiers & Profiles › Identifiers** and tap the **+** button for each of these:
 
-1. **App Group:** choose *App Groups*, set Description to `Second Brain`, and Identifier to `group.com.trentnick99.secondbrain`.
-2. **App ID (the app):** choose *App IDs › App*, set Description to `Second Brain`, choose Bundle ID **Explicit** `com.trentnick99.secondbrain`, and tick **App Groups** under Capabilities. Then choose Continue › Register. Open the new App ID, click **Configure** next to App Groups, tick your group and Save.
+1. **App Group:** choose *App Groups*, set Description to `Coach Spark`, and Identifier to `group.com.trentnick99.secondbrain`.
+2. **App ID (the app):** choose *App IDs › App*, set Description to `Coach Spark`, choose Bundle ID **Explicit** `com.trentnick99.secondbrain`, and tick **App Groups** under Capabilities. Then choose Continue › Register. Open the new App ID, click **Configure** next to App Groups, tick your group and Save.
 3. **App ID (the widget):** do the same with `com.trentnick99.secondbrain.widgets`, App Groups ticked and assigned to the same group.
 
 ## Step 5 — Create the app in App Store Connect (once)
@@ -38,7 +38,7 @@ At **developer.apple.com/account**, open **Certificates, Identifiers & Profiles 
 1. Go to **appstoreconnect.apple.com › Apps › + › New App**.
 2. Fill in:
    - Platform: **iOS**
-   - Name: something unique on the App Store, such as `Second Brain for Coaches`. App Store names must be unique. Your Home Screen still shows **Second Brain**.
+   - Name: something unique on the App Store, such as `Coach Spark`. App Store names must be unique. Your Home Screen shows **Coach Spark**.
    - Primary language: English (U.S.)
    - Bundle ID: pick `com.trentnick99.secondbrain` from the list
    - SKU: anything, such as `secondbrain`

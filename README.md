@@ -1,4 +1,4 @@
-# Project Second Brain
+# Coach Spark
 
 A native iPhone app (Swift · SwiftUI · SwiftData) for a retail store coach. Capture what associates ask, what managers assign and what you notice in a few seconds, sort it with an Eisenhower Matrix, get reminded, and finish each shift knowing what's done and what's left.
 
@@ -24,7 +24,8 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 | Area | Highlights |
 |---|---|
 | **Your store** | Knows coach and team lead roles, the store manager, and areas like AP, ACC and OPD. "Have Jordan work the truck" hands a task to a team lead, and it stays Waiting until they confirm. A weekly 7–5 / 10–8 / 12–10 schedule drives "end of shift", briefings and End My Shift. |
-| **Ask** | "What do I do if…": suggests vetted, offline guides (safety, equipment and freight, leading people, customers, ethics) plus your own store guides. Emergencies show "call 911" first. One tap searches Reddit (r/walmart) or the web in your browser. It doesn't generate answers. |
+| **Home** | Calm and roomy: a header with today's progress and End My Shift, four big tools (Capture, Floor walk, Huddle, More tools), today's top 3, and your pinned and recent notes. |
+| **Standards** | A reference library of lists, not a question answerer: food safety temperatures with their public sources, product quality checks, step lists for store processes (freezer door, frozen truck, spills…), and your own temperature lists, quality standards and processes. Search filters the lists. Works offline. |
 | **Huddle** | A 5-minute huddle from today: a seasonal safety message, yesterday's wins, the top three with owners, and shout-outs. Share it or save it. |
 | **Shift timeline** | Your shift hour by hour, from an editable plan plus tasks with a time. Home shows "Now", with optional nudges at each block. |
 | **Team lead lists** | Hand off tasks (confirmed) and text each team lead a clean list of titles and due times. |
@@ -49,7 +50,7 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 | **Recurring** | Daily, weekdays, specific weekdays, monthly and custom intervals. A week is generated ahead with no duplicates. Pause, edit or discontinue. |
 | **Notifications** | Local, scheduled ahead of time, and working offline. Actions: Mark Complete, Snooze 15 min / 1 hr, Tomorrow Morning, Open Task. Also deadline, still-open and daily-briefing alerts, privacy previews and a badge. |
 | **Widgets** | Home Screen (small, medium with tappable checkboxes, large with matrix counts and follow-ups) and Lock Screen (circular, rectangular, inline), all showing real data. |
-| **Siri & Shortcuts** | “Add a task to Second Brain”, “What are my priorities in Second Brain”, “Show my overdue tasks in Second Brain”, “Show my follow-ups in Second Brain”, “Remind me in Second Brain”, “End my shift in Second Brain”, “Import notes into Second Brain”, “Quick note in Second Brain”, “What's next in Second Brain”. Control Center buttons for Quick Capture, Floor Walk and Walk Notes, and an Off duty Focus filter. |
+| **Siri & Shortcuts** | “Add a task to Coach Spark”, “What are my priorities in Coach Spark”, “Show my overdue tasks in Coach Spark”, “Show my follow-ups in Coach Spark”, “Remind me in Coach Spark”, “End my shift in Coach Spark”, “Import notes into Coach Spark”, “Quick note in Coach Spark”, “What's next in Coach Spark”. Control Center buttons for Quick Capture, Floor Walk and Walk Notes, and an Off duty Focus filter. |
 | **Optional extras** | Apple Calendar integration (events, conflicts, add-to-calendar on request), an Apple Intelligence briefing (iOS 26+), iCloud sync, Face ID lock, JSON backup and restore with daily automatic backups. |
 
 ## Repository layout

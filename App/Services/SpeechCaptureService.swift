@@ -38,7 +38,7 @@ final class SpeechCaptureService {
 
         let speechStatus = await Self.requestSpeechAuthorization()
         guard speechStatus == .authorized else {
-            state = .unavailable("Speech recognition is turned off for Second Brain. You can enable it in iOS Settings, or use the keyboard's microphone key.")
+            state = .unavailable("Speech recognition is turned off for Coach Spark. You can enable it in iOS Settings, or use the keyboard's microphone key.")
             return
         }
         let micGranted = await AVAudioApplication.requestRecordPermission()
