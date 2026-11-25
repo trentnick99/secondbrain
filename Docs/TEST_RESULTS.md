@@ -1,24 +1,25 @@
 # Test results
 
-## Cloud Mac (GitHub Actions) — 2026-11-23
+## Cloud Mac (GitHub Actions) — 2026-11-25 (Coach Spark, build 12)
 
 Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5**. Workflow: `.github/workflows/build.yml`.
 
 | Suite | Result |
 |---|---|
-| **Compile:** app, widget extension, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded.** The first build found one error, a SwiftUI expression in `SettingsView` too complex to type-check; it was fixed in the next commit. |
-| **SecondBrainCoreTests**: 169 engine tests, including holidays, the fiscal week, Season Planner prep dates, store terms, team hand-offs, privacy notes, roles, importing notes, Ask guide matching (for example, a freezer-door question gets the door and frozen-truck guides and never the crowd guide), your own guides, scanned text, walk notes, floor walks, shift handoffs, weather alerts, huddles, the shift timeline, team lead lists, weekly recaps and What's next | ✅ **169 / 169 passed** |
-| **SecondBrainTests**: 24 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`, run 45540145226) |
-| **SecondBrainUITests**: 14 end-to-end tests (in-memory store, fictional data) | ✅ **14 / 14 passed** (run 45543044255). The tests cover: Quick Capture, ambiguous captures, the privacy note, the Matrix, End My Shift, the weekly planner, Store Terms, the Season Planner, Import notes, editing the schedule, Ask (suggested guide, Reddit link, step to task), your own Ask guide, the floor walk, and the huddle. The Apple Watch app, scan, speech, weather location and the Live Activity need real devices, so they're covered by compile checks and engine tests only. |
-| **Signed release + TestFlight upload** | ⏳ Waiting on the Apple Developer Program setup ([GITHUB_TESTFLIGHT.md](GITHUB_TESTFLIGHT.md)) |
+| **Compile:** app, widget extension, Apple Watch app, unit-test and UI-test targets (Debug, simulator) | ✅ **Succeeded** (run 45551404403) |
+| **SecondBrainCoreTests**: 176 engine tests, including holidays, the fiscal week, Season Planner prep dates, store terms, team hand-offs, privacy notes, roles, importing notes, Standards (built-in temperatures match the FDA Food Code, 21 CFR 115.50 and USDA values; search filters lists; your own lists; old guides become process lists once), scanned text, walk notes, floor walks, shift handoffs, weather alerts, huddles, the shift timeline, team lead lists, weekly recaps and What's next | ✅ **176 / 176 passed** |
+| **SecondBrainTests**: 24 SwiftData integration tests (in-memory store) | ✅ **Passed** (`TEST EXECUTE SUCCEEDED`, run 45551404403) |
+| **SecondBrainUITests**: 16 end-to-end tests (in-memory store, fictional data) | ✅ **16 / 16 passed** (run 45556141257). The tests cover: Quick Capture, ambiguous captures, the privacy note, the Matrix, End My Shift, the weekly planner, Store Terms, the Season Planner, Import notes (from More tools), editing the schedule, notes on Home, Standards (food temperatures and sources, a process step to a task, your own temperature list), the floor walk, and the huddle. In the first run, 3 failed: one simulator launch timeout, Import notes sitting below the half-height More tools sheet (the sheet now opens full height), and a floor walk toast that disappeared before the slow simulator read it (the test now checks the task itself). The rerun passed all 16. The Apple Watch app, scan, speech, weather location and the Live Activity need real devices, so they're covered by compile checks and engine tests only. |
+| **Screenshots** | ✅ 24 screens (run 45556193538), on the `screenshots` branch |
+| **Signed release + TestFlight upload** | ✅ **Build 12 uploaded** (run 45559615273). Apple processes it before it shows in TestFlight. |
 | **On-device checks**: notifications in each app state, widgets, Siri, Face ID, speech | ⏳ After installing from TestFlight. See the manual checklist below. |
 
-## Linux build environment — 2026-11-23
+## Linux build environment — 2026-11-25
 
 | Check | Result |
 |---|---|
-| Engine tests (Swift 5.10.1, Linux) | ✅ 169 / 169 |
-| `swiftc -parse` on all app, widget and test files | ✅ |
+| Engine tests (Swift 5.10.1, Linux) | ✅ 176 / 176 |
+| `swiftc -parse` on all app, widget and test files | ✅ 66 files |
 | Project validation (`scripts/validate_project.py`) | ✅ |
 
 ## Engine tests (passed)
