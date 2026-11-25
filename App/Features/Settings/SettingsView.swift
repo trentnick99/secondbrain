@@ -41,8 +41,6 @@ struct SettingsView: View {
     @State private var confirmDeleteAll = false
     @State private var confirmDeleteAllAgain = false
     @State private var showRecurring = false
-    @State private var showStoreTerms = false
-    @State private var showSeasonPlanner = false
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @State private var calendarService = CalendarService.shared
@@ -61,42 +59,9 @@ struct SettingsView: View {
             privacySection
             intelligenceSection
             calendarSection
+            storeSection
+            displaySection
             dataSection
-            Section {
-                Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
-                Button { router.open(.weeklyReview) } label: { Label("Weekly review", systemImage: "chart.bar.doc.horizontal") }
-                Button { showStoreTerms = true } label: { Label("Store terms", systemImage: "character.book.closed") }
-                NavigationLink { RoleSettingsView() } label: {
-                    LabeledContent {
-                        Text(RoleStorage.decode(roleJSON).map(\.title) ?? "Not set")
-                    } label: {
-                        Label("Your role", systemImage: "person.badge.key")
-                    }
-                }
-                .accessibilityIdentifier("roleSettingsRow")
-                Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
-                Button { router.open(.standards(nil)) } label: { Label("Standards", systemImage: "list.clipboard") }
-                Button { router.open(.floorWalk) } label: { Label("Floor walk", systemImage: "figure.walk") }
-                Button { router.open(.huddle) } label: { Label("Huddle", systemImage: "megaphone") }
-                Button { router.open(.timeline) } label: { Label("Shift timeline", systemImage: "clock") }
-                NavigationLink { TeamListsView() } label: { Label("Team lead lists", systemImage: "list.bullet.clipboard") }
-                NavigationLink { WeatherSettingsView() } label: {
-                    LabeledContent {
-                        Text(weatherAlerts ? "On" : "Off")
-                    } label: {
-                        Label("Severe weather alerts", systemImage: "cloud.bolt.rain")
-                    }
-                }
-                .accessibilityIdentifier("weatherSettingsRow")
-                Toggle(isOn: $shiftLiveActivity) {
-                    Label("Shift on Lock Screen", systemImage: "lock.rectangle.on.rectangle")
-                }
-                Button { showSeasonPlanner = true } label: { Label("Season planner", systemImage: "leaf.arrow.triangle.circlepath") }
-                Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
-                Picker("Appearance", selection: $appearance) {
-                    ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
-                }
-            }
             aboutSection
         }
         .navigationTitle("Settings")
@@ -150,8 +115,6 @@ struct SettingsView: View {
                 }
             }
             .sheet(isPresented: $showRecurring) { RecurringListView() }
-            .sheet(isPresented: $showStoreTerms) { StoreTermsView() }
-            .sheet(isPresented: $showSeasonPlanner) { SeasonPlannerView() }
     }
 
     // MARK: Sections
@@ -213,7 +176,7 @@ struct SettingsView: View {
         } header: {
             Text("Notifications")
         } footer: {
-            Text("Reminders are scheduled on your iPhone ahead of time, so they arrive without an internet connection and even when the app is closed. iOS allows up to 64 pending alerts; Coach Spark keeps the soonest 60 and tops them up each time you open the app.")
+            Text("Reminders are scheduled on your iPhone ahead of time, so they arrive without an internet connection and even when the app is closed. iOS allows up to 64 pending alerts; task reminders share them with shift timeline nudges, soonest first, and are topped up each time you open the app.")
         }
     }
 
@@ -237,7 +200,48 @@ struct SettingsView: View {
         } header: {
             Text("Privacy & security")
         } footer: {
-            Text("Data is stored on this iPhone, protected by iOS data protection. Coach Spark is a personal tool — it doesn't connect to any employer systems and never asks for work credentials.")
+            Text("Data is stored on this iPhone, protected by iOS data protection. App lock covers the app itself; widgets, the Watch, the Lock Screen shift card and automatic backups in the Files app aren't locked. Coach Spark is a personal tool — it doesn't connect to any employer systems and never asks for work credentials.")
+        }
+    }
+
+    /// Settings about your store and role. Tools live in More tools on Home, not here.
+    private var storeSection: some View {
+        Section {
+            NavigationLink { RoleSettingsView() } label: {
+                LabeledContent {
+                    Text(RoleStorage.decode(roleJSON).map(\.title) ?? "Not set")
+                } label: {
+                    Label("Your role", systemImage: "person.badge.key")
+                }
+            }
+            .accessibilityIdentifier("roleSettingsRow")
+            NavigationLink { WeatherSettingsView() } label: {
+                LabeledContent {
+                    Text(weatherAlerts ? "On" : "Off")
+                } label: {
+                    Label("Severe weather alerts", systemImage: "cloud.bolt.rain")
+                }
+            }
+            .accessibilityIdentifier("weatherSettingsRow")
+            Button { showRecurring = true } label: { Label("Recurring tasks", systemImage: "repeat") }
+        } header: {
+            Text("Your store")
+        }
+    }
+
+    private var displaySection: some View {
+        Section {
+            Picker("Appearance", selection: $appearance) {
+                ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
+            }
+            Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
+            Toggle(isOn: $shiftLiveActivity) {
+                Label("Shift on Lock Screen", systemImage: "lock.rectangle.on.rectangle")
+            }
+        } header: {
+            Text("Home and Lock Screen")
+        } footer: {
+            Text("Standards, the Huddle, the Season planner, Store terms and other tools are in More tools on Home.")
         }
     }
 
@@ -291,13 +295,15 @@ struct SettingsView: View {
                 let backups = BackupService.automaticBackups()
                 LabeledContent("Saved backups", value: "\(backups.count)")
             }
-            Toggle("iCloud sync (requires setup)", isOn: $iCloudSync)
+            #if ICLOUD_SYNC
+            Toggle("iCloud sync", isOn: $iCloudSync)
+            #endif
             Button { loadSample() } label: { Label("Add fictional sample data", systemImage: "wand.and.stars") }
             Button(role: .destructive) { confirmDeleteAll = true } label: { Label("Delete all data…", systemImage: "trash") }
         } header: {
             Text("Data")
         } footer: {
-            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Coach Spark › Backups. Backups include your Standards lists, schedule, role and settings. Restoring merges: newer records win, and nothing already on this iPhone is deleted or overwritten. iCloud sync needs the iCloud capability added when building (see Docs/SIGNING.md) and takes effect after relaunch; without it, data stays on this iPhone.")
+            Text("Backups are JSON files you can save to Files, iCloud Drive or email. Automatic backups appear in the Files app under On My iPhone › Coach Spark › Backups. Backups include your Standards lists, schedule, role and settings. Restoring merges: newer records win, and nothing already on this iPhone is deleted or overwritten. Your data stays on this iPhone.")
         }
     }
 

@@ -43,11 +43,15 @@ struct OnboardingView: View {
         .interactiveDismissDisabled()
     }
 
+    /// Icon sizes scale with the person's text size.
+    @ScaledMetric(relativeTo: .largeTitle) private var pageIconSize: CGFloat = 52
+    @ScaledMetric(relativeTo: .title) private var roleIconSize: CGFloat = 40
+
     private func pageLayout<Content: View>(icon: String, title: String, @ViewBuilder content: () -> Content) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 Image(systemName: icon)
-                    .font(.system(size: 52))
+                    .font(.system(size: pageIconSize))
                     .foregroundStyle(Theme.accent)
                     .padding(.top, 40)
                     .accessibilityHidden(true)
@@ -75,8 +79,8 @@ struct OnboardingView: View {
     }
 
     private var howItWorks: some View {
-        pageLayout(icon: "sparkles", title: "How it works") {
-            step("1", "Tap + anywhere and type or speak: “Check with John tomorrow about his schedule.”")
+        pageLayout(icon: "bolt.fill", title: "How it works") {
+            step("1", "Tap Capture on Home (or + on Tasks and Notes) and type or speak: “Check with John tomorrow about his schedule.”")
             step("2", "Coach Spark suggests the person, date, reminder and Eisenhower quadrant. If anything is unclear, it asks before saving — it never invents dates or people.")
             step("3", "Your dashboard, widgets and reminders keep it in front of you.")
             step("4", "At the end of the day, End My Shift shows what's done and carries the rest forward — nothing unfinished disappears.")
@@ -86,7 +90,7 @@ struct OnboardingView: View {
     private var roleStep: some View {
         VStack(spacing: 12) {
             Image(systemName: "person.badge.key")
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: roleIconSize, weight: .semibold))
                 .foregroundStyle(Theme.purple)
                 .padding(.top, 24)
             Text("Your role").font(.title2.weight(.bold))

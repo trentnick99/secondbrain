@@ -117,7 +117,9 @@ struct QuickCaptureView: View {
                     .accessibilityIdentifier("captureKind-\(kind.rawValue)")
                 }
             }
+            .padding(.trailing, 24)
         }
+        .trailingFade()
     }
 
     private var ambiguityList: some View {

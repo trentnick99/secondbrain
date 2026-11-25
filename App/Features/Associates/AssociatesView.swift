@@ -101,7 +101,7 @@ struct AssociatesView: View {
             .listRowBackground(Color.clear)
         }
         followUpSection("Overdue", overdue, tint: Theme.danger)
-        followUpSection("Today", today, tint: Theme.accent)
+        followUpSection("Today", today, tint: .secondary)
         followUpSection("Upcoming", upcoming, tint: .secondary)
         followUpSection("No date", undated, tint: .secondary)
         followUpSection("Waiting on someone", waiting, tint: Theme.warning)
@@ -191,8 +191,11 @@ struct FollowUpRow: View {
                     .font(.subheadline)
                     .lineLimit(2)
                 if !task.commitment.isEmpty {
-                    Label(task.commitment, systemImage: "hand.thumbsup")
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    HStack(spacing: 3) {
+                        Image(systemName: "hand.thumbsup").imageScale(.small).accessibilityHidden(true)
+                        Text(task.commitment)
+                    }
+                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
                 HStack(spacing: 8) {
                     if let due = task.dueDate, task.isOpen {

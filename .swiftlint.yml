@@ -1,0 +1,28 @@
+# A small, strict rule set: crash risks and obvious mistakes, not style preferences.
+# Runs in CI (.github/workflows/build.yml). Run locally with `swiftlint lint` on a Mac.
+included:
+  - App
+  - Shared
+  - Widgets
+  - Watch
+  - Packages/SecondBrainCore/Sources
+  - Tests
+excluded:
+  - Packages/SecondBrainCore/.build
+  - build
+only_rules:
+  - force_try
+  - force_cast
+  - duplicate_imports
+  - trailing_semicolon
+  - xctfail_message
+  - fatal_error_message
+  - mark
+  - empty_parameters
+  - unused_optional_binding
+  - redundant_discardable_let
+  - unused_enumerated
+  - discarded_notification_center_observer
+  - weak_delegate
+  - private_unit_test
+  - legacy_constructor

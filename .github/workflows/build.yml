@@ -22,6 +22,9 @@ on:
         default: macos-26-intel
         options: [macos-26-intel, macos-26, macos-15]
 
+permissions:
+  contents: read
+
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
@@ -45,6 +48,12 @@ jobs:
           xcodebuild -version
           swift --version
           echo "Xcode: $(xcodebuild -version | head -1)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Lint (SwiftLint)
+        run: |
+          command -v swiftlint >/dev/null || brew install swiftlint
+          swiftlint version
+          swiftlint lint --strict --quiet --reporter github-actions-logging
 
       - name: Engine tests (SecondBrainCore)
         run: swift test --package-path Packages/SecondBrainCore
@@ -72,6 +81,7 @@ jobs:
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -derivedDataPath build/DerivedData \
             -only-testing:SecondBrainTests \
+            -collect-test-diagnostics never \
             -resultBundlePath build/IntegrationTests.xcresult
 
       - name: UI tests (end-to-end workflow)
@@ -84,6 +94,8 @@ jobs:
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -derivedDataPath build/DerivedData \
             -only-testing:SecondBrainUITests \
+            -collect-test-diagnostics never \
+            -retry-tests-on-failure -test-iterations 2 \
             -resultBundlePath build/UITests.xcresult
 
       - name: Upload logs and test results

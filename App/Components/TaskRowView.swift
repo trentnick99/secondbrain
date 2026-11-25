@@ -13,19 +13,12 @@ struct TaskRowView: View {
         HStack(alignment: .top, spacing: 12) {
             CompletionButton(task: task)
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    if task.kind != .task {
-                        Image(systemName: task.kind.systemImage)
-                            .font(.caption)
-                            .foregroundStyle(task.kind == .issue ? Theme.warning : Theme.accent)
-                            .accessibilityHidden(true)
-                    }
-                    Text(task.displayTitle)
-                        .font(.body)
-                        .strikethrough(task.isCompleted)
-                        .foregroundStyle(task.isCompleted ? .secondary : .primary)
-                        .lineLimit(2)
-                }
+                // The title always starts at the same place; the item's type sits in the line below.
+                Text(task.displayTitle)
+                    .font(.body)
+                    .strikethrough(task.isCompleted)
+                    .foregroundStyle(task.isCompleted ? .secondary : .primary)
+                    .lineLimit(2)
                 metaLine
             }
             Spacer(minLength: 4)
@@ -72,11 +65,13 @@ struct TaskRowView: View {
     }
 
     private func metaLabel(_ item: Meta) -> some View {
-        Label(item.text, systemImage: item.icon)
-            .labelStyle(.titleAndIcon)
-            .font(.caption)
-            .foregroundStyle(item.color)
-            .lineLimit(1)
+        HStack(spacing: 3) {
+            Image(systemName: item.icon).imageScale(.small).accessibilityHidden(true)
+            Text(item.text)
+        }
+        .font(.caption)
+        .foregroundStyle(item.color)
+        .lineLimit(1)
     }
 
     private struct Meta { let text: String; let icon: String; let color: Color }
@@ -84,6 +79,10 @@ struct TaskRowView: View {
     private var metaItems: [Meta] {
         var items: [Meta] = []
         let now = Date()
+        if task.kind != .task {
+            items.append(Meta(text: task.kind.shortTitle, icon: task.kind.systemImage,
+                              color: task.kind == .issue ? Theme.warning : Theme.accent))
+        }
         if let due = task.dueDate, task.isOpen {
             let overdue = task.isOverdue(now: now)
             items.append(Meta(text: RelativeDateText.dueText(due: due, hasTime: task.hasDueTime, now: now, calendar: .current),

@@ -17,6 +17,7 @@ struct DashboardView: View {
     /// The clock Home is built from. Refreshed every minute, when the app comes back, and at midnight.
     @State private var now = Date()
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var typeSize
     private let weather = WeatherAlertService.shared
     @AppStorage(SettingsKey.offDuty, store: AppGroup.defaults) private var offDuty = false
     @AppStorage(SettingsKey.shiftPlanBlocks, store: AppGroup.defaults) private var planJSON = ""
@@ -89,16 +90,10 @@ struct DashboardView: View {
                     Button { router.open(.planner) } label: { Image(systemName: "calendar") }
                         .accessibilityLabel("Daily and weekly planner")
                 }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button { router.open(.storeTerms(nil)) } label: { Image(systemName: "character.book.closed") }
-                        .accessibilityLabel("Store terms")
-                        .accessibilityIdentifier("storeTermsButton")
-                    Button { router.open(.weeklyReview) } label: { Image(systemName: "chart.bar.doc.horizontal") }
-                        .accessibilityLabel("Weekly review")
+                ToolbarItem(placement: .topBarTrailing) {
                     Button { router.open(.settings) } label: { Image(systemName: "gearshape") }
                         .accessibilityLabel("Settings")
                         .accessibilityIdentifier("settingsButton")
-                        .accessibilityLabel("Settings")
                 }
             }
             .refreshable {
@@ -184,20 +179,24 @@ struct DashboardView: View {
         return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: now, calendar: cal)) \(label)"
     }
 
-    /// Four big tools. Everything else is one tap away in More tools.
+    /// Four big tools in a 2×2 grid (one column at accessibility text sizes). Everything else is one
+    /// tap away in More tools.
+    @ViewBuilder
     private var toolsGrid: some View {
-        Grid(horizontalSpacing: 12, verticalSpacing: 12) {
-            GridRow {
-                ToolTile(id: "capture", title: "Capture", subtitle: "Task, note or follow-up",
-                         systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
-                ToolTile(id: "floorwalk", title: "Floor walk", subtitle: "Check your areas",
-                         systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
-            }
-            GridRow {
-                ToolTile(id: "huddle", title: "Huddle", subtitle: "Built from today",
-                         systemImage: "megaphone.fill", tint: Theme.warning) { router.open(.huddle) }
-                ToolTile(id: "more", title: "More tools", subtitle: "Standards, timeline, import",
-                         systemImage: "square.grid.2x2.fill", tint: Theme.purple) { showMoreTools = true }
+        let capture = ToolTile(id: "capture", title: "Capture", subtitle: "Task, note or follow-up",
+                               systemImage: "bolt.fill", tint: Theme.accent) { router.open(.capture(nil)) }
+        let walk = ToolTile(id: "floorwalk", title: "Floor walk", subtitle: "Check your areas",
+                            systemImage: "figure.walk", tint: Theme.success) { router.open(.floorWalk) }
+        let huddle = ToolTile(id: "huddle", title: "Huddle", subtitle: "Built from today",
+                              systemImage: "megaphone.fill", tint: Theme.warning) { router.open(.huddle) }
+        let more = ToolTile(id: "more", title: "More tools", subtitle: "Standards, timeline, import",
+                            systemImage: "square.grid.2x2.fill", tint: Theme.purple) { showMoreTools = true }
+        if typeSize.isAccessibilitySize {
+            VStack(spacing: 12) { capture; walk; huddle; more }
+        } else {
+            Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+                GridRow { capture; walk }
+                GridRow { huddle; more }
             }
         }
     }

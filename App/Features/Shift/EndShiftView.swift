@@ -41,9 +41,6 @@ struct EndShiftView: View {
 
                 if !carryCandidates.isEmpty {
                     Section {
-                        ForEach(carryCandidates) { task in
-                            ShiftItemRow(task: task)
-                        }
                         Button {
                             confirmCarryAll = true
                         } label: {
@@ -51,10 +48,13 @@ struct EndShiftView: View {
                                 .font(.headline)
                         }
                         .accessibilityIdentifier("carryAllButton")
+                        ForEach(carryCandidates) { task in
+                            ShiftItemRow(task: task)
+                        }
                     } header: {
                         Text("Unfinished & overdue")
                     } footer: {
-                        Text("Nothing is removed. Items you leave alone stay where they are and show as overdue next shift.")
+                        Text("Swipe right to mark one done, left to move it, or tap ⋯ for a date. Nothing is removed: items you leave alone stay where they are and show as overdue next shift.")
                     }
                 }
 
@@ -125,7 +125,7 @@ struct EndShiftView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Finish") { finish(review: review, items: items) }.fontWeight(.semibold)
+                    Button("Finish shift") { finish(review: review, items: items) }.fontWeight(.semibold)
                 }
             }
             .confirmationDialog("Carry \(carryCandidates.count) items to your next shift (\(AppSettings.nextShiftLabel()))?", isPresented: $confirmCarryAll, titleVisibility: .visible) {
@@ -203,33 +203,46 @@ struct EndShiftView: View {
     }
 }
 
-/// One unfinished item with explicit choices: complete, tomorrow, pick a date, or leave it.
+/// One unfinished item with explicit choices: complete, next shift, pick a date, or leave it.
+/// The choices are swipe actions and a ⋯ menu, so a long list stays readable.
 struct ShiftItemRow: View {
     let task: TaskItem
     @Environment(\.modelContext) private var context
     @State private var showReschedule = false
+    @State private var completed = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(alignment: .center, spacing: 8) {
             TaskRowView(task: task)
-            HStack(spacing: 8) {
-                Button {
-                    TaskActions.complete(task, in: context)
-                } label: { Label("Done", systemImage: "checkmark") }
-                    .buttonStyle(.bordered).tint(Theme.success)
-                Button {
-                    TaskActions.carryForward([task], to: AppSettings.nextShiftDay(), in: context)
-                } label: { Label("Next shift", systemImage: "sunrise") }
-                    .buttonStyle(.bordered).tint(Theme.accent)
-                Button {
-                    showReschedule = true
-                } label: { Label("Pick date", systemImage: "calendar") }
-                    .buttonStyle(.bordered)
+            Menu {
+                Button { complete() } label: { Label("Done", systemImage: "checkmark") }
+                Button { moveToNextShift() } label: { Label("Next shift (\(AppSettings.nextShiftLabel()))", systemImage: "sunrise") }
+                Button { showReschedule = true } label: { Label("Pick a date…", systemImage: "calendar") }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3)
+                    .foregroundStyle(Theme.accent)
+                    .frame(minWidth: 44, minHeight: 44)
             }
-            .font(.caption.weight(.semibold))
-            .labelStyle(.titleAndIcon)
+            .accessibilityLabel("Choices for \(task.displayTitle)")
         }
-        .padding(.vertical, 4)
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+            Button { complete() } label: { Label("Done", systemImage: "checkmark") }.tint(Theme.success)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button { moveToNextShift() } label: { Label("Next shift", systemImage: "sunrise") }.tint(Theme.accent)
+            Button { showReschedule = true } label: { Label("Pick date", systemImage: "calendar") }
+        }
+        .sensoryFeedback(.success, trigger: completed)
         .sheet(isPresented: $showReschedule) { RescheduleSheet(task: task).presentationDetents([.medium, .large]) }
+    }
+
+    private func complete() {
+        TaskActions.complete(task, in: context)
+        completed += 1
+    }
+
+    private func moveToNextShift() {
+        TaskActions.carryForward([task], to: AppSettings.nextShiftDay(), in: context)
     }
 }

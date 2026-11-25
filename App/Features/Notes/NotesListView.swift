@@ -8,7 +8,6 @@ struct NotesListView: View {
     @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
     @State private var search = ""
     @State private var typeFilter: NoteType?
-    @State private var editing: Note?
     @State private var pendingDelete: Note?
 
     private var filtered: [Note] {
@@ -32,6 +31,7 @@ struct NotesListView: View {
                         }
                         .padding(.horizontal)
                     }
+                    .trailingFade()
                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                     .listRowBackground(Color.clear)
                 }
@@ -60,17 +60,6 @@ struct NotesListView: View {
                     Button { router.open(.importNotes(nil)) } label: { Image(systemName: "square.and.arrow.down") }
                         .accessibilityLabel("Import notes")
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        ForEach(NoteType.allCases) { type in
-                            Button { editing = newNote(type) } label: { Label("\(type.title) Note", systemImage: type.systemImage) }
-                        }
-                    } label: { Image(systemName: "square.and.pencil") }
-                    .accessibilityLabel("New note")
-                }
-            }
-            .sheet(item: $editing) { note in
-                NavigationStack { NoteEditorView(note: note) }
             }
             .confirmationDialog("Delete this note?", isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
                                 titleVisibility: .visible) {
@@ -98,15 +87,18 @@ struct NotesListView: View {
             }
     }
 
-    private func newNote(_ type: NoteType) -> Note {
-        let note = Note(title: "", body: "", type: type)
-        context.insert(note)
-        return note
-    }
 }
 
 struct NoteRow: View {
     let note: Note
+
+    /// "Today", "Yesterday" or "Nov 25"; the year only for notes from another year.
+    static func dateText(_ date: Date, now: Date = Date(), calendar: Calendar = .current) -> String {
+        guard calendar.isDate(date, equalTo: now, toGranularity: .year) else {
+            return date.formatted(date: .abbreviated, time: .omitted)
+        }
+        return RelativeDateText.dayLabel(for: date, now: now, calendar: calendar)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -119,7 +111,7 @@ struct NoteRow: View {
                 Text(note.snippet).font(.subheadline).foregroundStyle(.secondary).lineLimit(2)
             }
             HStack(spacing: 8) {
-                Text(note.updatedAt.formatted(date: .abbreviated, time: .omitted))
+                Text(Self.dateText(note.updatedAt))
                 if let name = note.associate?.name { Text("· \(name)") }
                 let open = (note.checklist ?? []).filter { !$0.isDone }.count
                 if open > 0 { Text("· \(open) to do") }

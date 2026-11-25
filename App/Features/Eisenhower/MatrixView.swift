@@ -25,6 +25,14 @@ struct MatrixView: View {
     @State private var showEscalations = false
     @State private var pendingDrop: (task: TaskItem, quadrant: Quadrant)?
     @State private var showGuide = false
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Two columns normally; one at accessibility text sizes so tasks stay readable.
+    private var columns: [GridItem] {
+        typeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    }
 
     struct QuadrantSelection: Identifiable { let quadrant: Quadrant; var id: String { quadrant.rawValue } }
 
@@ -39,8 +47,8 @@ struct MatrixView: View {
 
                     if !escalations.isEmpty { escalationBanner }
 
-                    axisLabels
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                    if !typeSize.isAccessibilitySize { axisLabels }
+                    LazyVGrid(columns: columns, spacing: 10) {
                         ForEach(Quadrant.allCases) { q in
                             QuadrantCard(quadrant: q, tasks: items(in: q), onOpen: { expanded = QuadrantSelection(quadrant: q) },
                                          onDrop: { ids in handleDrop(ids, into: q) })
@@ -144,8 +152,8 @@ struct MatrixView: View {
 
     private var axisLabels: some View {
         HStack {
-            Text("URGENT").font(.caption2.weight(.bold)).foregroundStyle(.secondary).frame(maxWidth: .infinity)
-            Text("NOT URGENT").font(.caption2.weight(.bold)).foregroundStyle(.secondary).frame(maxWidth: .infinity)
+            Text("Urgent").font(.caption.weight(.semibold)).foregroundStyle(.secondary).frame(maxWidth: .infinity)
+            Text("Not urgent").font(.caption.weight(.semibold)).foregroundStyle(.secondary).frame(maxWidth: .infinity)
         }
         .accessibilityHidden(true)
     }
@@ -204,8 +212,8 @@ struct QuadrantCard: View {
             Button(action: onOpen) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("\(quadrant.code) · \(quadrant.title.uppercased())")
-                            .font(.caption.weight(.heavy))
+                        Text("\(quadrant.code) · \(quadrant.title)")
+                            .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Theme.color(for: quadrant))
                         Text(quadrant.subtitle).font(.caption2).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
                     }

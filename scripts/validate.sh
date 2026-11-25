@@ -12,7 +12,7 @@ count=0
 while IFS= read -r f; do
   swiftc -parse "$f" >/dev/null
   count=$((count + 1))
-done < <(find App Shared Widgets Tests -name '*.swift' | sort)
+done < <(find App Shared Widgets Watch Tests -name '*.swift' | sort)
 echo "  $count files parsed"
 
 echo "▶ Project structure"

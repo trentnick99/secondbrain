@@ -215,3 +215,17 @@ struct QuickDateChips: View {
         }
     }
 }
+
+extension View {
+    /// Fades the trailing edge of a horizontal chip row, so a chip cut off at the edge reads as
+    /// "scroll for more" rather than a layout mistake.
+    func trailingFade(width: CGFloat = 32) -> some View {
+        mask {
+            HStack(spacing: 0) {
+                Rectangle()
+                LinearGradient(colors: [.black, .black.opacity(0)], startPoint: .leading, endPoint: .trailing)
+                    .frame(width: width)
+            }
+        }
+    }
+}

@@ -110,6 +110,7 @@ struct TaskListView: View {
             }
             .padding(.horizontal)
         }
+        .trailingFade()
     }
 
     /// "My area" appears once a role with an area is chosen (store managers already see everything).
