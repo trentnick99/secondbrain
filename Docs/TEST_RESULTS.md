@@ -1,5 +1,14 @@
 # Test results
 
+## Cloud Mac (GitHub Actions) — 2026-11-27 (build 16, calmer Home)
+
+| Suite | Result |
+|---|---|
+| Compile, SwiftLint, engine and SwiftData integration tests | ✅ run 45933721418 |
+| **SecondBrainUITests** | ✅ 20 / 20, including the new Home checks (counts in the header, one Next up list, removed cards gone, pinned notes open Notes). One passed on the automatic retry after a simulator launch timeout. |
+| Screenshots | ✅ run 45933732112 |
+| Signed release + TestFlight upload | ✅ **Build 16 uploaded** (run 45937139738). It adds a one-line header fix (the next shift's time no longer breaks across lines) made after the test run; the archive compiled it. |
+
 ## Cloud Mac (GitHub Actions) — 2026-11-25 (builds 13 and 15)
 
 Runner `macos-26-intel` · **Xcode 26.6** · simulator **iPhone 17 Pro, iOS 26.5**. SwiftLint (`--strict`) passes on both.
