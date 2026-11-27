@@ -2,19 +2,18 @@ import SwiftData
 import SwiftUI
 import SecondBrainCore
 
-/// Home: what needs attention right now, in the order a shift actually runs. Calm and roomy: a
-/// header with the day's progress, four big tools, today's top three and your notes, then tasks.
+/// Home: only what needs you right now. A header with today's counts and End My Shift, one status
+/// line, four tools, today's top three, the next few things due, and pinned notes. Everything else
+/// lives in Tasks, Notes, the planner and More tools.
 struct DashboardView: View {
     @Environment(\.modelContext) private var context
     @Environment(AppRouter.self) private var router
-    @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
     /// Open tasks plus what was finished since yesterday; a year of completed work is never loaded.
     @Query(TaskQueries.home()) private var tasks: [TaskItem]
     @Query(sort: \Note.updatedAt, order: .reverse) private var notes: [Note]
     @State private var showMoreTools = false
     @State private var pendingTool: Route?
-    @State private var showCompleted = false
     /// The clock Home is built from. Refreshed every minute, when the app comes back, and at midnight.
     @State private var now = Date()
     @Environment(\.scenePhase) private var scenePhase
@@ -30,45 +29,14 @@ struct DashboardView: View {
 
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 16) {
                     header(agenda)
-                    if offDuty {
-                        Label("Off duty. Your Focus is on, so work can wait.", systemImage: "moon.stars.fill")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Theme.accent)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(12)
-                            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
                     WeatherAlertBanner(alerts: weather.current)
-                    nowBlock
+                    statusLine
                     toolsGrid
-                    if !agenda.inbox.isEmpty { inboxBanner(count: agenda.inbox.count) }
-
                     focusCard(agenda, items: items)
-                    notesCard
-
-                    TaskCard(title: "Overdue", systemImage: "exclamationmark.circle.fill", tint: Theme.danger,
-                             tasks: items(agenda.overdue))
-                    TaskCard(title: "Do first", systemImage: Quadrant.doFirst.systemImage, tint: Theme.color(for: .doFirst),
-                             tasks: items(agenda.urgentImportant.filter { snap in !agenda.overdue.contains { $0.id == snap.id } }))
-                    TaskCard(title: "Associate follow-ups", systemImage: "person.crop.circle.badge.clock", tint: Theme.accent,
-                             tasks: items(agenda.followUpsDue.filter { snap in !agenda.overdue.contains { $0.id == snap.id } }),
-                             showQuadrant: false)
-                    TaskCard(title: "Due today", systemImage: "calendar", tint: Theme.accent,
-                             tasks: items(agenda.dueToday.filter { $0.quadrant != .doFirst && $0.kind != .followUp }),
-                             emptyText: agenda.dueToday.isEmpty && agenda.overdue.isEmpty ? "Nothing else is due today." : nil)
-                    TaskCard(title: "Upcoming reminders", systemImage: "bell", tint: Theme.accent,
-                             tasks: items(agenda.upcomingReminders), limit: 4)
-
-                    if let role = RoleStorage.decode(roleJSON), role.seesWholeStore || role.primaryArea != nil {
-                        if !role.seesWholeStore { MyAreaCard(role: role, tasks: tasks) }
-                    } else {
-                        RolePromptCard()
-                    }
-                    if showSeasonOnHome { SeasonComingUpCard(now: now) }
-                    upcoming(agenda, items: items)
-                    completed(agenda, items: items)
+                    nextUpCard(agenda, items: items)
+                    if !pinnedNotes.isEmpty { notesCard }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
@@ -112,10 +80,7 @@ struct DashboardView: View {
     // MARK: Sections
 
     private func header(_ agenda: DayAgenda) -> some View {
-        let done = agenda.completedToday.count
-        let total = done + agenda.dueToday.count + agenda.overdue.count
-        let progress = total == 0 ? 0 : Double(done) / Double(total)
-        return VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(greeting)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(Theme.heroText)
@@ -123,25 +88,10 @@ struct DashboardView: View {
             Text(dateLine)
                 .font(.subheadline)
                 .foregroundStyle(Theme.heroSecondary)
-            HStack(spacing: 8) {
-                HeroCount(value: agenda.dueToday.count, label: "due today")
-                HeroCount(value: agenda.overdue.count, label: "overdue", alert: agenda.overdue.count > 0)
-                if agenda.followUpsDue.count > 0 {
-                    HeroCount(value: agenda.followUpsDue.count, label: agenda.followUpsDue.count == 1 ? "follow-up" : "follow-ups")
-                }
-            }
-            Capsule()
-                .fill(Theme.heroTrack)
-                .frame(height: 8)
-                .overlay(alignment: .leading) {
-                    Capsule()
-                        .fill(Theme.heroProgress)
-                        .scaleEffect(x: max(progress, 0.03), y: 1, anchor: .leading)
-                }
-                .accessibilityHidden(true)
-            Text(total == 0 ? "Nothing due today" : "\(done) of \(total) done today")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(Theme.heroSecondary)
+            Text(summary(agenda))
+                .font(.subheadline)
+                .foregroundStyle(Theme.heroText)
+                .accessibilityIdentifier("homeSummary")
             Button {
                 router.open(.shift)
             } label: {
@@ -159,6 +109,24 @@ struct DashboardView: View {
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.heroFill, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    /// "4 due · 3 overdue · 1 follow-up · 1 of 8 done", with the overdue count in bold.
+    private func summary(_ agenda: DayAgenda) -> AttributedString {
+        let done = agenda.completedToday.count
+        let total = done + agenda.dueToday.count + agenda.overdue.count
+        if total == 0 && agenda.followUpsDue.isEmpty { return AttributedString("Nothing due today") }
+        var text = AttributedString("\(agenda.dueToday.count) due")
+        if !agenda.overdue.isEmpty {
+            text += AttributedString(" · ")
+            var overdue = AttributedString("\(agenda.overdue.count) overdue")
+            overdue.inlinePresentationIntent = .stronglyEmphasized
+            text += overdue
+        }
+        let followUps = agenda.followUpsDue.count
+        if followUps > 0 { text += AttributedString(" · \(followUps) follow-up\(followUps == 1 ? "" : "s")") }
+        if total > 0 { text += AttributedString(" · \(done) of \(total) done") }
+        return text
     }
 
     /// First line of the briefing ("Good evening. You have 6 tasks due today…"), or a plain greeting.
@@ -180,8 +148,8 @@ struct DashboardView: View {
         return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: now, calendar: cal)) \(label)"
     }
 
-    /// Four big tools in a 2×2 grid (one column at accessibility text sizes). Everything else is one
-    /// tap away in More tools.
+    /// Four tools in a compact 2×2 grid (one column at accessibility text sizes). Everything else is
+    /// one tap away in More tools.
     @ViewBuilder
     private var toolsGrid: some View {
         let capture = ToolTile(id: "capture", title: "Capture", subtitle: "Task, note or follow-up",
@@ -193,12 +161,27 @@ struct DashboardView: View {
         let more = ToolTile(id: "more", title: "More tools", subtitle: "Standards, timeline, import",
                             systemImage: "square.grid.2x2.fill", tint: Theme.purple) { showMoreTools = true }
         if typeSize.isAccessibilitySize {
-            VStack(spacing: 12) { capture; walk; huddle; more }
+            VStack(spacing: 10) { capture; walk; huddle; more }
         } else {
-            Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow { capture; walk }
                 GridRow { huddle; more }
             }
+        }
+    }
+
+    /// At most one line under the header: Off duty when the Focus is on, otherwise what's planned now.
+    @ViewBuilder
+    private var statusLine: some View {
+        if offDuty {
+            Label("Off duty. Your Focus is on, so work can wait.", systemImage: "moon.stars.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.accent)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        } else {
+            nowBlock
         }
     }
 
@@ -229,56 +212,75 @@ struct DashboardView: View {
         }
     }
 
-    /// Pinned notes first, then the most recent: the things worth keeping in front of you.
-    private var homeNotes: [Note] {
-        Array((notes.filter(\.isPinned) + notes.filter { !$0.isPinned }).prefix(4))
-    }
+    /// Only notes you pinned: the things you chose to keep in front of you.
+    private var pinnedNotes: [Note] { Array(notes.filter(\.isPinned).prefix(3)) }
 
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                SectionTitle(title: "Notes", systemImage: "note.text", tint: Theme.purple)
-                if !notes.isEmpty {
-                    Button("See all") { router.open(.tab(.notes)) }
-                        .font(.subheadline.weight(.semibold))
-                        .accessibilityIdentifier("homeNotesSeeAll")
-                }
+                SectionTitle(title: "Pinned notes", systemImage: "pin.fill", tint: Theme.warning)
+                Button("See all") { router.open(.tab(.notes)) }
+                    .font(.subheadline.weight(.semibold))
+                    .accessibilityIdentifier("homeNotesSeeAll")
             }
-            if homeNotes.isEmpty {
-                Text("Jot down what you notice on the floor. Pinned notes stay here.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            ForEach(homeNotes) { note in
+            ForEach(pinnedNotes) { note in
                 NavigationLink { NoteEditorView(note: note) } label: { HomeNoteRow(note: note) }
                     .buttonStyle(.plain)
-                if note.id != homeNotes.last?.id { Divider() }
+                if note.id != pinnedNotes.last?.id { Divider() }
             }
-            Button { router.open(.capture(.note)) } label: {
-                Label("New note", systemImage: "square.and.pencil")
-                    .font(.subheadline.weight(.semibold))
-            }
-            .padding(.top, 2)
-            .accessibilityIdentifier("homeNewNote")
         }
         .card()
     }
 
-    private func inboxBanner(count: Int) -> some View {
-        Button {
-            router.taskFilterRequest = .inbox
-            router.open(.tab(.tasks))
-        } label: {
-            HStack {
-                Image(systemName: "tray.full").foregroundStyle(Theme.warning)
-                Text("\(count) item\(count == 1 ? "" : "s") in your Inbox to sort")
-                    .font(.subheadline.weight(.semibold))
-                Spacer()
-                Image(systemName: "chevron.right").foregroundStyle(.secondary)
+    /// Overdue, then Do first, follow-ups and the rest due today, without what's already in the top 3.
+    private func nextUp(_ agenda: DayAgenda) -> [TaskSnapshot] {
+        let top = agenda.topPriorities.isEmpty ? agenda.suggestedPriorities : agenda.topPriorities
+        var seen = Set(top.map(\.id))
+        return (agenda.overdue + agenda.urgentImportant + agenda.followUpsDue + agenda.dueToday)
+            .filter { seen.insert($0.id).inserted }
+    }
+
+    /// One short list instead of separate Overdue, Do first, Follow-ups and Due today cards.
+    private func nextUpCard(_ agenda: DayAgenda, items: ([TaskSnapshot]) -> [TaskItem]) -> some View {
+        let list = items(nextUp(agenda))
+        let shown = Array(list.prefix(5))
+        return VStack(alignment: .leading, spacing: 8) {
+            SectionTitle(title: "Next up", systemImage: "list.bullet", tint: Theme.accent)
+            if shown.isEmpty {
+                Text("Nothing else is due today.").font(.subheadline).foregroundStyle(.secondary).padding(.vertical, 4)
             }
-            .card(tint: Theme.warning)
+            ForEach(shown) { task in
+                Button { router.open(.task(task.id)) } label: { TaskRowView(task: task) }
+                    .buttonStyle(.plain)
+                    .contextMenu { TaskQuickMenu(task: task) }
+                if task.id != shown.last?.id { Divider().padding(.leading, 56) }
+            }
+            if list.count > shown.count || !agenda.inbox.isEmpty {
+                HStack {
+                    if list.count > shown.count {
+                        Button("See all \(list.count) in Tasks") { openTasks(.today) }
+                            .accessibilityIdentifier("nextUpSeeAll")
+                    }
+                    Spacer(minLength: 8)
+                    if !agenda.inbox.isEmpty {
+                        Button { openTasks(.inbox) } label: {
+                            Label("\(agenda.inbox.count) to sort", systemImage: "tray.full")
+                        }
+                        .tint(Theme.warning)
+                        .accessibilityIdentifier("homeInboxLink")
+                    }
+                }
+                .font(.subheadline.weight(.semibold))
+                .padding(.top, 2)
+            }
         }
-        .buttonStyle(.plain)
+        .card()
+        .accessibilityIdentifier("nextUpCard")
+    }
+
+    private func openTasks(_ filter: TaskFilter) {
+        router.taskFilterRequest = filter
+        router.open(.tab(.tasks))
     }
 
     @ViewBuilder
@@ -310,62 +312,6 @@ struct DashboardView: View {
             }
         }
         .card()
-    }
-
-    @ViewBuilder
-    private func upcoming(_ agenda: DayAgenda, items: ([TaskSnapshot]) -> [TaskItem]) -> some View {
-        let tomorrow = items(agenda.tomorrow)
-        let week = items(agenda.restOfWeek)
-        let recurringSeries = Set(agenda.recurring.map(\.title))
-        if !tomorrow.isEmpty || !week.isEmpty || !recurringSeries.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                SectionTitle(title: "Upcoming", systemImage: "calendar.badge.clock")
-                if !tomorrow.isEmpty {
-                    Text("Tomorrow").font(.footnote.weight(.semibold)).foregroundStyle(.secondary)
-                    ForEach(tomorrow.prefix(4)) { task in
-                        Button { router.open(.task(task.id)) } label: { TaskRowView(task: task) }.buttonStyle(.plain)
-                    }
-                }
-                if !week.isEmpty {
-                    Text("Rest of the week").font(.footnote.weight(.semibold)).foregroundStyle(.secondary)
-                    ForEach(week.prefix(4)) { task in
-                        Button { router.open(.task(task.id)) } label: { TaskRowView(task: task) }.buttonStyle(.plain)
-                    }
-                    if week.count > 4 {
-                        Button("See the week") { router.open(.planner) }.font(.footnote)
-                    }
-                }
-                if !recurringSeries.isEmpty {
-                    Text("Recurring responsibilities").font(.footnote.weight(.semibold)).foregroundStyle(.secondary)
-                    Text(recurringSeries.sorted().joined(separator: " · "))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .card()
-        }
-    }
-
-    @ViewBuilder
-    private func completed(_ agenda: DayAgenda, items: ([TaskSnapshot]) -> [TaskItem]) -> some View {
-        let done = items(agenda.completedToday)
-        if !done.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Button {
-                    withAnimation { showCompleted.toggle() }
-                } label: {
-                    HStack {
-                        SectionTitle(title: "Completed today", systemImage: "checkmark.circle.fill", count: done.count, tint: Theme.success)
-                        Image(systemName: showCompleted ? "chevron.up" : "chevron.down").foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-                if showCompleted {
-                    ForEach(done) { task in TaskRowView(task: task, showQuadrant: false) }
-                }
-            }
-            .card()
-        }
     }
 }
 
@@ -399,26 +345,7 @@ struct StatPill: View {
     }
 }
 
-/// "4 due today" on the header.
-private struct HeroCount: View {
-    let value: Int
-    let label: String
-    var alert = false
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Text("\(value)").font(.subheadline.weight(.bold).monospacedDigit())
-            Text(label).font(.subheadline)
-        }
-        .foregroundStyle(alert ? Theme.heroFill : Theme.heroText)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(alert ? Theme.heroText : Theme.heroTrack, in: Capsule())
-        .accessibilityElement(children: .combine)
-    }
-}
-
-/// A big, quiet tool button on Home.
+/// A compact tool button on Home: icon and name. The subtitle is read out by VoiceOver.
 struct ToolTile: View {
     let id: String
     let title: String
@@ -429,23 +356,21 @@ struct ToolTile: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
                 Image(systemName: systemImage)
-                    .font(.body.weight(.semibold))
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(tint)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 32, height: 32)
                     .background(Theme.tint(tint, 0.16), in: Circle())
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.headline)
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-            .padding(16)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
             .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous).strokeBorder(Theme.stroke))
             .contentShape(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))

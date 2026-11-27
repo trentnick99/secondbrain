@@ -69,9 +69,7 @@ final class SecondBrainUITests: XCTestCase {
     }
 
     func testSeasonPlannerAddsAPrepTask() throws {
-        let card = app.buttons["seasonComingUpCard"].firstMatch
-        XCTAssertTrue(card.waitForExistence(timeout: 5), "Home always shows what's coming up next")
-        card.tap()
+        openMoreTool("Season planner")
         XCTAssertTrue(app.descendants(matching: .any)["fiscalWeekLabel"].waitForExistence(timeout: 5))
         let add = app.buttons.matching(identifier: "seasonAddButton").firstMatch
         XCTAssertTrue(add.waitForExistence(timeout: 5))
@@ -193,12 +191,20 @@ final class SecondBrainUITests: XCTestCase {
         app.buttons["standardSave"].firstMatch.tap()
     }
 
-    func testHomeShowsNotesUnderTopThree() throws {
-        XCTAssertTrue(scrollTo(element(containing: "Weekly huddle")), "A sample note is on Home")
-        let newNote = app.buttons["homeNewNote"].firstMatch
-        XCTAssertTrue(scrollTo(newNote))
-        newNote.tap()
-        XCTAssertTrue(captureField.waitForExistence(timeout: 5), "New note opens Capture")
+    func testHomeShowsPinnedNotes() throws {
+        XCTAssertTrue(scrollTo(element(containing: "Weekly huddle")), "The pinned sample note is on Home")
+        let seeAll = app.buttons["homeNotesSeeAll"].firstMatch
+        XCTAssertTrue(scrollTo(seeAll))
+        seeAll.tap()
+        XCTAssertTrue(app.tabBars.buttons["Notes"].isSelected, "See all opens Notes")
+    }
+
+    func testHomeKeepsToWhatNeedsYouNow() throws {
+        XCTAssertTrue(app.descendants(matching: .any)["homeSummary"].waitForExistence(timeout: 5), "Today's counts are in the header")
+        XCTAssertTrue(scrollTo(app.descendants(matching: .any)["nextUpCard"].firstMatch), "One Next up list")
+        for gone in ["Upcoming reminders", "Completed today", "Associate follow-ups", "Recurring responsibilities"] {
+            XCTAssertFalse(element(containing: gone).exists, "\(gone) isn't on Home any more")
+        }
     }
 
     func testDeepLinkOpensEvenWhenASheetIsOpen() throws {

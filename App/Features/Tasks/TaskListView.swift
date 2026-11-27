@@ -161,7 +161,7 @@ struct TaskListView: View {
             return false
         case .myArea:
             guard t.isOpen, t.status != .inbox, let role = AppSettings.userRole else { return false }
-            return MyAreaCard.belongs(t, to: role)
+            return MyArea.belongs(t, to: role)
         case .upcoming:
             guard t.isOpen, let due = t.dueDate else { return false }
             return due >= endOfToday

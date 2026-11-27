@@ -181,78 +181,8 @@ struct RoutinesView: View {
     }
 }
 
-/// Home: invites people to pick their role until they do (or dismiss it).
-struct RolePromptCard: View {
-    @Environment(AppRouter.self) private var router
-    @AppStorage(SettingsKey.dismissedRolePrompt, store: AppGroup.defaults) private var dismissed = false
-
-    var body: some View {
-        if !dismissed {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "person.badge.key")
-                    .font(.title3)
-                    .foregroundStyle(Theme.purple)
-                    .frame(width: 40, height: 40)
-                    .background(Theme.tint(Theme.purple, 0.18), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Tailor it to your role").font(.headline)
-                    Text("Pick Food coach, Stocking coach or another role to get suggested routines, a “My area” view and sorted market notes.")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                    HStack {
-                        Button("Choose role") { router.open(.role) }
-                            .buttonStyle(.borderedProminent)
-                            .accessibilityIdentifier("chooseRoleButton")
-                        Button("Not now") { dismissed = true }
-                            .buttonStyle(.bordered)
-                    }
-                    .padding(.top, 2)
-                }
-            }
-            .card(tint: Theme.purple)
-        }
-    }
-}
-
-/// Home: open tasks for the person's areas, plus store-wide items.
-struct MyAreaCard: View {
-    @Environment(AppRouter.self) private var router
-    let role: UserRole
-    let tasks: [TaskItem]
-
-    var body: some View {
-        let mine = tasks.filter { $0.isOpen && $0.status != .inbox && Self.belongs($0, to: role) }
-            .sorted { ($0.quadrant.sortIndex, $0.dueDate ?? .distantFuture) < ($1.quadrant.sortIndex, $1.dueDate ?? .distantFuture) }
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                SectionTitle(title: "My area · \(role.areasSummary)", systemImage: "person.crop.square", count: mine.isEmpty ? nil : mine.count, tint: Theme.purple)
-                if mine.count > 4 {
-                    Button("See all") {
-                        router.taskFilterRequest = .myArea
-                        router.open(.tab(.tasks))
-                    }
-                    .font(.subheadline.weight(.semibold))
-                }
-            }
-            if mine.isEmpty {
-                Text("Nothing open for \(role.areasSummary) or the total store. Import market notes or add suggested routines to fill this in.")
-                    .font(.subheadline).foregroundStyle(.secondary)
-            }
-            ForEach(mine.prefix(4)) { task in
-                Button { router.open(.task(task.id)) } label: { TaskRowView(task: task) }
-                    .buttonStyle(.plain)
-                    .contextMenu { TaskQuickMenu(task: task) }
-            }
-            HStack(spacing: 16) {
-                Button { router.open(.importNotes(nil)) } label: { Label("Import notes", systemImage: "square.and.arrow.down") }
-                Button { router.open(.routines) } label: { Label("Routines", systemImage: "repeat") }
-            }
-            .font(.footnote.weight(.semibold))
-            .padding(.top, 2)
-        }
-        .card()
-    }
-
-    /// Tasks filed under one of the person's areas, or store-wide.
+/// Which tasks count as "My area" in Tasks: your areas, plus store-wide items.
+enum MyArea {
     static func belongs(_ task: TaskItem, to role: UserRole) -> Bool {
         task.department == StoreAreas.totalStore || role.covers(task.department)
     }

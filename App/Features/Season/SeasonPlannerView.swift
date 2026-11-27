@@ -231,7 +231,7 @@ private struct MomentRow: View {
     }
 }
 
-/// Shows the person's areas plus store-wide items (no areas listed) in the Season Planner and on Home.
+/// Shows the person's areas plus store-wide items (no areas listed) in the Season Planner.
 enum SeasonFilter {
     static func canFilter(_ role: UserRole?) -> Bool {
         guard let role else { return false }
@@ -241,75 +241,6 @@ enum SeasonFilter {
     static func isRelevant(_ moment: RetailMoment, to role: UserRole?) -> Bool {
         guard let role, canFilter(role) else { return true }
         return moment.areas.isEmpty || moment.areas.contains(where: role.covers)
-    }
-}
-
-/// Home card: what's coming up in the next three weeks, with prep still to add.
-struct SeasonComingUpCard: View {
-    @Environment(AppRouter.self) private var router
-    @AppStorage(SettingsKey.seasonAdded, store: AppGroup.defaults) private var addedRaw = ""
-    @AppStorage(SettingsKey.seasonHidden, store: AppGroup.defaults) private var hiddenRaw = ""
-    @AppStorage(SettingsKey.customSeasonEvents, store: AppGroup.defaults) private var eventsJSON = ""
-    let now: Date
-
-    var body: some View {
-        let calendar = Calendar.current
-        let added = SeasonPlanStore.keys(addedRaw)
-        let hidden = SeasonPlanStore.keys(hiddenRaw)
-        // The next three weeks — or, in a quiet stretch, just the next thing coming.
-        let role = AppSettings.userRole
-        let mine: (RetailMoment) -> Bool = { m in
-            !hidden.contains(m.key) && (!AppGroup.defaults.bool(forKey: SettingsKey.seasonMyAreasOnly, default: SettingsDefault.seasonMyAreasOnly)
-                                        || SeasonFilter.isRelevant(m, to: role))
-        }
-        let storeEvents = StoreEventStorage.decode(eventsJSON)
-        let soon = RetailCalendar.upcoming(from: now, days: 21, calendar: calendar, including: storeEvents).filter(mine)
-        let moments = soon.isEmpty
-            ? Array(RetailCalendar.upcoming(from: now, days: 120, calendar: calendar, including: storeEvents).filter(mine).prefix(1))
-            : Array(soon.prefix(3))
-        if !moments.isEmpty {
-            Button { router.open(.seasonPlanner) } label: {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        SectionTitle(title: "Coming up", systemImage: "leaf.arrow.triangle.circlepath", tint: Theme.purple)
-                        Spacer()
-                        Text(RetailCalendar.fiscalWeekLabel(for: now, calendar: calendar))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                    ForEach(moments) { moment in
-                        let toAdd = moment.prep.filter { !added.contains($0.key) }.count
-                        HStack(alignment: .firstTextBaseline, spacing: 10) {
-                            Image(systemName: moment.kind.systemImage)
-                                .foregroundStyle(moment.kind == .safety ? Theme.warning : Theme.purple)
-                                .frame(width: 20)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(moment.title).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
-                                Text(detail(moment, toAdd: toAdd, calendar: calendar))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                        }
-                    }
-                    Text("Open Season Planner").font(.footnote.weight(.semibold)).foregroundStyle(Theme.purple)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .card(tint: Theme.purple)
-            .accessibilityIdentifier("seasonComingUpCard")
-        }
-    }
-
-    private func detail(_ moment: RetailMoment, toAdd: Int, calendar: Calendar) -> String {
-        let when = RelativeDateText.dayLabel(for: moment.start, now: now, calendar: calendar)
-        switch toAdd {
-        case 0: return moment.prep.isEmpty ? when : "\(when) · prep added"
-        case 1: return "\(when) · 1 prep step to add"
-        default: return "\(when) · \(toAdd) prep steps to add"
-        }
     }
 }
 

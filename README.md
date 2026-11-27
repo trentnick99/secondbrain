@@ -24,7 +24,7 @@ You'll find the full walkthrough in [Docs/INSTALL.md](Docs/INSTALL.md) and the s
 | Area | Highlights |
 |---|---|
 | **Your store** | Knows coach and team lead roles, the store manager, and areas like AP, ACC and OPD. "Have Jordan work the truck" hands a task to a team lead, and it stays Waiting until they confirm. A weekly 7–5 / 10–8 / 12–10 schedule drives "end of shift", briefings and End My Shift. |
-| **Home** | Calm and roomy: a header with today's progress and End My Shift, four big tools (Capture, Floor walk, Huddle, More tools), today's top 3, your pinned and recent notes, then overdue, Do First, follow-ups, due today and reminders. The greeting and date stay current through the shift. |
+| **Home** | About one screen: a header with today's counts and End My Shift, one status line when it applies, four tools (Capture, Floor walk, Huddle, More tools), today's top 3, the next five things due, and pinned notes. The greeting and date stay current through the shift. |
 | **Standards** | A reference library of lists, not a question answerer: food safety temperatures with their public sources, product quality checks, step lists for store processes (freezer door, frozen truck, spills…), and your own temperature lists, quality standards and processes. Record a reading against any line of your own lists and see if it's within the standard; a miss can become a task. Share any list as text. Search filters the lists. Works offline. |
 | **Huddle** | A 5-minute huddle from today: a seasonal safety message, yesterday's wins, the top three with owners, and shout-outs. Share it or save it. |
 | **Shift timeline** | Your shift hour by hour, from an editable plan plus tasks with a time. Home shows "Now", with optional nudges at each block. |

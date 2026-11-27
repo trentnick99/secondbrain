@@ -42,7 +42,6 @@ struct SettingsView: View {
     @State private var confirmDeleteAllAgain = false
     @State private var showRecurring = false
     @AppStorage(SettingsKey.userRole, store: AppGroup.defaults) private var roleJSON = ""
-    @AppStorage(SettingsKey.showSeasonOnHome, store: AppGroup.defaults) private var showSeasonOnHome = SettingsDefault.showSeasonOnHome
     @State private var calendarService = CalendarService.shared
 
     var body: some View {
@@ -234,12 +233,11 @@ struct SettingsView: View {
             Picker("Appearance", selection: $appearance) {
                 ForEach(AppearanceMode.allCases) { Text($0.title).tag($0.rawValue) }
             }
-            Toggle("Show “Coming up” on Home", isOn: $showSeasonOnHome)
             Toggle(isOn: $shiftLiveActivity) {
                 Label("Shift on Lock Screen", systemImage: "lock.rectangle.on.rectangle")
             }
         } header: {
-            Text("Home and Lock Screen")
+            Text("Display")
         } footer: {
             Text("Standards, the Huddle, the Season planner, Store terms and other tools are in More tools on Home.")
         }

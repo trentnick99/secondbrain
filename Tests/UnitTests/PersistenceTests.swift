@@ -81,7 +81,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(Set(tasks.map(\.department)), ["Total Store", "Food"])
         XCTAssertNotNil(tasks.first { $0.department == "Total Store" }?.dueDate)
         XCTAssertNil(tasks.first { $0.department == "Food" }?.dueDate, "No date is invented")
-        XCTAssertTrue(MyAreaCard.belongs(tasks[0], to: UserRole(role: .coach, areas: ["Food"])))
+        XCTAssertTrue(MyArea.belongs(tasks[0], to: UserRole(role: .coach, areas: ["Food"])))
     }
 
     // MARK: Season Planner

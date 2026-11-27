@@ -4,7 +4,7 @@
 
 | Step | What you do | What happens |
 |---|---|---|
-| 1. Open the app | Tap the icon at the start of your shift | **Home** shows a greeting, today's counts and progress, four big tools, today's top 3 (or suggestions), your notes, overdue items, Do First, follow-ups, due today and upcoming reminders |
+| 1. Open the app | Tap the icon at the start of your shift | **Home** shows a greeting, one line of today's counts, End My Shift, four tools, today's top 3 (or suggestions), the next five things due, and your pinned notes |
 | 2. Capture a task | Tap **Capture** on Home (or **+** on Tasks and Notes) and say or type "Make sure dairy is cleaned up before Friday" | The preview shows *Task · Dairy · Due Thu · Q2 Schedule (“before Friday” → due Thu)*. Tap **Save**. |
 | 3. Assign a quadrant | Open **Matrix** and drag the task onto Q1, or long-press › Move to Quadrant | The quadrant is saved as a manual choice and recorded in the task's history |
 | 4. Record an associate request | **Capture** then "Sarah needs help understanding her schedule. Talk to her tomorrow." | Becomes a **Follow-up** for Sarah, due tomorrow, with the request recorded. Because Sarah is new, the preview asks you to confirm before adding her. |
@@ -51,14 +51,14 @@ Teams and groups (Stock 1–3, CAP 1–3, "the overnight team", "my TLs", "the s
 
 **Store Terms reference.** Open **More tools › Store terms** on Home to search about 500 terms, acronyms and slang. They're grouped into 15 categories, including stocking, OPD, Front End, Fresh, metrics, safety and AP, equipment, scheduling, layout and department numbers. Each term is tagged when it's an **older term**, **informal** or **varies by store**. A list shows words with more than one meaning, such as MOD, BOB, DA and Pick Walk. A task's page explains any acronyms in it under **Terms**, and Siri answers "Look up a store term in Coach Spark". The list is compiled from public employee sources and isn't official, so confirm anything that matters locally.
 
-**Season Planner.** Open it from **More tools › Season planner**, or tap **Coming up** on Home, which shows the next three weeks along with the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
+**Season Planner.** Open it from **More tools › Season planner**. The top shows the Walmart fiscal week, such as "FY27 · Week 43". It covers the next 12 months:
 - **Holidays**, worked out by the calendar: Valentine's Day, Easter, Mother's Day, Memorial Day, Father's Day, July 4th, Labor Day, Halloween, Thanksgiving, Black Friday, Cyber Monday, Christmas Eve, Christmas, New Year's Eve and New Year's Day.
 - **Announced sales events:** Walmart Deals (June 22–28, 2026), Early Black Friday Deals (Nov 12–15), Black Friday Deals (Nov 23–29; in stores from Nov 27 at 6 AM) and Cyber Monday Deals (Nov 30–Dec 2). Events for later years are added once Walmart announces them. Dates are never guessed.
 - **Typical seasonal timing**, labeled "confirm locally": Lawn & Garden, back-to-school, the Halloween set just after Labor Day, the holiday conversion after Halloween, and post-holiday clearance.
 - **Operations and safety:** the new fiscal year (Saturday of the week containing Feb 1), the two clock changes (overnight shifts run an hour shorter or longer), holiday staffing, summer heat, hurricane season and winter weather.
-- **Your store's events:** add your own, such as a remodel, an inventory count or a market visit, with a date, an optional end date, a note and your own prep steps, each set a number of days before. They're marked "Added by you", appear on the Home "Coming up" card, and are included in backups. Coach Spark never adds or guesses one for you.
+- **Your store's events:** add your own, such as a remodel, an inventory count or a market visit, with a date, an optional end date, a note and your own prep steps, each set a number of days before. They're marked "Added by you" and are included in backups. Coach Spark never adds or guesses one for you.
 
-Each item has prep steps, such as "Black Friday safety walk: aisles clear, PLE parked, crowd plan". Tap **Add** to make one a task, or **Add all** and confirm. Due dates move back to your last scheduled workday before the event, and reminders follow your shift start. Swipe an item to hide it if it doesn't apply to your store. You can turn the Home card off in Settings › Home and Lock Screen.
+Each item has prep steps, such as "Black Friday safety walk: aisles clear, PLE parked, crowd plan". Tap **Add** to make one a task, or **Add all** and confirm. Due dates move back to your last scheduled workday before the event, and reminders follow your shift start. Swipe an item to hide it if it doesn't apply to your store.
 
 Quick Capture also understands holidays after "by", "before", "on", "until" or "ahead of": "by Black Friday" or "before Thanksgiving". A bare name like "the Halloween set" or "Christmas trees" is never treated as a date.
 
@@ -87,9 +87,9 @@ Quick Capture sends Vizio and onn. to Electronics, and treats digital shelf labe
 ## Your role and imported notes
 
 **Your role.** In Settings › Your role (also part of the welcome steps), pick **Coach**, **Team Lead** or **Store Manager**, your main area (for example Food), and any other areas you also cover. Other areas are hidden by default, and you can change this at any time. Your role then shapes:
-- **Home:** a **My area** card shows open work for your areas and store-wide items. Store managers see the whole store, so they don't get this card.
+- **Tasks:** the **My area** filter shows open work for your areas and store-wide items. Store managers see the whole store, so they don't get this filter.
 - **Tasks:** a **My area** filter.
-- **Season Planner:** a toggle shows only your areas plus store-wide items. It's on by default and also applies to the Home "Coming up" card.
+- **Season Planner:** a toggle shows only your areas plus store-wide items. It's on by default.
 - **Suggested routines:** a starter list of common routines for your role and area, such as a Saturday numbers review for coaches or a truck plan for Stocking. Add one, or **Add all** after confirming. They become ordinary recurring tasks you can edit, pause or stop. They're suggestions only, so follow your store's actual schedule.
 
 **Scan, photo and walk notes.** Import also takes a **Scan** of a printed or handwritten page (on an iPhone with a camera) or a **Photo** of notes or a whiteboard. The text is read on your iPhone, and photos aren't saved. **Speak walk notes** (also **Walk notes** on Home) lets you talk as you walk the floor, like "Aisle 12 has holes. Dairy cooler door is leaking." Each sentence becomes an item, and walk notes keep every area you mention.
@@ -104,14 +104,18 @@ Copy and paste only content you're allowed to keep on a personal device. If your
 
 ## Home
 
-Home is laid out calm and roomy, in the order a shift runs:
+Home shows only what needs you right now, so it fits on about one screen:
 
-- **Header:** a greeting ("Good morning"), the date, your shift and fiscal week, how many items are due today, overdue and waiting as follow-ups, a progress bar, and **End My Shift**. Home keeps its clock current: it refreshes every minute, when you come back to the app, and at midnight.
+- **Header:** a greeting ("Good morning"), the date, your shift and fiscal week, one line of counts ("4 due · **3 overdue** · 1 follow-up · 1 of 8 done"), and **End My Shift**. Home keeps its clock current: it refreshes every minute, when you come back to the app, and at midnight.
+- **One status line**, only when it applies: severe weather, **Off duty**, or **Now: [block] · until [time]** from your shift plan.
 - **Toolbar:** the planner on the left and Settings on the right.
-- **Four big tools:** **Capture**, **Floor walk**, **Huddle** and **More tools**. More tools holds everything else: Task, Follow-up, Note, Reminder, Standards, Shift timeline, Walk notes, Import notes, Team lead lists, Planner, Season planner, Weekly review and Store terms.
-- **Today's top 3**, then **Notes:** your pinned notes first, then your most recent, up to four. Tap one to open it, **New note** to write one, or **See all** for the Notes tab.
-- Then overdue items, Do First, follow-ups, due today, reminders and what's coming up.
+- **Four tools:** **Capture**, **Floor walk**, **Huddle** and **More tools**. More tools holds everything else: Task, Follow-up, Note, Reminder, Standards, Shift timeline, Walk notes, Import notes, Team lead lists, Planner, Season planner, Weekly review and Store terms.
+- **Today's top 3** (or suggestions).
+- **Next up:** the next five things that need you, overdue first, then Do first, follow-ups and the rest due today, without repeating your top 3. **See all** opens Tasks › Today, and **To sort** opens the Inbox when it has items.
+- **Pinned notes**, up to three, when you've pinned any. **See all** opens Notes.
 - At large text sizes, the tools stack in one column.
+
+Everything else has a home of its own: reminders and later tasks are in **Tasks › Upcoming**, your area's work in **Tasks › My area**, the week in the **planner**, finished work in **Tasks › Completed**, and season events in the **Season planner**.
 
 ## Standards
 
@@ -286,6 +290,6 @@ Turn it on in Settings › Calendar. Events then appear in the daily planner and
 
 There's an optional Face ID or passcode lock, plus a privacy blur in the app switcher when the lock is on. App Lock covers the app itself; widgets, the Watch, the Lock Screen shift card and automatic backups in the Files app aren't locked. You can hide notification previews. Data is stored with iOS data protection, and you can export or restore it. There are no accounts, no analytics, no employer systems and no credentials.
 
-**Settings** holds only settings: your schedule, notifications, privacy, suggestions, calendar, your store (role, severe weather alerts, recurring tasks), Home and Lock Screen, data, and about. Tools are in **More tools** on Home.
+**Settings** holds only settings: your schedule, notifications, privacy, suggestions, calendar, your store (role, severe weather alerts, recurring tasks), display, data, and about. Tools are in **More tools** on Home.
 
 **Backups and deleting.** Backups include your tasks, notes, associates, Standards lists and check-offs, Season planner events, schedule, role and settings. Restoring adds what's missing, updates records that are newer in the backup, and never deletes anything. Lists, season events and settings already on the phone are kept as they are. **Delete all data** removes all of that plus every automatic backup on the iPhone; notification and appearance settings stay.

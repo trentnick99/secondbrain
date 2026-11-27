@@ -100,7 +100,6 @@ enum UserContent {
         SettingsKey.calendarEnabled: .fillIfMissing,
         SettingsKey.autoBackup: .fillIfMissing,
         SettingsKey.appearance: .fillIfMissing,
-        SettingsKey.showSeasonOnHome: .fillIfMissing,
         SettingsKey.seasonMyAreasOnly: .fillIfMissing,
         SettingsKey.weatherAlertsEnabled: .fillIfMissing,
         SettingsKey.shiftLiveActivity: .fillIfMissing,
