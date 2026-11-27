@@ -145,7 +145,15 @@ struct DashboardView: View {
         if let shift = schedule.shift(on: now, calendar: cal) { return "Shift \(shift.shortLabel)" }
         let next = schedule.nextWorkday(after: now, calendar: cal)
         let label = schedule.shift(on: next, calendar: cal)?.shortLabel ?? ""
-        return "Off today · next shift \(RelativeDateText.dayLabel(for: next, now: now, calendar: cal)) \(label)"
+        var day = RelativeDateText.dayLabel(for: next, now: now, calendar: cal)
+        if day == "Tomorrow" { day = "tomorrow" }
+        return "Off today · next shift " + Self.keepTogether("\(day) \(label)")
+    }
+
+    /// Stops a line break inside "tomorrow 7–5": non-breaking space, and a word joiner around the dash.
+    private static func keepTogether(_ text: String) -> String {
+        text.replacingOccurrences(of: " ", with: "\u{00A0}")
+            .replacingOccurrences(of: "–", with: "\u{2060}–\u{2060}")
     }
 
     /// Four tools in a compact 2×2 grid (one column at accessibility text sizes). Everything else is
